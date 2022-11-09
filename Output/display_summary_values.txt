@@ -1,0 +1,219 @@
+------------------------------
+
+**TALLY of which displays have multiple males, females present, and/or copulations**
+
+# A tibble: 4 × 2
+  DisplayType     n
+  <fct>       <int>
+1 SOL           186
+2 MUL            12
+3 AUD            97
+4 COP            14
+
+
+------------------------------
+
+------------------------------
+
+**DISPLAY LENGTH summary**
+
+# A tibble: 4 × 5
+  DisplayType  Mean   Min   Max    SD
+  <fct>       <dbl> <int> <int> <dbl>
+1 SOL          34.9    20   124  16.8
+2 MUL         191.     50   522 134. 
+3 AUD         101.     19   365  70.6
+4 COP          62.4    35    79  15.7
+
+
+------------------------------
+
+             Df Sum Sq Mean Sq F value Pr(>F)    
+DisplayType   3 486332  162111   67.53 <2e-16 ***
+Residuals   305 732119    2400                   
+---
+Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1
+  Tukey multiple comparisons of means
+    95% family-wise confidence level
+
+Fit: aov(formula = DisplayLength ~ DisplayType, data = data_analyzed)
+
+$DisplayType
+              diff         lwr        upr     p adj
+MUL-SOL  155.89785  118.202066 193.593633 0.0000000
+AUD-SOL   66.55936   50.708307  82.410416 0.0000000
+COP-SOL   27.49309   -7.582244  62.568419 0.1811067
+AUD-MUL  -89.33849 -128.068179 -50.608797 0.0000000
+COP-MUL -128.40476 -178.194438 -78.615085 0.0000000
+COP-AUD  -39.06627  -75.250466  -2.882082 0.0285915
+
+------------------------------
+
+**DISPLAY UNIQUE ELEMENTS summary**
+
+# A tibble: 4 × 5
+  DisplayType  Mean   Min   Max    SD
+  <fct>       <dbl> <dbl> <dbl> <dbl>
+1 SOL          6.80     4    10 0.905
+2 MUL         10.4      7    12 1.38 
+3 AUD          5.86     4     8 0.935
+4 COP          3.36     2     5 0.929
+
+
+------------------------------
+
+             Df Sum Sq Mean Sq F value Pr(>F)    
+DisplayType   3  379.5  126.49   144.1 <2e-16 ***
+Residuals   305  267.8    0.88                   
+---
+Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1
+  Tukey multiple comparisons of means
+    95% family-wise confidence level
+
+Fit: aov(formula = UniqueDisplayElements ~ DisplayType, data = data_analyzed)
+
+$DisplayType
+              diff       lwr        upr p adj
+MUL-SOL  3.6155914  2.894705  4.3364779     0
+AUD-SOL -0.9454052 -1.248538 -0.6422728     0
+COP-SOL -3.4439324 -4.114706 -2.7731589     0
+AUD-MUL -4.5609966 -5.301655 -3.8203378     0
+COP-MUL -7.0595238 -8.011691 -6.1073561     0
+COP-AUD -2.4985272 -3.190506 -1.8065481     0
+
+------------------------------
+
+**DISPLAY UNIQUE ELEMENTS-TO-LENGTH RATIO summary**
+
+# A tibble: 4 × 5
+  DisplayType   Mean    Min   Max     SD
+  <fct>        <dbl>  <dbl> <dbl>  <dbl>
+1 SOL         0.220  0.0693 0.35  0.0656
+2 MUL         0.0768 0.0192 0.18  0.0433
+3 AUD         0.0849 0.0142 0.316 0.0566
+4 COP         0.0569 0.0303 0.103 0.0206
+
+
+------------------------------
+
+             Df Sum Sq Mean Sq F value Pr(>F)    
+DisplayType   3   1.45  0.4832   130.4 <2e-16 ***
+Residuals   305   1.13  0.0037                   
+---
+Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1
+  Tukey multiple comparisons of means
+    95% family-wise confidence level
+
+Fit: aov(formula = UniqueElementRatio ~ DisplayType, data = data_analyzed)
+
+$DisplayType
+                diff         lwr         upr     p adj
+MUL-SOL -0.143579095 -0.19041271 -0.09674548 0.0000000
+AUD-SOL -0.135469617 -0.15516312 -0.11577611 0.0000000
+COP-SOL -0.163526876 -0.20710481 -0.11994894 0.0000000
+AUD-MUL  0.008109478 -0.04000867  0.05622763 0.9723306
+COP-MUL -0.019947782 -0.08180696  0.04191140 0.8387331
+COP-AUD -0.028057260 -0.07301285  0.01689834 0.3732217
+
+------------------------------
+
+**DISPLAY ENTROPY summary**
+
+# A tibble: 4 × 5
+  DisplayType  Mean   Min   Max    SD
+  <fct>       <dbl> <dbl> <dbl> <dbl>
+1 SOL         2.37  1.64   2.89 0.240
+2 MUL         2.46  1.68   3.11 0.459
+3 AUD         1.79  0.640  2.57 0.361
+4 COP         0.512 0.113  1.23 0.371
+
+
+------------------------------
+
+             Df Sum Sq Mean Sq F value Pr(>F)    
+DisplayType   3  59.97  19.988   223.9 <2e-16 ***
+Residuals   305  27.22   0.089                   
+---
+Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1
+  Tukey multiple comparisons of means
+    95% family-wise confidence level
+
+Fit: aov(formula = Entropy ~ DisplayType, data = data_analyzed)
+
+$DisplayType
+               diff        lwr        upr    p adj
+MUL-SOL  0.08482132 -0.1450430  0.3146857 0.776009
+AUD-SOL -0.58144062 -0.6780984 -0.4847828 0.000000
+COP-SOL -1.86237682 -2.0762620 -1.6484917 0.000000
+AUD-MUL -0.66626195 -0.9024309 -0.4300929 0.000000
+COP-MUL -1.94719815 -2.2508096 -1.6435867 0.000000
+COP-AUD -1.28093620 -1.5015831 -1.0602893 0.000000
+
+------------------------------
+
+**DISPLAY COMPRESSION RATIO summary**
+
+# A tibble: 4 × 5
+  DisplayType  Mean   Min   Max    SD
+  <fct>       <dbl> <dbl> <dbl> <dbl>
+1 SOL          1.29 0.857  2.38 0.287
+2 MUL          2.26 1.47   4.02 0.701
+3 AUD          2.77 0.88   7.3  1.14 
+4 COP          3.50 1.95   4.71 0.902
+
+
+------------------------------
+
+             Df Sum Sq Mean Sq F value Pr(>F)    
+DisplayType   3  178.9   59.64   116.1 <2e-16 ***
+Residuals   305  156.6    0.51                   
+---
+Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1
+  Tukey multiple comparisons of means
+    95% family-wise confidence level
+
+Fit: aov(formula = CompressionRatio ~ DisplayType, data = data_analyzed)
+
+$DisplayType
+             diff         lwr      upr     p adj
+MUL-SOL 0.9676753  0.41635470 1.518996 0.0000491
+AUD-SOL 1.4733765  1.24154648 1.705206 0.0000000
+COP-SOL 2.2111054  1.69811028 2.724101 0.0000000
+AUD-MUL 0.5057012 -0.06074089 1.072143 0.0988347
+COP-MUL 1.2434301  0.51522995 1.971630 0.0000840
+COP-AUD 0.7377289  0.20851615 1.266942 0.0020856
+
+------------------------------
+
+**DISPLAY LOCAL COMPLEXITY summary (mean across rolling window)**
+
+# A tibble: 4 × 5
+  DisplayType  Mean   Min   Max    SD
+  <fct>       <dbl> <dbl> <dbl> <dbl>
+1 SOL          42.4  34.0  46.2  2.12
+2 MUL          39.2  34.8  41.9  1.92
+3 AUD          32.8  29.3  41.6  2.24
+4 COP          29.1  28.2  32.9  1.35
+
+
+------------------------------
+
+             Df Sum Sq Mean Sq F value Pr(>F)    
+DisplayType   3   7231  2410.2   531.9 <2e-16 ***
+Residuals   305   1382     4.5                   
+---
+Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1
+  Tukey multiple comparisons of means
+    95% family-wise confidence level
+
+Fit: aov(formula = LocalComplexity ~ DisplayType, data = data_analyzed)
+
+$DisplayType
+              diff        lwr        upr   p adj
+MUL-SOL  -3.236137  -4.873996  -1.598278 3.5e-06
+AUD-SOL  -9.595754 -10.284473  -8.907035 0.0e+00
+COP-SOL -13.375220 -14.899222 -11.851218 0.0e+00
+AUD-MUL  -6.359617  -8.042398  -4.676835 0.0e+00
+COP-MUL -10.139083 -12.302415  -7.975752 0.0e+00
+COP-AUD  -3.779466  -5.351648  -2.207285 0.0e+00
+
