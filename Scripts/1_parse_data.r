@@ -19,6 +19,9 @@ data_raw <- read_csv(RAW_DATA_PATH, show_col_types=FALSE) |>
 #		COP bouts have female present, and Cop
 # 7. MUTATE DisplayType column from Character -> Factors
 
+# Which elements are excluded?
+excludedElements <- c("Start", "End", "FOn", "Fff", "OthF")
+
 # A keyed dictionary of behavioral elements
 # e.g., behaviorCodes["Start"] returns "A"
 behaviorCodes <- c("Start" = "A",
@@ -45,6 +48,23 @@ behaviorCodes <- c("Start" = "A",
 				   "Metr" = "V",
 				   "OthC" = "W")
 
+# Custom function to end uncoded behavior strings at cop
+# Returns original string if no Cop element present
+cutAtCop <- function(s, coded=FALSE) {
+	# If the behaviors are coded,
+	#	we're cutting at behaviorCods["Cop"] (should be "U")
+	# If the behaviors are uncoded, 
+	#	we're cutting at "Cop"
+	if (coded) {
+		copElement <- behaviorCodes["Cop"]
+		ret <- strsplit(s, copElement)[[1]][1]
+	} else {
+		copElement <- ";Cop"
+		ret <- strsplit(s, copElement)[[1]][1]
+	}
+	return(ret)
+}
+
 # Custom function to classify displays
 #		SOL bouts have one Male, no female present
 #		MUL bouts have multiple Males, no female present
@@ -66,23 +86,6 @@ getDisplayType <- function(hasMultipleMales, hasFemale, hasCopulation) {
 	return("CHECK")
 } 
 
-# Custom function to end uncoded behavior strings at cop
-# Returns original string if no Cop element present
-cutAtCop <- function(s, coded=FALSE) {
-	# If the behaviors are coded,
-	#	we're cutting at behaviorCods["Cop"] (should be "U")
-	# If the behaviors are uncoded, 
-	#	we're cutting at "Cop"
-	if (coded) {
-		copElement <- behaviorCodes["Cop"]
-		ret <- strsplit(s, copElement)[[1]][1]
-	} else {
-		copElement <- ",Cop"
-		ret <- strsplit(s, copElement)[[1]][1]
-	}
-	return(ret)
-}
-
 
 # ERROR CHECK does your dictionary contain codes for all behaviors?
 missingCodes <- data_raw |>
@@ -91,8 +94,6 @@ if (nrow(missingCodes) > 0) {
 	cat("\n\nERROR in Scripts/1_parse_data.r:\nYour behaviorCode dictionary does not include all behaviors.\n\nQUITTING\n\n")
 	quit(save="no", status=1)
 }
-
-excludedElements <- c("Start", "End", "FOn", "Fff", "OthF")
 
 data_clean <- data_raw |>
 		   filter(!(Behavior %in% excludedElements)) |>
