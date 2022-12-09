@@ -20,14 +20,16 @@ data_raw <- read_csv(RAW_DATA_PATH, show_col_types=FALSE) |>
 # 7. MUTATE DisplayType column from Character -> Factors
 
 # Which elements are excluded?
-excludedElements <- c("Start", "End", "FOn", "Fff", "OthF")
+excludedElements <- c("Start", "End", "FOn", "Fff", "AttC")
 
 # A keyed dictionary of behavioral elements
 # e.g., behaviorCodes["Start"] returns "A"
-behaviorCodes <- c("Start" = "A",
-				   "Zro" = "B",
-				   "SLAD" = "C",
-				   "OthM" = "D",
+behaviorCodes <- c("Start" = "A", 
+                   "Zro" = "B", 
+                   "SLAD" = "C", 
+                   "OthM" = "D",
+                   "OthF" = "D",
+                   "OthC" = "D",
 				   "HdBw" = "E",
 				   "ALAD" = "F",
 				   "HafB" = "G",
@@ -42,11 +44,9 @@ behaviorCodes <- c("Start" = "A",
 				   "Taf" = "P",
 				   "FOn" = "Q",
 				   "Fff" = "R",
-				   "OthF" = "S",
-				   "AttC" = "T",
-				   "Cop" = "U",
-				   "Metr" = "V",
-				   "OthC" = "W")
+				   "AttC" = "S",
+				   "Cop" = "T",
+				   "Metr" = "U")
 
 # Custom function to end uncoded behavior strings at cop
 # Returns original string if no Cop element present
@@ -99,7 +99,8 @@ data_clean <- data_raw |>
 		   filter(!(Behavior %in% excludedElements)) |>
 		   mutate(BehaviorCode = map_chr(Behavior, ~ behaviorCodes[.])) |>
 		   group_by(UID, ObsDate, Log, Male1ID, FemID, Bird2ID) |>
-		   summarize(Display = paste(Behavior, collapse=";"),
+		   summarize(Duration = max(Time) - min(Time),
+                     Display = paste(Behavior, collapse=";"),
 		   		  	 DisplayCode = paste(BehaviorCode, collapse=""),
 		    		 .groups="keep") |>
 		   mutate(hasMultipleMales = grepl("B2AL", Display) |
