@@ -229,3 +229,56 @@ print(summary(model_localComplexity))
 print(tukey_localComplexity)
 sink()
 
+# Jaro string distances
+#
+uids <- data_clean |>
+     filter(Male1ID != 8000) |>
+     pull(UID)
+
+distMat <- matrix(data=NA, nrow=length(uids), ncol=length(uids),
+                  dimnames=list(uids, uids))
+
+for (r in 1:length(uids)) {
+    rID <- uids[r]
+    rD <- data_clean[data_clean$UID==rID,"DisplayCode"][[1]]
+    for (c in 1:length(uids)) {
+        cID <- uids[c]
+        cD <- data_clean[data_clean$UID==cID,"DisplayCode"][[1]]
+        dist <- stringdist(rD, cD, method="jw")
+        distMat[r,c] <- dist
+    }
+}
+
+getDistanceType <- function(d1_m, d1_type, d2_m, d2_type) {
+     distanceType <- "Diff Male / Diff Type"
+     if (d1_m == d2_m) {
+        if (d1_type == d2_type) {
+            distanceType <- "Same Male / Same Type"
+        } else {
+            distanceType <- "Same Male / Diff Type"
+        }
+     } else if (d1_type == d2_type) {
+        distanceType <- "Diff Male / Same Type"
+     }
+     return(distanceType)
+}
+
+distances <- distMat |>
+          as.data.frame() %>%
+          mutate(D1_UID=row.names(.)) |>
+          pivot_longer(cols=-D1_UID, names_to="D2_UID", values_to="Distance") |>
+          mutate(D1_Male1ID = map_chr(D1_UID, ~ data_clean[data_clean$UID==., "Male1ID"][[1]]),
+                 D1_DisplayType = map_chr(D1_UID, ~ data_clean[data_clean$UID==., "DisplayType"][[1]]),
+                 D2_Male1ID = map_chr(D2_UID, ~ data_clean[data_clean$UID==., "Male1ID"][[1]]),
+                 D2_DisplayType = map_chr(D2_UID, ~ data_clean[data_clean$UID==., "DisplayType"][[1]])) |>
+          mutate(DistanceType = pmap_chr(list(D1_Male1ID, D1_DisplayType, D2_Male1ID, D2_DisplayType), getDistanceType)) |>
+          filter(D1_UID != D2_UID)
+
+ggplot(distances) +
+    geom_boxplot(aes(x=DistanceType, y=Distance)) +
+    theme_bw() +
+    ylab("Jaro distance") +
+    theme(panel.grid=element_blank(),
+          axis.title.x=element_blank()) +
+    facet_grid(rows=vars(D1_DisplayType), 
+               cols=vars(D2_DisplayType))

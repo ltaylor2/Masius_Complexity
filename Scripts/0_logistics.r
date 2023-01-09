@@ -2,8 +2,9 @@
 suppressPackageStartupMessages(library(tidyverse))
 suppressPackageStartupMessages(library(lubridate))
 suppressPackageStartupMessages(library(acss))
-library(brotli)
-library(patchwork)
+suppressPackageStartupMessages(library(brotli))
+suppressPackageStartupMessages(library(stringdist))
+suppressPackageStartupMessages(library(patchwork))
 
 # SET ME
 WD <- "C:/Users/ltayl/Documents/Masius_Complexity"
