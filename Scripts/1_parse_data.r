@@ -1,7 +1,54 @@
-#Read data (raw)
-# 1. MUTATE ObsDate to <date> format
-data_raw <- read_csv(RAW_DATA_PATH, show_col_types=FALSE) |>
-		 mutate(ObsDate = lubridate::mdy(ObsDate))
+# Read data (raw)
+# 1. Convert Date column 
+data_raw <- read_csv(RAW_DATA_PATH, 
+                     col_types = c("UID"='c',
+                                   "ObsDate"='c',
+                                   "Log"='c',
+                                   "Observer"='c',
+                                   "Time"='n',
+                                   "Male1ID"='c',
+                                   "FemID"='c',
+                                   "Bird2ID"='c',
+                                   "Bird3ID"='c',
+                                   "FemOnOff"='c',
+                                   "Behavior"='c',
+                                   "MaleOtherBeh1"='c')) |>
+        mutate(ObsDate = mdy(ObsDate))
+
+# A function to specify "Other" behaviors using dataset notes
+specifyOtherBehaviors <- function(behavior, details) {
+    # If it's not an "Other" behavior, 
+    #   return the original behavior
+    if (!(grepl("Other Behavior", behavior))) {
+        return(behavior)
+    }
+
+    # Otherwise, return BirdID Other Behavior <details>
+    #   (if details are specified)
+    if (is.na(details)) {
+        return(paste(behavior, "Unspecified"))
+    }
+    return(paste(behavior, details))
+}
+
+# Source behavior element dictionaries 
+# See Data/dictionary_behaviors.r for details
+source("Data/dictionary_behaviors.r")
+
+# Organize raw data
+# 1. Create col (mutate) Duration (max element time) before cutting any elements 
+# 2. Filter out partial behaviors
+# 3. Filter out movement-only behaviors not used in analyses
+# 4. Replace (mutate) "other" behaviors using dataset notes where applicable 
+# 5. Replace (mutate) original behavioral descriptions with abbreviations 
+# 6. Create col 
+data_clean_long <- data_raw |>
+                group_by(UID) |> mutate(Duration = max(Time)) |> ungroup() |>
+                filter(!(Behavior %in% behaviors_cut_partial)) |>
+                filter(!(Behavior %in% behaviors_cut_movement)) |>
+                mutate(Behavior = map2_chr(Behavior, MaleOtherBeh1, specifyOtherBehaviors)) |>
+                mutate(Behavior = behaviorCodes_original[Behavior])
+
 
 # Produce clean dataset with display element strings
 # These steps to include only male aesthetic displays
