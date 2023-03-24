@@ -1,0 +1,46 @@
+
+# Read in banding dataset
+## Also note : 8200 (suspected females), 8300 (unknown sex), 8400 (suspected pre-def males)
+# [Select] only ID (=Aluminum Band #), Date (=Date Banded), Sex, Age
+# [Mutate] date column into Date object for sorting
+# [Group by] ID
+# [Slice Max] only the latest banding row for each ID, because some birds
+#             were recapped and given updated band combos
+#             in which case we want the most recent sex/age information
+bands <- read_csv("Data/data_banding.csv", show_col_types=FALSE) |>
+      select(Band_ID = "Alum#", Date="Date Banded", Sex, Age) |>
+      mutate(Date = ymd(Date)) |>
+      group_by(Band_ID) |>
+      slice_max(order_by=Date, n=1, with_ties=FALSE)
+      
+# Custom function to categorize display types, 
+#   Input: a UID for a display
+#   Output: a dataframe mapping that UID to the display type
+#           (SOLO, MULT, AUDI, COP)
+# NOTE also does some error checking of original dataset w/r/t band numbers
+# categorizeDisplayType <- function(uid) {
+#     display <- filter(data_raw, UID==uid)
+
+#     # Quick check to confirm there is only one ID for each ID column
+#     maleID <- unique(display$Male1ID)
+#     femID <- unique(display$FemID)
+#     b2ID <- unique(display$Bird2ID)
+#     b3ID <- unique(display$Bird3ID)
+
+#     if (length(maleID) > 1 | length(femID) > 1 | length(b2ID) > 1 | length(b3ID) > 1) { 
+#         cat(paste("\nERROR in Scripts/1_parse_data.r, categorizeDisplayType()\n",
+#                   "Display UID", uid, "has multiple IDs in one of the ID columns"))
+#     }
+
+#     # Now get various data from the display to use in coding the type of display
+#     hasFemOn <- "Female On Log" %in% display$FemOnOff
+#     hasFemAction <- any(grepl("Female", display$Behavior))
+#     hasAttCop <- "Attempted Copulation" %in% display$Behavior
+#     hasCop <- "Copulation" %in% display$Behavior
+#     hasB2Action <- any(grepl("Bird2", display$Behavior))
+
+#     # TEMP data table with relevant info
+#     ret <- tibble(UID=uid, maleID, femID, b2ID, b3ID, hasFemOn, hasFemAction, hasAttCop, hasCop, hasB2Action)
+#     ret[is.na(ret)] <- ""
+#     return(ret)
+# }
