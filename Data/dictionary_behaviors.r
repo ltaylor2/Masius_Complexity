@@ -7,6 +7,7 @@ behaviors_cut_partial <- c("Male1 Half-bow Left",
                            "Male1 TafLF_Off",
                            "Male1 Metronome_Right",
                            "Bird2 TafLF_Off")
+
 # Elements to cut from dataset
 #   Because they represent movement tracking only
 behaviors_cut_movement <- c("Female Looking Away",
@@ -17,8 +18,18 @@ behaviors_cut_movement <- c("Female Looking Away",
                             "Male1 On Log",
                             "Male1 Off Log")
 
-behaviorCodes_original <- c("Start"                               = "Start",
-                            "Male1 On Log No Display"             = "Zro",
+# Elements to cut from dataset because they are used for tracking
+behaviors_cut_tracking <- c("Start", 
+                            "End", 
+                            "Female On Log", 
+                            "Female Off Log")
+
+# Elements to cut from dataset
+#   Because they do not directly constitute dance display behaviors
+behaviors_cut_other <- c("Male1 Other Behavior Vocalization", 
+                         "Male1 Other Behavior Gardening")
+
+behaviorCodes_original <- c("Male1 On Log No Display"             = "Zro",
                             "Male1 ALAD"                          = "ALAD",
                             "Male1 SLAD"                          = "SLAD",
                             "Male1 BowRight"                      = "Bow",
@@ -29,13 +40,9 @@ behaviorCodes_original <- c("Start"                               = "Start",
                             "Male1 NeckTwist"                     = "Neck",
                             "Male1 TafLF_On"                      = "Taf",
                             "Male1 Mixed Element"                 = "Mix",
-                            "Male1 Other Behavior Wing Flash"     = "WiFl",
-                            "Male1 Other Behavior Vocalization"   = "Voc",
-                            "Male1 Other Behavior Gardening"      = "Gard",
+                            "Male1 Other Behavior Wing Flash"     = "Othr",
                             "Male1 Other Behavior Unspecified"    = "Othr",
                             "Male1 Other Behavior Unknown"        = "Othr",
-                            "Female On Log"                       = "FOn",
-                            "Female Off Log"                      = "Fff",
                             "Bird2 On-log NO display"             = "B2Zr",
                             "Bird2 ALAD"                          = "B2AL",
                             "Bird2 SLAD"                          = "B2SL",
@@ -46,30 +53,28 @@ behaviorCodes_original <- c("Start"                               = "Start",
                             "Bird2 TafLF_On"                      = "B2Tf",
                             "Bird2 Mixed Element"                 = "B2Mx",
                             "Attempted Copulation"                = "AttC",
-                            "Copulation"                          = "Cop",
-                            "End"                                 = "End")
+                            "Copulation"                          = "Cop")
 
-behaviorCodes_short <- c("Start" = "A", 
-                         "Zro"   = "B", 
-                         "SLAD"  = "C", 
-                         "OthM"  = "D",
-                         "OthF"  = "D",
-                         "OthC"  = "D",
-				         "HdBw"  = "E",
-				         "ALAD"  = "F",
-				         "HafB"  = "G",
-				         "Bow"   = "H",
-				         "End"   = "I",
-				         "Mix"   = "J",
-				         "Swtc"  = "K",
-				         "Neck"  = "L",
-				         "B2Nk"  = "M",
-				         "B2Bw"  = "N",
-				         "B2AL"  = "O",
-				         "Taf"   = "P",
-				         "FOn"   = "Q",
-				         "Fff"   = "R",
-				         "AttC"  = "S",
-				         "Cop"   = "T",
-				         "Metr"  = "U")
-      
+behaviorCodes_short <- c("Zro"  = "A",
+                         "ALAD" = "B",
+                         "SLAD" = "C",
+                         "Bow"  = "D",
+                         "HafB" = "E",
+                         "HdBw" = "F",
+                         "Metr" = "G",
+                         "Swtc" = "H",
+                         "Neck" = "I",
+                         "Taf"  = "J",
+                         "Mix"  = "K",
+                         "Othr" = "L",
+                         "B2Zr" = "M",
+                         "B2AL" = "N",
+                         "B2SL" = "O",
+                         "B2Bw" = "P",
+                         "B2Hf" = "Q",
+                         "B2Hd" = "R",
+                         "B2Nk" = "S",
+                         "B2Tf" = "T",
+                         "B2Mx" = "U",
+                         "AttC" = "V",
+                         "Cop"  = "W")
