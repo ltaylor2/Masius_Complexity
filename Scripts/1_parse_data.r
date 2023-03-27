@@ -47,6 +47,13 @@ categorizeDisplayType <- function(uid) {
     # Quick check to confirm there is only one ID for each ID column
     maleID <- unique(display$Male1ID)
     femID <- unique(display$FemID)
+    if (is.na(femID)) {
+        femSex <- "NA"
+    } else if (femID >= 8000) {
+        femSex <- "Unknown"
+    } else {
+         femSex <- bands[bands$Band_ID == femID, "Sex"][[1]]
+    }
 
     b2ID <- unique(display$Bird2ID)
 
@@ -69,6 +76,7 @@ categorizeDisplayType <- function(uid) {
     hasFemAction <- any(grepl("Female", display$Behavior))
     hasAttCop <- "Attempted Copulation" %in% display$Behavior
     hasCop <- "Copulation" %in% display$Behavior
+    hasMaleFem <- (femSex == "M")
     hasB2Action <- any(grepl("Bird2", display$Behavior))
     hasMaleB2 <- (b2Sex == "M")
 
@@ -76,13 +84,14 @@ categorizeDisplayType <- function(uid) {
     if (!is.na(femID)) { category <- "AUDI"}
     if (is.na(femID) & (hasFemOn | hasFemAction) ) { category <- "ERROR"}
     if (hasCop) { category <- "COP"}
-    if (hasB2Action | (hasMaleB2)) { category <- "MULT" }
+    if (hasMaleFem | hasB2Action | (hasMaleB2)) { category <- "MULT" }
+
     # TEMP data table with relevant info
     ret <- tibble(UID=uid, Category=category,
                   maleID, femID, b2ID, 
                   hasFemOn, hasFemAction, 
                   hasAttCop, hasCop, 
-                  hasB2Action, hasMaleB2)
+                  hasMaleFem, hasB2Action, hasMaleB2)
     ret[is.na(ret)] <- ""
     return(ret)
 }

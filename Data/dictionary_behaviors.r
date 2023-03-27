@@ -13,13 +13,13 @@ behaviors_cut_movement <- c("Female Looking Away",
                             "FemaleSwitch",       
                             "Female Movement", 
                             "Male1 On Log",
-                            "Male1 Off Log")
+                            "Male1 Off Log",
+                            "Female On Log", 
+                            "Female Off Log")
 
 # Elements to cut from dataset because they are used for tracking
 behaviors_cut_tracking <- c("Start", 
-                            "End", 
-                            "Female On Log", 
-                            "Female Off Log")
+                            "End")
 
 # Elements to cut from dataset
 #   Because they do not directly constitute dance display behaviors
