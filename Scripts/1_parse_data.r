@@ -142,23 +142,6 @@ if (nrow(missingCodes) > 0) {
     quit(save="no", status=1)
 }
 
-# Custom function to end uncoded behavior strings at cop
-# Returns original string if no Cop element present
-cutDisplayAtCop <- function(s, coded=FALSE) {
-	# If the behaviors are coded,
-	#	we're cutting at behaviorCods["Cop"] (should be "U")
-	# If the behaviors are uncoded, 
-	#	we're cutting at "Cop"
-	if (coded) {
-		copElement <- behavior_code["Cop"]
-		ret <- strsplit(s, copElement)[[1]][1]
-	} else {
-		copElement <- ";Cop"
-		ret <- strsplit(s, copElement)[[1]][1]
-	}
-	return(ret)
-}
-
 # Custom function to calculate display duration
 #   NOTE calculated from Raw data, including all cut elements
 #   NOTE cuts duration off at Cop, when relevant
@@ -175,14 +158,35 @@ displayDuration <- function(uid, coded=FALSE) {
     return(duration)
 }
 
+# Organize the final, wide version of the dataset
+#   where each row is a Display String for one display
+# [Group by] UID and all other info cols 
+#            NOTE should still be one UID per row, but we add the extra info
+#                 to check that UID's haven't been duplicated across different displays
+# [Arrange] Element by Time within each UID to put elements in chronological order 
+#           NOTE should be chronological order already, but just making sure! 
+# [Summarize] the DisplayShort col as the collapsed set of elements, semicolon deliminted, across the display
+#             the DisplayCode col as the collapsed set of single-character element for the final string
+# [Separate] After-cop DisplayShort strings for each display (will be NA if no Cop is present in the display)
+# [Separate] After-cop DisplayCode strings for each display (will be NA if no Cop is present)
+# [Mutate] Total duration (s) of display
+#          NOTE duration is calculated from raw data, including untracked elements
+#               but cuts off duration at Cop element, when relevant
+# [Ungroup] To avoid any errors
 data_clean_wide <- data_clean_long |>
 		        group_by(UID, Category, ObsDate, Log, Male1ID, FemID, Bird2ID) |>
+                arrange(UID, Time) |>
 		        summarise(DisplayShort = paste(BehaviorShort, collapse=";"), 
                           DisplayCode = paste(BehaviorCode, collapse=""), 
-                          .groups="keep") |>	        
-                mutate(DisplayShort = map_chr(DisplayShort, ~cutDisplayAtCop(., coded=FALSE)),
-		   		       DisplayCode = map_chr(DisplayCode, ~cutDisplayAtCop(., coded=TRUE))) |>
+                          .groups="keep") |>	
+                separate(DisplayShort, into=c("DisplayShort", "DisplayShort_AfterCop"), 
+                         sep="(?<=;Cop)", 
+                         fill="right", extra="merge") |>
+                separate(DisplayCode, into=c("DisplayCode", "DisplayCode_AfterCop"), 
+                         sep=paste0("(?<=", behavior_code["Cop"], ")"),
+                         fill="right", extra="merge") |>
                 mutate(Duration = map_dbl(UID, displayDuration)) |>
                 ungroup()
 
-write_csv(data_clean_wide, "Data/data_clean.csv")
+# Write clean datasheet for analysis
+write_csv(data_clean_wide, CLEAN_DATA_PATH)

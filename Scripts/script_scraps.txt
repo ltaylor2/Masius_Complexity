@@ -44,3 +44,35 @@ bands <- read_csv("Data/data_banding.csv", show_col_types=FALSE) |>
 #     ret[is.na(ret)] <- ""
 #     return(ret)
 # }
+
+# Custom function to end uncoded behavior strings at cop
+# Returns original string if no Cop element present
+cutDisplayAtCop <- function(s, coded=FALSE) {
+	# If the behaviors are coded,
+	#	we're cutting at behavior_code["Cop"] (should be "U")
+	# If the behaviors are uncoded, 
+	#	we're cutting at "Cop"
+	if (coded) {
+		copElement <- behavior_code["Cop"]
+		ret <- strsplit(s, copElement)[[1]][1]
+	} else {
+		copElement <- ";Cop"
+		ret <- strsplit(s, copElement)[[1]][1]
+	}
+	return(ret)
+}
+
+# Custom function to compute the compression ratio,
+# where the ratio is given as length(s) : length(compressed(s))
+# given brotli compression
+# NOTE default brotli::brotli_compress values of quality=11 (max) and window=22
+brotliCompressionRatio <- function(s) {
+	raw_original <- charToRaw(s)
+	length_original <- length(raw_original)
+
+	raw_compressed <- brotli::brotli_compress(raw_original)
+	length_compressed <- length(raw_compressed)
+
+	compressionRatio <- length_original / length_compressed
+	return(compressionRatio)
+}
