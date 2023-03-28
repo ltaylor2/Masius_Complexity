@@ -6,49 +6,12 @@ countUniqueChars <- function(s) {
 	return(length(unique(strsplit(s, "")[[1]])))
 }
  
-displayTypeFctLevels <- c("SOLO", "AUDI", "COP")
-
-# Custom function to get mean local complexity
-# across a rolling window from acss::local_complexity
-# NOTE includes an error check that no string of length SPAN
-# 		contains more than ALPHABET characters
-# NOTE maximum acss::local_complexity values of alphabet=9 and span=12
-# NOTE excludes NA returns acss::acss(), called through acss::local_complexity
-meanLocalComplexity <- function(s, alphabet, span) {
-	# ERROR CHECK -- do any substrings of length SPAN
-	#	contain more than ALPHABET characters?
-	start <- 1
-	stop <- span
-
-    # If the string is shorter than the window,
-    #   set the window and span to be the length
-    if (span > nchar(s)) { 
-        stop <- nchar(s) 
-        span <- nchar(s)
-    }
-	while (stop<=nchar(s)) {
-		subs <- substr(s, start, stop)
-		ncs <- countUniqueChars(subs)
-		if (ncs > alphabet) {
-			cat("\n\nERROR in Scripts/2_analyze.r (see meanLocalComplexity, acss::local_complexity):\nSome rolling window substrings for computing local complexity contain more than ALPHABET characters\n\nQUITTING\n\n")
-			quit(save="no", status=1)
-		}
-		start <- start+1
-		stop <- stop+1
-	}
-
-	# If we've made it through the error check,
-	#	compute local complexity scores
-	# Returns as a named vector
-	lcs <- local_complexity(s, alphabet=alphabet, span=span)
-	meanLC <- mean(lcs[[1]])
-
-	if (is.na(meanLC)) {
-		cat("\n\nERROR in Scripts/2_analyze.r (see meanLocalComplexity, acss::local_complexity):\nSome rolling window substrings for computing local complexity are returning NA values\n\nQUITTING\n\n")
-		quit(save="no", status=1)
-	}
-
-	return(meanLC)
+# Custom function to Brotli compress
+compress <- function(raw) {
+    maxWindow <- 22
+    if (length(raw) < maxWindow) { maxWindow <- length(raw) }
+    compressed <- brotli::brotli_compress(raw, quality=11, window=maxWindow)
+    return(compressed)
 }
 
 # NOTE takes a few minutes because of call to acss::local_complexity()
@@ -65,8 +28,8 @@ meanLocalComplexity <- function(s, alphabet, span) {
 #           Entropy_Scaled (numeric, 0-1) - Scaled entropy value by max entropy, where max is log2(UniqueElements) 
 #           Compression_Length (numeric) - Length of raw compressed display string
 #           Compression_Ratio (numeric, 0-1) - Relative length of raw compressed:uncompressed display string
+# [Mutate] If unscaled entropy is 0, scaled entropy is 0
 data_analyzed <- data_clean |>
-			  mutate(Category = factor(Category, levels=c("SOLO", "AUDI", "COP"))) |>
               mutate(DisplayCode_Raw = map(DisplayCode, charToRaw)) |>
               mutate(DisplayCode_Compressed = map(DisplayCode_Raw, brotli::brotli_compress)) |>
 			  mutate(DisplayLength         = nchar(DisplayCode),
@@ -74,38 +37,94 @@ data_analyzed <- data_clean |>
 			  		 Entropy_Unscaled      = acss::entropy(DisplayCode),
                      Entropy_Scaled        = Entropy_Unscaled / log(UniqueDisplayElements, base=2),
                      Compression_Length    = map_dbl(DisplayCode_Compressed, length),
-                     Compression_Ratio     = map2_dbl(DisplayCode_Raw, DisplayCode_Compressed, ~ length(.y) / length(.x)),
-			  		 LocalComplexity       = map_dbl(DisplayCode, ~ meanLocalComplexity(., alphabet=9, span=11)))
+                     Compression_Ratio     = map2_dbl(DisplayCode_Raw, DisplayCode_Compressed, ~ length(.x) / length(.y))) |>
+              mutate(Entropy_Scaled = ifelse(Entropy_Unscaled==0, 0, Entropy_Scaled))
 
 # Write analyzed data file
 write_csv(data_analyzed, ANALYZED_DATA_PATH)
 
 # # Custom function to write a summary block
 # # for output text files
-writeSummaryBlock <- function(df, header, append) {
+writeSummaryBlock <- function(df, header, append=TRUE) {
 	sink(SUMMARY_TEXT_OUTPUT_PATH, append=append)
 	cat("------------------------------\n\n")
 	cat(paste0("**",  header, "**\n\n"))
-	print(df)
+	print(df, n=nrow(df))
 	cat("\n\n------------------------------\n\n")
 	sink()
 }
 
-# Tally the number of bouts of different types
-#	(writes new summary output file)
-tally_displayTypes <- data_analyzed |>
-				   group_by(DisplayType) |>
-				   tally()
 
-# # Summarize display length 
-# # 	(appends to summary output file)
-# summary_displayLength <- data_analyzed |>
-# 			          group_by(DisplayType) |>
-# 			          summarize(Mean = mean(DisplayLength),
-# 			          			Min = min(DisplayLength),
-# 			          			Max = max(DisplayLength),
-# 			          			SD = sd(DisplayLength)) |>
-# 			          arrange(DisplayType)
+# Tally display categories 
+data_analyzed |>
+    group_by(Category) |>
+    tally() |>
+    writeSummaryBlock("Categories Tally", append=FALSE)
+
+# Tally the number of logs
+data_analyzed |>
+    group_by(Log) |>
+    tally() |>
+    writeSummaryBlock("Logs Tally")
+
+# Identifiable males
+data_analyzed |>
+    group_by(Male1ID < 8000) |>
+    tally() |>
+    writeSummaryBlock("Identifiable Male Tally")
+
+# Male IDs
+data_analyzed |>
+    group_by(Male1ID) |>
+    tally() |>
+    writeSummaryBlock("Male ID Tally")
+
+# Date tallies
+data_analyzed |>
+    mutate(ObsDate = format(ObsDate, format="%m-%d")) |>
+    group_by(Category, ObsDate) |>
+    tally() |>
+    pivot_wider(names_from=Category, values_from=n) |>
+    arrange(ObsDate) |>
+    writeSummaryBlock("Date Tally")
+
+# Month tally
+data_analyzed |>
+    group_by(month(ObsDate)) |>
+    tally() |>
+    writeSummaryBlock("Month Tally")
+
+# Category tally
+data_analyzed |>
+    group_by(Category) |>
+    tally() |>
+    writeSummaryBlock("Category Tally")
+
+# Category tally
+data_analyzed |>
+    group_by(Category) |>
+    tally() |>
+    writeSummaryBlock("Category Tally")
+
+# Female Identified Tally
+data_analyzed |>
+    group_by(FemID < 8000, Category) |>
+    tally() |>
+    writeSummaryBlock("Female Identified Tally")
+
+# Female AUDI Attendance Tally
+data_analyzed |>
+    filter(Category == "AUDI") |>
+    group_by(FemID) |>
+    tally() |>
+    writeSummaryBlock("Female AUDI Attendance Tally")
+
+# Female COP Attendance Tally
+data_analyzed |>
+    filter(Category == "COP") |>
+    group_by(FemID) |>
+    tally() |>
+    writeSummaryBlock("Female COP Attendance Tally")
 
 # writeSummaryBlock(summary_displayLength,
 # 				  "DISPLAY LENGTH summary",
@@ -117,8 +136,8 @@ tally_displayTypes <- data_analyzed |>
 # print(tukey_displayLength)
 # sink()
 
-# # Summarize unique display elements
-# # 	(appends to summary output file)
+# # # Summarize unique display elements
+# # # 	(appends to summary output file)
 # summary_displayElements <- data_analyzed |>
 # 			            group_by(DisplayType) |>
 # 			            summarize(Mean = mean(UniqueDisplayElements),

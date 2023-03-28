@@ -182,6 +182,8 @@ displayDuration <- function(uid, coded=FALSE) {
 #          NOTE duration is calculated from raw data, including untracked elements
 #               but cuts off duration at Cop element, when relevant
 # [Ungroup] To avoid any errors
+# [Filter] out displays <60s
+# [Filter] out displays that are missing ALAD or Bows
 data_clean_wide <- data_clean_long |>
 		        group_by(UID, Category, ObsDate, Log, Male1ID, FemID, Bird2ID) |>
                 arrange(UID, Time) |>
@@ -195,7 +197,9 @@ data_clean_wide <- data_clean_long |>
                          sep=paste0("(?<=", behavior_code["Cop"], ")"),
                          fill="right", extra="merge") |>
                 mutate(Duration = map_dbl(UID, displayDuration)) |>
-                ungroup()
+                ungroup() |>
+                filter(Duration >= 60) |>
+                filter(grepl("ALAD", DisplayShort) & grepl("Bow", DisplayShort))
 
 # Write clean datasheet for analysis
 write_csv(data_clean_wide, CLEAN_DATA_PATH)

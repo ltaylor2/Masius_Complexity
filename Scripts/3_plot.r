@@ -1,135 +1,149 @@
 # Custom plotting theme
 customTheme <- theme_bw() +
-			theme(panel.grid=element_blank(),
-				  axis.text.x=element_text(size=6),
-				  axis.text.y=element_text(size=6),
-				  axis.title.x=element_text(size=9),
-				  axis.title.y=element_text(size=9),
-				  plot.title=element_text(size=9))
-			
+            theme(panel.grid=element_blank(),
+                  axis.text.x=element_text(size=6),
+                  axis.text.y=element_text(size=6),
+                  axis.title.x=element_text(size=9),
+                  axis.title.y=element_text(size=9),
+                  plot.title=element_text(size=9))
+            
 # 4-Class qualitative colors, colorblind safe
 # from colorbrewer2.org
-customDisplayTypeColors <- c("SOL" = "#a6cee3",
-							 "MUL" = "#1f78b4",
-							 "AUD" = "#b2df8a",
-							 "COP" = "#33a02c")
+categoryColors <- c("SOLO" = "#a6cee3",
+                    "AUDI" = "#b2df8a",
+                    "COP" = "#2c4a11")
 
-# Read in DATA
-# TODO TODO TODO TODO TODO 
-# *********TEMPORARY*********
-# Right now we have 3 "CHECK" displays -- 
-#	displays that appear to have multiple males and a female present
-#	confirm how to code these
-# 1. Factor display types to maintain order on plots
-displayTypeFctLevels <- c("SOL", "MUL", "AUD", "COP", "CHECK")
-data_analyzed <- read_csv(ANALYZED_DATA_PATH, show_col_types=FALSE) |>
-			  filter(DisplayType != "CHECK") |>
-			  mutate(DisplayType = factor(DisplayType, levels=displayTypeFctLevels))
+# Read in analyzed data
+data_analyzed <- read_csv(ANALYZED_DATA_PATH, show_col_types=FALSE)
 
-# PLOT (boxplot) of display length
-plot_displayLength <- ggplot(data_analyzed) +
-				   geom_jitter(aes(x=DisplayType, y=DisplayLength),
-				   		 	   colour="black",
-				   			   width=0.15, height=0) +
-				   geom_boxplot(aes(x=DisplayType, y=DisplayLength,
-				   				 fill=DisplayType),
-				   			    colour="black",
-				   			    alpha=0.5) +
-				   scale_fill_manual(values=customDisplayTypeColors) +
-				   guides(fill="none") +
-				   xlab("Display type") +
-				   ggtitle("Display length (elements)") +
-				   customTheme +
-				   theme(axis.title.x=element_blank(),
-				   		 axis.title.y=element_blank())
+# FIGURE 1 ------------------------------------------------------
+# Boxplot of Duration
+plot_duration <- ggplot(data_analyzed, aes(x=Category, y=Duration, fill=Category)) +
+              geom_jitter(width=0.15, height=0,
+                          colour="black", size=0.5) +
+                   geom_boxplot(alpha=0.5, outlier.shape=NA) +
+              scale_x_discrete(limits=c("SOLO", "AUDI", "COP")) +
+              scale_y_continuous(breaks=seq(0, 780, by=120)) +
+              scale_fill_manual(values=categoryColors) +
+              guides(fill="none") +
+              ylab("Duration (s)") +
+              customTheme +
+              theme(axis.title.x = element_blank())
 
-# PLOT (boxplot) of display elements
-plot_displayElements <- ggplot(data_analyzed) +
-				     geom_jitter(aes(x=DisplayType, y=UniqueDisplayElements),
-				     		 	   colour="black",
-				     			   width=0.15, height=0, alpha=0.5) +
-				     geom_boxplot(aes(x=DisplayType, y=UniqueDisplayElements,
-				     				 fill=DisplayType),
-				     			    colour="black",
-				     			    alpha=0.5) +
-				     scale_fill_manual(values=customDisplayTypeColors) +
-				     scale_y_continuous(breaks=seq(0, 12, by=2)) +
-				     guides(fill="none") +
-				     xlab("Display type") +
-				     ggtitle("Unique elements") +
-				     customTheme +
-				     theme(axis.title.x=element_blank(),
-				     	   axis.title.y=element_blank())
+# Boxplot of Display Length                      
+plot_displayLength <- ggplot(data_analyzed, aes(x=Category, y=DisplayLength, fill=Category)) +
+                   geom_jitter(width=0.15, height=0,
+                               colour="black", size=0.5) +
+                   geom_boxplot(alpha=0.5, outlier.shape=NA) +
+                   scale_x_discrete(limits=c("SOLO", "AUDI", "COP")) +   
+                   scale_y_continuous(breaks=seq(0, 400, by=100), limits=c(0, 400)) +                
+                   scale_fill_manual(values=categoryColors) +
+                   guides(fill="none") +
+                   xlab("Display context") +
+                   ylab("Length (elements)") +
+                   customTheme
 
-# PLOT (boxplot) of display element ratio
-plot_elementRatio <- ggplot(data_analyzed) +
-				  geom_jitter(aes(x=DisplayType, y=UniqueElementRatio),
-				  		 	  colour="black",
-				  			  width=0.15, height=0, alpha=0.5) +
-				  geom_boxplot(aes(x=DisplayType, y=UniqueElementRatio,
-				  				   fill=DisplayType),
-				  			   colour="black",
-				  			   alpha=0.5) +
-				  scale_fill_manual(values=customDisplayTypeColors) +
-				  guides(fill="none") +
-				  xlab("Display type") +
-				  ggtitle("Unique elements / length") +
-				  customTheme +
-				  theme(axis.title.x=element_blank(),
-				  		axis.title.y=element_blank())
+# Boxplot of Unique Elements                      
+plot_uniqueElements <- ggplot(data_analyzed, aes(x=Category, y=UniqueDisplayElements, fill=Category)) +
+                    geom_jitter(width=0.15, height=0,
+                                colour="black", size=0.5) +
+                    geom_boxplot(alpha=0.5, outlier.shape=NA) +
+                    scale_x_discrete(limits=c("SOLO", "AUDI", "COP")) +     
+                    scale_y_continuous(breaks=seq(0, 10, by=2)) +              
+                    scale_fill_manual(values=categoryColors) +
+                    guides(fill="none") +
+                    ylab("Unique elements") +
+                    customTheme +
+                    theme(axis.title.x = element_blank())
 
-# PLOT (boxplot) of entropy
-plot_entropy <- ggplot(data_analyzed) +
-			 geom_jitter(aes(x=DisplayType, y=Entropy),
-			 		 	 colour="black",
-			 			 width=0.15, height=0, alpha=0.5) +
-			 geom_boxplot(aes(x=DisplayType, y=Entropy,
-			 				  fill=DisplayType),
-			 			  colour="black",
-			 			  alpha=0.5) +
-			 scale_fill_manual(values=customDisplayTypeColors) +
-			 guides(fill="none") +
-			 xlab("Display type") +
-			 ggtitle("Entropy") +
-			 customTheme +
-			 theme(axis.title.x=element_blank(),
-			 		axis.title.y=element_blank())
+# Create combined plot and write to file              
+plots_repertoire <- plot_duration + plot_displayLength + plot_uniqueElements +
+                 plot_annotation(tag_levels="A", tag_prefix="(", tag_suffix=")") &
+                 theme(plot.tag.position=c(0.89, 0.93)) 
+ggsave(plots_repertoire, file="Plots/FIGURE_1.png", width=6, height=2) 
 
-# PLOT (boxplot) of compression ratio
-plot_compressionRatio <- ggplot(data_analyzed) +
-			 		  geom_jitter(aes(x=DisplayType, y=CompressionRatio),
-			 		  		 	  colour="black",
-			 		  			  width=0.15, height=0, alpha=0.5) +
-			 		  geom_boxplot(aes(x=DisplayType, y=CompressionRatio,
-			 		  				   fill=DisplayType),
-			 		  			   colour="black",
-			 		  			   alpha=0.5) +
-			 		  scale_fill_manual(values=customDisplayTypeColors) +
-			 		  guides(fill="none") +
-			 		  xlab("Display type") +
-			 		  ggtitle("Compression ratio") +
-			 		  customTheme +
-			 		  theme(axis.title.y=element_blank())
 
-# PLOT (boxplot) of local complexity
-plot_localComplexity <- ggplot(data_analyzed) +
-			 		 geom_jitter(aes(x=DisplayType, y=LocalComplexity),
-			 		 		 	 colour="black",
-			 		 			 width=0.15, height=0, alpha=0.5) +
-			 		 geom_boxplot(aes(x=DisplayType, y=LocalComplexity,
-			 		 				  fill=DisplayType),
-			 		 			  colour="black",
-			 		 			  alpha=0.5) +
-			 		 scale_fill_manual(values=customDisplayTypeColors) +
-			 		 guides(fill="none") +
-			 		 xlab("Display type") +
-			 		 ggtitle("Local complexity (window mean)") +
-			 		 customTheme +
-			 		 theme(axis.title.x=element_blank(),
-			 		 	   axis.title.y=element_blank())
+# FIGURE 2 ------------------------------------------------------
+# Boxplot of scaled entropy
+plot_entropy <- ggplot(data_analyzed, aes(x=Category, y=Entropy_Scaled, fill=Category)) +
+             geom_jitter(width=0.15, height=0,
+                         colour="black", size=0.5) +
+                  geom_boxplot(alpha=0.5, outlier.shape=NA) +
+             scale_x_discrete(limits=c("SOLO", "AUDI", "COP")) +
+             scale_y_continuous(breaks=seq(0, 1, by=0.2), limits=c(0,1)) +
+             scale_fill_manual(values=categoryColors) +
+             guides(fill="none") +
+             xlab("Display context") +
+             ylab("Entropy (scaled)") +
+             customTheme
 
-# FIGURE 1 OUTPUT
-# (assemble subplots via patchwork package)
-FIGURE_1 <- (plot_displayLength + plot_displayElements + plot_elementRatio) /
-			(plot_entropy + plot_compressionRatio + plot_localComplexity)
-ggsave(FIGURE_1, file="Plots/FIGURE_1.png", width=7.5, height=6)
+# Boxplot of compression ratio                      
+plot_compression <- ggplot(data_analyzed, aes(x=Category, y=Compression_Ratio, fill=Category)) +
+                 geom_jitter(width=0.15, height=0,
+                             colour="black", size=0.5) +
+                 geom_boxplot(alpha=0.5, outlier.shape=NA) +
+                 scale_x_discrete(limits=c("SOLO", "AUDI", "COP")) +   
+                 scale_y_continuous(breaks=seq(0, 8, by=2), limits=c(0, 8)) +
+                 scale_fill_manual(values=categoryColors) +
+                 guides(fill="none") +
+                 xlab("Display context") +
+                 ylab("Compression ratio") +
+                 customTheme
+
+# Correlation plot of entropy and compression          
+
+# Compute convex hulls
+hulls <- data_analyzed |>
+      group_by(Category) |>
+      slice(chull(Entropy_Scaled, Compression_Ratio))
+
+# Arrange hull labels
+labels <- tibble(Category=c("SOLO", "AUDI", "COP"),
+                 x       =c(0.88,    0.75,    0.15),
+                 y       =c(0.19,    6.60,    2.75),
+                 angle   =c(0,       -59,      -63))
+
+plot_syntaxCorrelation <- ggplot(data_analyzed) +
+                       geom_point(aes(x=Entropy_Scaled, y=Compression_Ratio, colour=Category), 
+                                  size=0.6, alpha=0.9) +
+                       geom_polygon(data=hulls, 
+                                    aes(x=Entropy_Scaled, y=Compression_Ratio, fill=Category), alpha=0.4) +
+                       geom_smooth(aes(x=Entropy_Scaled, y=Compression_Ratio), 
+                                   formula="y~x", method="lm", 
+                                   colour="black", se=FALSE) +
+                       geom_text(data=labels, 
+                                 aes(label=Category, colour=Category,
+                                     x=x, y=y, angle=angle),
+                                     size=3) + 
+                       scale_colour_manual(values=categoryColors) +
+                       scale_fill_manual(values=categoryColors) +
+                       scale_x_continuous(breaks=seq(0, 1, by=0.2), limits=c(0,1)) +
+                       scale_y_continuous(breaks=seq(0, 8, by=2), limits=c(0, 8)) +
+                       guides(fill="none", colour="none") +
+                       xlab("Entropy (scaled)") +
+                       ylab("Compression ratio") +
+                       customTheme
+
+
+# Create combined plot and write to file              
+plots_syntax <- plot_entropy + plot_compression + plot_syntaxCorrelation +
+             plot_annotation(tag_levels="A", tag_prefix="(", tag_suffix=")") &
+             theme(plot.tag.position=c(0.89, 0.93)) 
+ggsave(plots_syntax, file="Plots/FIGURE_2.png", width=6, height=2) 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
