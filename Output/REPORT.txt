@@ -2,7 +2,7 @@
 
 **Categories Tally**
 
-# A tibble: 3 x 2
+# A tibble: 3 × 2
   Category     n
   <chr>    <int>
 1 AUDI        89
@@ -16,7 +16,7 @@
 
 **Logs Tally**
 
-# A tibble: 15 x 2
+# A tibble: 15 × 2
    Log            n
    <chr>      <int>
  1 Bare         102
@@ -42,7 +42,7 @@
 
 **Identifiable Male Tally**
 
-# A tibble: 2 x 2
+# A tibble: 2 × 2
   `Male1ID < 8000`     n
   <lgl>            <int>
 1 FALSE               12
@@ -55,7 +55,7 @@
 
 **Male ID Tally**
 
-# A tibble: 11 x 2
+# A tibble: 11 × 2
    Male1ID     n
      <dbl> <int>
  1     112    24
@@ -77,7 +77,7 @@
 
 **Date Tally**
 
-# A tibble: 94 x 4
+# A tibble: 94 × 4
    ObsDate  SOLO  AUDI   COP
    <chr>   <int> <int> <int>
  1 01-01      NA     2    NA
@@ -182,7 +182,7 @@
 
 **Month Tally**
 
-# A tibble: 8 x 2
+# A tibble: 8 × 2
   `month(ObsDate)`     n
              <dbl> <int>
 1                1     7
@@ -201,7 +201,7 @@
 
 **Category Tally**
 
-# A tibble: 3 x 2
+# A tibble: 3 × 2
   Category     n
   <chr>    <int>
 1 AUDI        89
@@ -215,7 +215,7 @@
 
 **Category Tally**
 
-# A tibble: 3 x 2
+# A tibble: 3 × 2
   Category     n
   <chr>    <int>
 1 AUDI        89
@@ -229,7 +229,7 @@
 
 **Female Identified Tally**
 
-# A tibble: 5 x 3
+# A tibble: 5 × 3
 # Groups:   FemID < 8000 [3]
   `FemID < 8000` Category     n
   <lgl>          <chr>    <int>
@@ -246,7 +246,7 @@
 
 **Female AUDI Attendance Tally**
 
-# A tibble: 13 x 2
+# A tibble: 13 × 2
    FemID     n
    <dbl> <int>
  1   118     1
@@ -270,7 +270,7 @@
 
 **Female COP Attendance Tally**
 
-# A tibble: 5 x 2
+# A tibble: 5 × 2
   FemID     n
   <dbl> <int>
 1   295     1
@@ -278,6 +278,456 @@
 3   959     1
 4  8200     8
 5  8300     1
+
+
+------------------------------
+
+------------------------------
+
+**DURATION -- Key values**
+
+# A tibble: 3 × 5
+  Category `mean(Duration)` `sd(Duration)` `min(Duration)` `max(Duration)`
+  <chr>               <dbl>          <dbl>           <dbl>           <dbl>
+1 AUDI                 217.          130.             61.7            717 
+2 COP                  126.           40.8            70.4            213.
+3 SOLO                 136.           64.9            64.7            509 
+
+
+------------------------------
+
+------------------------------
+
+**DURATION -- ANOVA**
+
+             Df  Sum Sq Mean Sq F value   Pr(>F)    
+Category      2  439521  219760   30.05 9.02e-13 ***
+Residuals   350 2559411    7313                     
+---
+Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1
+
+
+------------------------------
+
+------------------------------
+
+**DURATION -- Tukey**
+
+  Tukey multiple comparisons of means
+    95% family-wise confidence level
+
+Fit: aov(formula = Duration ~ Category, data = data_analyzed)
+
+$Category
+               diff        lwr       upr     p adj
+COP-AUDI  -90.95506 -150.71714 -31.19299 0.0011296
+SOLO-AUDI -80.63033 -105.46165 -55.79900 0.0000000
+SOLO-COP   10.32474  -46.92661  67.57608 0.9054976
+
+
+
+------------------------------
+
+------------------------------
+
+**DISPLAY LENGTH -- Key values**
+
+# A tibble: 3 × 5
+  Category `mean(DisplayLength)` `sd(DisplayLength)` `min(DisplayLength)` `max(DisplayLength)`
+  <chr>                    <dbl>               <dbl>                <int>                <int>
+1 AUDI                     101.                 72.0                   19                  365
+2 COP                       61.9                16.2                   35                   79
+3 SOLO                      23.9                12.9                    6                  124
+
+
+------------------------------
+
+------------------------------
+
+**DISPLAY LENGTH -- ANOVA**
+
+             Df Sum Sq Mean Sq F value Pr(>F)    
+Category      2 398303  199151   139.1 <2e-16 ***
+Residuals   350 501271    1432                   
+---
+Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1
+
+
+------------------------------
+
+------------------------------
+
+**DISPLAY LENGTH -- Tukey**
+
+  Tukey multiple comparisons of means
+    95% family-wise confidence level
+
+Fit: aov(formula = DisplayLength ~ Category, data = data_analyzed)
+
+$Category
+               diff       lwr       upr     p adj
+COP-AUDI  -39.49265 -65.94059 -13.04472 0.0014430
+SOLO-AUDI -77.47549 -88.46469 -66.48629 0.0000000
+SOLO-COP  -37.98284 -63.31964 -12.64604 0.0013727
+
+
+
+------------------------------
+
+------------------------------
+
+**UNIQUE ELEMENTS -- Key values**
+
+# A tibble: 3 × 5
+  Category `mean(UniqueDisplayElements)` `sd(UniqueDisplayElements)` `min(UniqueDisplayElements)` `max(UniqueDisplayElements)`
+  <chr>                            <dbl>                       <dbl>                        <dbl>                        <dbl>
+1 AUDI                              5.87                       0.968                            4                            8
+2 COP                               3.15                       0.801                            2                            5
+3 SOLO                              5.91                       1.05                             4                           10
+
+
+------------------------------
+
+------------------------------
+
+**UNIQUE ELEMENTS -- ANOVA**
+
+             Df Sum Sq Mean Sq F value Pr(>F)    
+Category      2   94.3   47.17   44.99 <2e-16 ***
+Residuals   350  367.0    1.05                   
+---
+Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1
+
+
+------------------------------
+
+------------------------------
+
+**UNIQUE ELEMENTS -- Tukey**
+
+  Tukey multiple comparisons of means
+    95% family-wise confidence level
+
+Fit: aov(formula = UniqueDisplayElements ~ Category, data = data_analyzed)
+
+$Category
+                 diff        lwr       upr     p adj
+COP-AUDI  -2.71132239 -3.4269202 -1.995725 0.0000000
+SOLO-AUDI  0.04319799 -0.2541351  0.340531 0.9375895
+SOLO-COP   2.75452038  2.0689863  3.440054 0.0000000
+
+
+
+------------------------------
+
+------------------------------
+
+**RANDOMIZATION -- Unique elements**
+
+# A tibble: 1 × 2
+  `Mean < cop_UniqueDisplayElements`     n
+  <lgl>                              <int>
+1 FALSE                              10000
+
+
+------------------------------
+
+------------------------------
+
+**Entropy (scaled) -- Key values**
+
+# A tibble: 3 × 5
+  Category `mean(Entropy_Scaled)` `sd(Entropy_Scaled)` `min(Entropy_Scaled)` `max(Entropy_Scaled)`
+  <chr>                     <dbl>                <dbl>                 <dbl>                 <dbl>
+1 AUDI                      0.705               0.115                  0.315                 0.926
+2 COP                       0.262               0.162                  0.113                 0.632
+3 SOLO                      0.871               0.0742                 0.540                 0.992
+
+
+------------------------------
+
+------------------------------
+
+**Entropy (scaled) -- ANOVA**
+
+             Df Sum Sq Mean Sq F value Pr(>F)    
+Category      2  5.827  2.9134   356.7 <2e-16 ***
+Residuals   350  2.859  0.0082                   
+---
+Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1
+
+
+------------------------------
+
+------------------------------
+
+**Entropy (scaled) -- Tukey**
+
+  Tukey multiple comparisons of means
+    95% family-wise confidence level
+
+Fit: aov(formula = Entropy_Scaled ~ Category, data = data_analyzed)
+
+$Category
+               diff        lwr        upr p adj
+COP-AUDI  -0.443781 -0.5069410 -0.3806210     0
+SOLO-AUDI  0.166010  0.1397668  0.1922532     0
+SOLO-COP   0.609791  0.5492844  0.6702975     0
+
+
+
+------------------------------
+
+------------------------------
+
+**RANDOMIZATION -- Entropy**
+
+# A tibble: 1 × 2
+  `Mean < cop_Entropy`     n
+  <lgl>                <int>
+1 FALSE                10000
+
+
+------------------------------
+
+------------------------------
+
+**Compression Ratio -- Key values**
+
+# A tibble: 3 × 5
+  Category `mean(Compression_Ratio)` `sd(Compression_Ratio)` `min(Compression_Ratio)` `max(Compression_Ratio)`
+  <chr>                        <dbl>                   <dbl>                    <dbl>                    <dbl>
+1 AUDI                          2.80                   1.15                      0.88                     7.45
+2 COP                           3.65                   1.01                      1.95                     4.73
+3 SOLO                          1.07                   0.297                     0.6                      2.34
+
+
+------------------------------
+
+------------------------------
+
+**Compression Ratio -- ANOVA**
+
+             Df Sum Sq Mean Sq F value Pr(>F)    
+Category      2  253.5  126.74   296.3 <2e-16 ***
+Residuals   350  149.7    0.43                   
+---
+Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1
+
+
+------------------------------
+
+------------------------------
+
+**Compression Ratio -- Tukey**
+
+  Tukey multiple comparisons of means
+    95% family-wise confidence level
+
+Fit: aov(formula = Compression_Ratio ~ Category, data = data_analyzed)
+
+$Category
+                diff        lwr       upr    p adj
+COP-AUDI   0.8524869  0.3954146  1.309559 4.46e-05
+SOLO-AUDI -1.7301635 -1.9200785 -1.540249 0.00e+00
+SOLO-COP  -2.5826504 -3.0205201 -2.144781 0.00e+00
+
+
+
+------------------------------
+
+------------------------------
+
+**RANDOMIZATION -- Compression Ratio**
+
+# A tibble: 1 × 2
+  `Mean > cop_compressionRatio`     n
+  <lgl>                         <int>
+1 FALSE                         10000
+
+
+------------------------------
+
+------------------------------
+
+**Entropy vs. Compressibility correlation**
+
+
+Call:
+lm(formula = Compression_Ratio ~ Entropy_Scaled, data = data_analyzed)
+
+Residuals:
+    Min      1Q  Median      3Q     Max 
+-2.0976 -0.3983 -0.1151  0.1965  4.9831 
+
+Coefficients:
+               Estimate Std. Error t value Pr(>|t|)    
+(Intercept)      5.5958     0.2055   27.23   <2e-16 ***
+Entropy_Scaled  -4.9479     0.2500  -19.79   <2e-16 ***
+---
+Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1
+
+Residual standard error: 0.7368 on 351 degrees of freedom
+Multiple R-squared:  0.5274,	Adjusted R-squared:  0.526 
+F-statistic: 391.7 on 1 and 351 DF,  p-value: < 2.2e-16
+
+
+
+------------------------------
+
+------------------------------
+
+**Highest Compression Ratio**
+
+# A tibble: 1 × 4
+  UID   Category DisplayLength DisplayCode                                                                                                                                                                                                                                                                           
+  <chr> <chr>            <int> <chr>                                                                                                                                                                                                                                                                                 
+1 1487  AUDI               365 DDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDIIIIIIIDDBFFFFFFFFFFFFFFFFFIIHHHHHHHHHHHHHHHHIIIIIIIIHHHHIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIHHHHHHHHIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDHHHHHHHHJHHHH…
+
+
+------------------------------
+
+------------------------------
+
+**Compression rate comparison**
+
+# A tibble: 1 × 4
+  UID   Category DisplayLength DisplayCode                                                                      
+  <chr> <chr>            <int> <chr>                                                                            
+1 453   AUDI                81 JJDBAIIIIIIHHIIIIIIIIIIIIIIIIIIIIIIIIIDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDBFFFFIIIIEDBA
+
+
+------------------------------
+
+------------------------------
+
+**Lowest Entropy display**
+
+# A tibble: 1 × 3
+  UID   Category DisplayCode                                                       
+  <chr> <chr>    <chr>                                                             
+1 1533  COP      DDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDB
+
+
+------------------------------
+
+------------------------------
+
+**Lowest Entropy display**
+
+# A tibble: 1 × 3
+  UID   Category DisplayCode                                                       
+  <chr> <chr>    <chr>                                                             
+1 1533  COP      DDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDB
+
+
+------------------------------
+
+------------------------------
+
+**Highest Compression Ratio**
+
+# A tibble: 1 × 6
+  UID   Category Entropy_Scaled Compression_Ratio DisplayLength DisplayCode                                                                                                                                                                                                                                          
+  <chr> <chr>             <dbl>             <dbl>         <int> <chr>                                                                                                                                                                                                                                                
+1 1487  AUDI              0.633              7.45           365 DDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDIIIIIIIDDBFFFFFFFFFFFFFFFFFIIHHHHHHHHHHHHHHHHIIIIIIIIHHHHIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIHHHHHHHHIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIDDDDDDDDDDD…
+
+
+------------------------------
+
+------------------------------
+
+**Compression rate comparison**
+
+# A tibble: 1 × 6
+  UID   Category Entropy_Scaled Compression_Ratio DisplayLength DisplayCode                                                                      
+  <chr> <chr>             <dbl>             <dbl>         <int> <chr>                                                                            
+1 453   AUDI              0.639              2.53            81 JJDBAIIIIIIHHIIIIIIIIIIIIIIIIIIIIIIIIIDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDBFFFFIIIIEDBA
+
+
+------------------------------
+
+------------------------------
+
+**Lowest Entropy display**
+
+# A tibble: 1 × 5
+  UID   Category Entropy_Scaled Compression_Ratio DisplayCode                                                       
+  <chr> <chr>             <dbl>             <dbl> <chr>                                                             
+1 1533  COP               0.113              4.71 DDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDB
+
+
+------------------------------
+
+------------------------------
+
+**Lowest Entropy display**
+
+# A tibble: 1 × 6
+  UID   Category Entropy_Scaled Compression_Ratio DisplayLength DisplayCode                                                       
+  <chr> <chr>             <dbl>             <dbl>         <int> <chr>                                                             
+1 1533  COP               0.113              4.71            66 DDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDB
+
+
+------------------------------
+
+------------------------------
+
+**COP display codes**
+
+ [1] "IIDDDDDDDEDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDEB" "DDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDB"              "EDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDB" 
+ [4] "IIDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDB"                                  "IIIIIIIIIIIDDDIIIIIIIIDDDIIIIIIIIDDDDDDDDDDDDDIIIIIIIIIIIIIDDDDDIIIIIIIIIIIDB"   "JJHHHHHHIIIIDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDB"
+ [7] "IDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDB"                                   "IIDDDDDDDDDDDDDDDDDDDDDDDDDDDDJJJIIDDDB"                                         "DDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDLDDDDB"        
+[10] "IDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDB"                                             "DDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDB"                            "IIIIIDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDB"          
+[13] "IDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDB"          
+
+
+------------------------------
+
+------------------------------
+
+**COP display codes**
+
+# A tibble: 13 × 2
+   UID   DisplayCode                                                                    
+   <chr> <chr>                                                                          
+ 1 1455  IIDDDDDDDEDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDEB
+ 2 1533  DDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDB             
+ 3 1558  EDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDB 
+ 4 1817  IIDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDB                                 
+ 5 1824  IIIIIIIIIIIDDDIIIIIIIIDDDIIIIIIIIDDDDDDDDDDDDDIIIIIIIIIIIIIDDDDDIIIIIIIIIIIDB  
+ 6 1878  JJHHHHHHIIIIDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDB
+ 7 1920  IDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDB                                  
+ 8 1987  IIDDDDDDDDDDDDDDDDDDDDDDDDDDDDJJJIIDDDB                                        
+ 9 2020  DDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDLDDDDB        
+10 5005  IDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDB                                            
+11 989   DDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDB                           
+12 991   IIIIIDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDB          
+13 992   IDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDB          
+
+
+------------------------------
+
+------------------------------
+
+**COP display codes**
+
+# A tibble: 13 × 3
+   UID   Male1ID DisplayCode                                                                    
+   <chr>   <dbl> <chr>                                                                          
+ 1 1455      296 IIDDDDDDDEDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDEB
+ 2 1533      296 DDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDB             
+ 3 1558      296 EDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDB 
+ 4 1817      296 IIDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDB                                 
+ 5 1824      296 IIIIIIIIIIIDDDIIIIIIIIDDDIIIIIIIIDDDDDDDDDDDDDIIIIIIIIIIIIIDDDDDIIIIIIIIIIIDB  
+ 6 1878      296 JJHHHHHHIIIIDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDB
+ 7 1920      296 IDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDB                                  
+ 8 1987      296 IIDDDDDDDDDDDDDDDDDDDDDDDDDDDDJJJIIDDDB                                        
+ 9 2020      296 DDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDLDDDDB        
+10 5005      940 IDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDB                                            
+11 989       980 DDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDB                           
+12 991       980 IIIIIDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDB          
+13 992       980 IDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDB          
 
 
 ------------------------------

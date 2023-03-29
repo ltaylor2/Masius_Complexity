@@ -120,3 +120,25 @@ meanLocalComplexity <- function(s, alphabet, span) {
 	return(meanLC)
 }
 
+
+
+
+
+after_cop <- data_analyzed |>
+        filter(Category == "COP") |>
+        select(UID, Category, DisplayCode_AfterCop) |>
+        separate(DisplayCode_AfterCop, into=as.character(0:max(data_analyzed$DisplayLength)),
+                 sep="", fill="right") |>
+        pivot_longer(-c(UID, Category), names_to="Index", values_to="Code") |>
+        filter(Code!="" & !is.na(Code)) |>
+        group_by(UID, Category, Code) |>
+        tally() |>
+        group_by(Category, Code) |>
+        tally() |>
+        select(Code, Category, N_Displays_with_Element=n) |>
+        left_join(tally(group_by(data_analyzed, Category), name="Total_Displays_of_Category"), by="Category") |>
+        mutate(Proportion_Displays_with_Element = N_Displays_with_Element / Total_Displays_of_Category) |>
+        mutate(Percent_Displays_with_Element = round(Proportion_Displays_with_Element * 100,0)) |>
+        select(Code, Perc=Percent_Displays_with_Element, N=N_Displays_with_Element) |>
+        mutate(Element = map_chr(Code, ~ names(behavior_code)[behavior_code==.]),
+               .after=Code)

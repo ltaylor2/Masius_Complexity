@@ -19,18 +19,27 @@ data_analyzed <- read_csv(ANALYZED_DATA_PATH, show_col_types=FALSE)
 # TABLE 1 ------------------------------------------------------
 # Table of core behavioral elements and descriptions, with category-specific frequencies
 table_1 <- data_analyzed |>
-        select(Category, DisplayCode) |>
+        select(UID, Category, DisplayCode) |>
         separate(DisplayCode, into=as.character(0:max(data_analyzed$DisplayLength)),
                  sep="", fill="right") |>
-        pivot_longer(-Category, names_to="Index", values_to="Element") |>
-        filter(Element != "" & !is.na(Element)) |>
-        group_by(Category, Element) |>
+        pivot_longer(-c(UID, Category), names_to="Index", values_to="Code") |>
+        filter(Code!="" & !is.na(Code)) |>
+        group_by(UID, Category, Code) |>
         tally() |>
-        pivot_wider(id_cols=Element, names_from=Category, values_from=n) |>
-        select(Code=Element, SOLO, AUDI, COP) |>
+        group_by(Category, Code) |>
+        tally() |>
+        group_by(Category) |>
+        select(Category, Code, N_Displays_with_Element=n) |>
+        left_join(tally(group_by(data_analyzed, Category), name="Total_Displays_of_Category"), by="Category") |>
+        mutate(Proportion_Displays_with_Element = N_Displays_with_Element / Total_Displays_of_Category) |>
+        mutate(Percent_Displays_with_Element = round(Proportion_Displays_with_Element * 100,0)) |>
+        select(Code, Perc=Percent_Displays_with_Element, N=N_Displays_with_Element) |>
+        pivot_wider(id_cols=Code, names_from=Category, values_from=c(Perc, N)) |>
+        select(Code, Perc_SOLO, Perc_AUDI, Perc_COP, N_SOLO, N_AUDI, N_COP) |>
         mutate(Element = map_chr(Code, ~ names(behavior_code)[behavior_code==.]),
                .after=Code)
 write_csv(table_1, file="Output/TABLE_1.csv")
+
 
 # FIGURE 1 ------------------------------------------------------
 # Boxplot of Duration

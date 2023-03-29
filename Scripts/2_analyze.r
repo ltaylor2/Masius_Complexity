@@ -1,3 +1,7 @@
+# Set random seed to Tinbergen's birthday
+#   To replicate randomizationr results
+set.seed(1973)
+
 # Read data (cleaned up in Scripts/1_parse_data.r)
 data_clean <- read_csv(CLEAN_DATA_PATH, show_col_types=FALSE)
 
@@ -43,17 +47,30 @@ data_analyzed <- data_clean |>
 # Write analyzed data file
 write_csv(data_analyzed, ANALYZED_DATA_PATH)
 
-# # Custom function to write a summary block
-# # for output text files
+# Randomization tools (for small COP sample sizes) ---------------------------------------------
+n_draws <- nrow(filter(data_analyzed, Category=="COP"))
+# Custom function for a single random 
+randomDraw <- function(i, variable) {
+    if (i==1 | (i %% 5000) == 0) { cat(paste("Random draw", i, "for variable", variable, "\n")) }
+
+    draw <- data_analyzed |>
+         slice_sample(n=n_draws, replace=FALSE) |>
+         pull(variable)
+    return(tibble(Variable=variable, Mean=mean(draw)))
+}
+
+# Custom function to write a summary block
+# for output text files
 writeSummaryBlock <- function(df, header, append=TRUE) {
 	sink(SUMMARY_TEXT_OUTPUT_PATH, append=append)
 	cat("------------------------------\n\n")
 	cat(paste0("**",  header, "**\n\n"))
 	print(df, n=nrow(df))
 	cat("\n\n------------------------------\n\n")
-	sink()
+	while(sink.number()>0) { sink() }
 }
 
+# REPORT Tallies) ---------------------------------------------
 
 # Tally display categories 
 data_analyzed |>
@@ -127,118 +144,162 @@ data_analyzed |>
     tally() |>
     writeSummaryBlock("Female COP Attendance Tally")
 
-# writeSummaryBlock(summary_displayLength,
-# 				  "DISPLAY LENGTH summary",
-# 				  append=TRUE)
-# model_displayLength <- aov(DisplayLength ~ DisplayType, data=data_analyzed)
-# tukey_displayLength <- TukeyHSD(model_displayLength)
-# sink(SUMMARY_TEXT_OUTPUT_PATH, append=TRUE)
-# print(summary(model_displayLength))
-# print(tukey_displayLength)
-# sink()
+# REPORT Duration ---------------------------------------------
+data_analyzed |>
+    group_by(Category) |>
+    summarize(mean(Duration), sd(Duration), min(Duration), max(Duration)) |>
+    writeSummaryBlock("DURATION -- Key values")
 
-# # # Summarize unique display elements
-# # # 	(appends to summary output file)
-# summary_displayElements <- data_analyzed |>
-# 			            group_by(DisplayType) |>
-# 			            summarize(Mean = mean(UniqueDisplayElements),
-# 			            		  Min = min(UniqueDisplayElements),
-# 			            		  Max = max(UniqueDisplayElements),
-# 			            		  SD = sd(UniqueDisplayElements)) |>
-# 			            arrange(DisplayType)
-        
-# writeSummaryBlock(summary_displayElements,
-# 				  "DISPLAY UNIQUE ELEMENTS summary",
-# 				  append=TRUE)
-# model_displayElements <- aov(UniqueDisplayElements ~ DisplayType, data=data_analyzed)
-# tukey_displayElements <- TukeyHSD(model_displayElements)
-# sink(SUMMARY_TEXT_OUTPUT_PATH, append=TRUE)
-# print(summary(model_displayElements))
-# print(tukey_displayElements)
-# sink()
+aov(Duration ~ Category, data=data_analyzed) |>
+    summary() |>
+    writeSummaryBlock("DURATION -- ANOVA")
 
-# # Summarize unique element ratio (Unique Elements / Display Length)
-# # 	(appends to summary output file)
-# summary_elementRatio <- data_analyzed |>
-# 			         group_by(DisplayType) |>
-# 			         summarize(Mean = mean(UniqueElementRatio),
-# 			         		   Min = min(UniqueElementRatio),
-# 			         		   Max = max(UniqueElementRatio),
-# 			         		   SD = sd(UniqueElementRatio)) |>
-# 			         arrange(DisplayType)
+aov(Duration ~ Category, data=data_analyzed) |>
+    TukeyHSD() |>
+    writeSummaryBlock("DURATION -- Tukey")
 
-# writeSummaryBlock(summary_elementRatio,
-# 				  "DISPLAY UNIQUE ELEMENTS-TO-LENGTH RATIO summary",
-# 				  append=TRUE)
-# model_elementRatio <- aov(UniqueElementRatio ~ DisplayType, data=data_analyzed)
-# tukey_elementRatio <- TukeyHSD(model_elementRatio)
-# sink(SUMMARY_TEXT_OUTPUT_PATH, append=TRUE)
-# print(summary(model_elementRatio))
-# print(tukey_elementRatio)
-# sink()
+# REPORT Display Length ---------------------------------------------
 
-# # Summarize entropy
-# # 	(appends to summary output file)
-# summary_entropy <- data_analyzed |>
-# 			    group_by(DisplayType) |>
-# 			    summarize(Mean = mean(Entropy),
-# 			    		  Min = min(Entropy),
-# 			    		  Max = max(Entropy),
-# 			    		  SD = sd(Entropy)) |>
-# 			    arrange(DisplayType)
+data_analyzed |>
+    group_by(Category) |>
+    summarize(mean(DisplayLength), sd(DisplayLength), min(DisplayLength), max(DisplayLength)) |>
+    writeSummaryBlock("DISPLAY LENGTH -- Key values")
 
-# writeSummaryBlock(summary_entropy,
-# 				  "DISPLAY ENTROPY summary",
-# 				  append=TRUE)
-# model_entropy <- aov(Entropy ~ DisplayType, data=data_analyzed)
-# tukey_entropy <- TukeyHSD(model_entropy)
-# sink(SUMMARY_TEXT_OUTPUT_PATH, append=TRUE)
-# print(summary(model_entropy))
-# print(tukey_entropy)
-# sink()
+aov(DisplayLength ~ Category, data=data_analyzed) |>
+    summary() |>
+    writeSummaryBlock("DISPLAY LENGTH -- ANOVA")
 
-# # Summarize compression ratio
-# # 	(appends to summary output file)
-# summary_compressionRatio <- data_analyzed |>
-# 			    		 group_by(DisplayType) |>
-# 			    		 summarize(Mean = mean(CompressionRatio),
-# 			    		 		   Min = min(CompressionRatio),
-# 			    		 		   Max = max(CompressionRatio),
-# 			    		 		   SD = sd(CompressionRatio)) |>
-# 			    		 arrange(DisplayType)
+aov(DisplayLength ~ Category, data=data_analyzed) |>
+    TukeyHSD() |>
+    writeSummaryBlock("DISPLAY LENGTH -- Tukey")
 
-# writeSummaryBlock(summary_compressionRatio,
-# 				  "DISPLAY COMPRESSION RATIO summary",
-# 				  append=TRUE)
-# model_compressionRatio <- aov(CompressionRatio ~ DisplayType, data=data_analyzed)
-# tukey_compressionRatio <- TukeyHSD(model_compressionRatio)
-# sink(SUMMARY_TEXT_OUTPUT_PATH, append=TRUE)
-# print(summary(model_compressionRatio))
-# print(tukey_compressionRatio)
-# sink()
+# REPORT Unique elements ---------------------------------------------
+data_analyzed |>
+    group_by(Category) |>
+    summarize(mean(UniqueDisplayElements), sd(UniqueDisplayElements), min(UniqueDisplayElements), max(UniqueDisplayElements)) |>
+    writeSummaryBlock("UNIQUE ELEMENTS -- Key values")
 
-# # Summarize mean local complexity
-# # 	(appends to summary output file)
-# summary_localComplexity <- data_analyzed |>
-# 			    		group_by(DisplayType) |>
-# 			    		summarize(Mean = mean(LocalComplexity),
-# 			    				  Min = min(LocalComplexity),
-# 			    				  Max = max(LocalComplexity),
-# 			    				  SD = sd(LocalComplexity)) |>
-# 			    		arrange(DisplayType)
+aov(UniqueDisplayElements ~ Category, data=data_analyzed) |>
+    summary() |>
+    writeSummaryBlock("UNIQUE ELEMENTS -- ANOVA")
 
-# writeSummaryBlock(summary_localComplexity,
-# 				  "DISPLAY LOCAL COMPLEXITY summary (mean across rolling window)",
-# 				  append=TRUE)
-# model_localComplexity <- aov(LocalComplexity ~ DisplayType, data=data_analyzed)
-# tukey_localComplexity <- TukeyHSD(model_localComplexity)
-# sink(SUMMARY_TEXT_OUTPUT_PATH, append=TRUE)
-# print(summary(model_localComplexity))
-# print(tukey_localComplexity)
-# sink()
+aov(UniqueDisplayElements ~ Category, data=data_analyzed) |>
+    TukeyHSD() |>
+    writeSummaryBlock("UNIQUE ELEMENTS -- Tukey")
 
-# # Jaro string distances
-# #
+# RANDOMIZATION Unique elements ---------------------------------------------
+
+# Generate random distribution
+randomDistribution_uniqueElements <- map_df(1:RANDOMIZATION_REPLICATES, ~randomDraw(., "UniqueDisplayElements"))
+
+# Save for plotting later
+saveRDS(randomDistribution_uniqueElements, file="Output/randomDistribution_uniqueElements.rds")
+
+# Summarize for report
+cop_UniqueDisplayElements <- data_analyzed |>
+                          filter(Category == "COP") |>
+                          pull(UniqueDisplayElements) |>
+                          mean()
+
+randomDistribution_uniqueElements |> 
+    group_by(Mean < cop_UniqueDisplayElements) |>
+    tally() |>
+    writeSummaryBlock("RANDOMIZATION -- Unique elements")
+
+# REPORT Entropy, scaled ---------------------------------------------
+data_analyzed |>
+    group_by(Category) |>
+    summarize(mean(Entropy_Scaled), sd(Entropy_Scaled), min(Entropy_Scaled), max(Entropy_Scaled)) |>
+    writeSummaryBlock("Entropy (scaled) -- Key values")
+
+aov(Entropy_Scaled ~ Category, data=data_analyzed) |>
+    summary() |>
+    writeSummaryBlock("Entropy (scaled) -- ANOVA")
+
+aov(Entropy_Scaled ~ Category, data=data_analyzed) |>
+    TukeyHSD() |>
+    writeSummaryBlock("Entropy (scaled) -- Tukey")
+
+# RANDOMIZATION (Entropy, scaled) ---------------------------------------------
+randomDistribution_entropy <- map_df(1:RANDOMIZATION_REPLICATES, ~randomDraw(., "Entropy_Scaled"))
+
+# Save for plotting later
+saveRDS(randomDistribution_entropy, file="Output/randomDistribution_entropy.rds")
+
+# Summarize for report
+cop_Entropy <- data_analyzed |>
+            filter(Category == "COP") |>
+            pull(Entropy_Scaled) |>
+            mean()
+
+randomDistribution_entropy |> 
+    group_by(Mean < cop_Entropy) |>
+    tally() |>
+    writeSummaryBlock("RANDOMIZATION -- Entropy")
+
+# REPORT Compression ratio ---------------------------------------------
+data_analyzed |>
+    group_by(Category) |>
+    summarize(mean(Compression_Ratio), sd(Compression_Ratio), min(Compression_Ratio), max(Compression_Ratio)) |>
+    writeSummaryBlock("Compression Ratio -- Key values")
+
+aov(Compression_Ratio ~ Category, data=data_analyzed) |>
+    summary() |>
+    writeSummaryBlock("Compression Ratio -- ANOVA")
+
+aov(Compression_Ratio ~ Category, data=data_analyzed) |>
+    TukeyHSD() |>
+    writeSummaryBlock("Compression Ratio -- Tukey")
+
+# RANDOMIZATION (Compression ratio) ---------------------------------------------
+randomDistribution_compressionRatio <- map_df(1:RANDOMIZATION_REPLICATES, ~randomDraw(., "Compression_Ratio"))
+
+# Save for plotting later
+saveRDS(randomDistribution_compressionRatio, file="Output/randomDistribution_compressionRatio.rds")
+
+# Summarize for report
+cop_compressionRatio <- data_analyzed |>
+            filter(Category == "COP") |>
+            pull(Compression_Ratio) |>
+            mean()
+
+randomDistribution_compressionRatio |> 
+    group_by(Mean > cop_compressionRatio) |>
+    tally() |>
+    writeSummaryBlock("RANDOMIZATION -- Compression Ratio")
+
+# Entropy vs. Compressibility correlation ---------------------------------------------
+lm(Compression_Ratio ~ Entropy_Scaled, data=data_analyzed) |>
+    summary() |>
+    writeSummaryBlock("Entropy vs. Compressibility correlation")
+
+# Most compressible string ---------------------------------------------
+data_analyzed |>
+    filter(Compression_Ratio == max(Compression_Ratio)) |>
+    select(UID, Category, Entropy_Scaled, Compression_Ratio, DisplayLength, DisplayCode) |>
+    writeSummaryBlock("Highest Compression Ratio")
+
+# Compression ratio comparison string ---------------------------------------------
+data_analyzed |>
+    filter(UID == 453) |>
+    select(UID, Category, Entropy_Scaled, Compression_Ratio, DisplayLength, DisplayCode) |>
+    writeSummaryBlock("Compression rate comparison")
+
+# Lowest entropy string ---------------------------------------------
+data_analyzed |>
+    filter(Entropy_Scaled == min(Entropy_Unscaled)) |>
+    select(UID, Category, Entropy_Scaled, Compression_Ratio, DisplayLength, DisplayCode) |>
+    writeSummaryBlock("Lowest Entropy display")
+
+# Cop strings ---------------------------------------------
+data_analyzed |>
+    filter(Category == "COP") |>
+    select(UID, Male1ID DisplayCode) |>
+    writeSummaryBlock("COP display codes")
+
+
+# JARO DISTANCES ---------------------------------------------
+# Jaro string distances
 # uids <- data_clean |>
 #      filter(Male1ID != 8000) |>
 #      pull(UID)
@@ -256,7 +317,6 @@ data_analyzed |>
 #         distMat[r,c] <- dist
 #     }
 # }
-
 # getDistanceType <- function(d1_m, d1_type, d2_m, d2_type) {
 #      distanceType <- "Diff Male / Diff Type"
 #      if (d1_m == d2_m) {
@@ -270,7 +330,6 @@ data_analyzed |>
 #      }
 #      return(distanceType)
 # }
-
 # distances <- distMat |>
 #           as.data.frame() %>%
 #           mutate(D1_UID=row.names(.)) |>
@@ -281,7 +340,6 @@ data_analyzed |>
 #                  D2_DisplayType = map_chr(D2_UID, ~ data_clean[data_clean$UID==., "DisplayType"][[1]])) |>
 #           mutate(DistanceType = pmap_chr(list(D1_Male1ID, D1_DisplayType, D2_Male1ID, D2_DisplayType), getDistanceType)) |>
 #           filter(D1_UID != D2_UID)
-
 # ggplot(distances) +
 #     geom_boxplot(aes(x=DistanceType, y=Distance)) +
 #     theme_bw() +
@@ -289,4 +347,4 @@ data_analyzed |>
 #     theme(panel.grid=element_blank(),
 #           axis.title.x=element_blank()) +
 #     facet_grid(rows=vars(D1_DisplayType), 
-#                cols=vars(D2_DisplayType))
+#                cols=vars(D2_DisplayType)) 
