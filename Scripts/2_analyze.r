@@ -294,7 +294,7 @@ data_analyzed |>
 # Cop strings ---------------------------------------------
 data_analyzed |>
     filter(Category == "COP") |>
-    select(UID, Male1ID DisplayCode) |>
+    select(UID, Male1ID, DisplayCode) |>
     writeSummaryBlock("COP display codes")
 
 
