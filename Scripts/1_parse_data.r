@@ -47,9 +47,10 @@ categorizeDisplayType <- function(uid) {
     # Quick check to confirm there is only one ID for each ID column
     maleID <- unique(display$Male1ID)
     femID <- unique(display$FemID)
+
     if (is.na(femID)) {
         femSex <- "NA"
-    } else if (femID >= 8000) {
+    } else if (as.numeric(femID) >= 8000) {
         femSex <- "Unknown"
     } else {
          femSex <- bands[bands$Band_ID == femID, "Sex"][[1]]
@@ -59,7 +60,7 @@ categorizeDisplayType <- function(uid) {
 
     if (is.na(b2ID)) {
         b2Sex <- "NA"
-    } else if (b2ID >= 8000) {
+    } else if (as.numeric(b2ID) >= 8000) {
         b2Sex <- "Unknown"
     } else {
          b2Sex <- bands[bands$Band_ID == b2ID, "Sex"][[1]]
@@ -84,7 +85,7 @@ categorizeDisplayType <- function(uid) {
     if (!is.na(femID)) { category <- "AUDI"}
     if (is.na(femID) & (hasFemOn | hasFemAction) ) { category <- "ERROR"}
     if (hasCop) { category <- "COP"}
-    if (hasMaleFem | hasB2Action | (hasMaleB2)) { category <- "MULT" }
+    if (hasMaleFem | hasB2Action) { category <- "MULT" }
 
     # TEMP data table with relevant info
     ret <- tibble(UID=uid, Category=category,
@@ -184,6 +185,8 @@ displayDuration <- function(uid, coded=FALSE) {
 # [Ungroup] To avoid any errors
 # [Filter] out displays <60s
 # [Filter] out displays that are missing ALAD or Bows
+# [Mutate] cut Attempted Copulation ("AttC", should be code "M") from final display strings
+# [Mutate] cut Copulation ("Cop", should be code "N") from final display strings
 data_clean_wide <- data_clean_long |>
 		        group_by(UID, Category, ObsDate, Log, Male1ID, FemID, Bird2ID) |>
                 arrange(UID, Time) |>
@@ -199,7 +202,12 @@ data_clean_wide <- data_clean_long |>
                 mutate(Duration = map_dbl(UID, displayDuration)) |>
                 ungroup() |>
                 filter(Duration >= 60) |>
-                filter(grepl("ALAD", DisplayShort) & grepl("Bow", DisplayShort))
+                filter(grepl("ALAD", DisplayShort) & grepl("Bow", DisplayShort)) |>
+                mutate(DisplayCode = str_replace(DisplayCode, behavior_code["AttC"], ""),
+                       DisplayCode_AfterCop = str_replace(DisplayCode_AfterCop, behavior_code["AttC"], "")) |>
+                mutate(DisplayCode = str_replace(DisplayCode, behavior_code["Cop"], ""),
+                       DisplayCode_AfterCop = str_replace(DisplayCode_AfterCop, behavior_code["Cop"], ""))
+
 
 # Write clean datasheet for analysis
 write_csv(data_clean_wide, CLEAN_DATA_PATH)

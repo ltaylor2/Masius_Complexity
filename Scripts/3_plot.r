@@ -16,6 +16,22 @@ categoryColors <- c("SOLO" = "#a6cee3",
 # Read in analyzed data
 data_analyzed <- read_csv(ANALYZED_DATA_PATH, show_col_types=FALSE)
 
+# TABLE 1 ------------------------------------------------------
+# Table of core behavioral elements and descriptions, with category-specific frequencies
+table_1 <- data_analyzed |>
+        select(Category, DisplayCode) |>
+        separate(DisplayCode, into=as.character(0:max(data_analyzed$DisplayLength)),
+                 sep="", fill="right") |>
+        pivot_longer(-Category, names_to="Index", values_to="Element") |>
+        filter(Element != "" & !is.na(Element)) |>
+        group_by(Category, Element) |>
+        tally() |>
+        pivot_wider(id_cols=Element, names_from=Category, values_from=n) |>
+        select(Code=Element, SOLO, AUDI, COP) |>
+        mutate(Element = map_chr(Code, ~ names(behavior_code)[behavior_code==.]),
+               .after=Code)
+write_csv(table_1, file="Output/TABLE_1.csv")
+
 # FIGURE 1 ------------------------------------------------------
 # Boxplot of Duration
 plot_duration <- ggplot(data_analyzed, aes(x=Category, y=Duration, fill=Category)) +

@@ -85,6 +85,7 @@ data_analyzed |>
     group_by(Category, ObsDate) |>
     tally() |>
     pivot_wider(names_from=Category, values_from=n) |>
+    select(ObsDate, SOLO, AUDI, COP) |>
     arrange(ObsDate) |>
     writeSummaryBlock("Date Tally")
 
