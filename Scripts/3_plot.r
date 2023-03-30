@@ -1,11 +1,11 @@
 # Custom plotting theme
 customTheme <- theme_bw() +
             theme(panel.grid=element_blank(),
-                  axis.text.x=element_text(size=6),
-                  axis.text.y=element_text(size=6),
-                  axis.title.x=element_text(size=9),
-                  axis.title.y=element_text(size=9),
-                  plot.title=element_text(size=9))
+                  axis.text.x=element_text(size=8),
+                  axis.text.y=element_text(size=8),
+                  axis.title.x=element_text(size=12),
+                  axis.title.y=element_text(size=12),
+                  plot.title=element_text(size=12))
             
 # 4-Class qualitative colors, colorblind safe
 # from colorbrewer2.org
@@ -15,6 +15,11 @@ categoryColors <- c("SOLO" = "#a6cee3",
 
 # Read in analyzed data
 data_analyzed <- read_csv(ANALYZED_DATA_PATH, show_col_types=FALSE)
+
+# Load jaro distances
+# [Mutate] Category_1 to Factor to order facets in plot
+distances <- readRDS("Output/distances.rds") |>
+          mutate(Category_1 = factor(Category_1, levels=c("SOLO", "AUDI", "COP")))
 
 # TABLE 1 ------------------------------------------------------
 # Table of core behavioral elements and descriptions, with category-specific frequencies
@@ -156,9 +161,48 @@ plots_syntax <- plot_entropy + plot_compression + plot_syntaxCorrelation +
              theme(plot.tag.position=c(0.89, 0.93)) 
 ggsave(plots_syntax, file="Plots/FIGURE_2.png", width=6, height=2) 
 
+# FIGURE 3 ------------------------------------------------------
+# Jaro distance comparison
 
+comparisonSampleSizes <- distances |>
+                      group_by(Category_1, Comparison_Type) |>
+                      tally()
+                      
+comparisonOrder <- c("Same Male/Same Context",
+                     "Diff Male/Same Context",
+                     "Same Male/Diff Context",
+                     "Diff Male/Diff Context")
 
+comparisonLabels <- c("Same Male/Same Context" = "Same Male\nSame Context",
+                     "Diff Male/Same Context"  = "Diff Male\nSame Context",
+                     "Same Male/Diff Context"  = "Same Male\nDiff Context",
+                     "Diff Male/Diff Context"  = "Diff Male\nDiff Context")
 
+plot_jaro <- ggplot(distances, 
+                    aes(x=Comparison_Type, y=Jaro_Distance,
+                        fill=Category_1)) +
+          geom_jitter(width=0.15, height=0,
+                      colour="black", size=0.15, alpha=0.15) +
+          geom_boxplot(alpha=0.5, outlier.shape=NA) +
+          geom_text(data=comparisonSampleSizes,
+                    aes(label=n, x=Comparison_Type, 
+                        y=-Inf), vjust=-0.5, size=3) +
+          xlab("Comparison display") +
+          ylab("Jaro distance") +
+          ggtitle("Focal display context") +
+          facet_wrap(facet=vars(Category_1)) +
+          scale_x_discrete(limits=comparisonOrder,
+                           labels=comparisonLabels) +
+          scale_y_continuous(limits=c(0,1), breaks=seq(0, 1, by=0.2)) +
+          scale_fill_manual(values=categoryColors) +
+          guides(fill="none") +
+          customTheme +
+          theme(plot.title = element_text(hjust=0.5, size=12),
+                strip.text = element_text(size=12),
+                axis.text.x = element_text(size=6, angle=30, vjust=0.87),
+                strip.background = element_rect(colour="black", fill=NA))
+      
+ggsave(plot_jaro, file="Plots/FIGURE_3.png", width=7, height=4)
 
 
 

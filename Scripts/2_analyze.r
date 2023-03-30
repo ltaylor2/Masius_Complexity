@@ -47,7 +47,75 @@ data_analyzed <- data_clean |>
 # Write analyzed data file
 write_csv(data_analyzed, ANALYZED_DATA_PATH)
 
+# Jaro distances ---------------------------------------------
+
+# Custom function to classify Jaro comparison types
+jaroComparisonType <- function(category_1, category_2,
+                               male_1, male_2) {
+    if ((category_1==category_2) & (male_1==male_2)) {
+        return("Same Male/Same Context")        
+    } else if ((category_1==category_2) & (male_1!=male_2)) {
+        return("Diff Male/Same Context")
+    } else if ((category_1!=category_2) & (male_1==male_2)) {
+        return("Same Male/Diff Context")
+    }
+    return("Diff Male/Diff Context")
+}
+
+# Compute Jaro distances
+# [Expand Grid] produce two columns, with all combinations
+#               of display UID
+# [Select] to rename col names
+# [Filter] out rows with the same display
+# [Left join] UID_1 information from full dataset
+# [Select] Category, Male, and Display string for display 1
+# [Left join] UID_2 information frm full dataset
+# [Select] Category, Male, and Display string for display 2
+# [Filter] to include only identified males
+# [Filter] out redundant comparisons
+#              NOTE we have to cut this because we don't want to double count 
+#              e.g. M1-COP1 vs. M2-COP1 and M2-COP1 vs. M1-COP1
+#                   or
+#                   M1-COP1 vs. M1-COP2 and M1-COP2 vs. M1-COP1
+#              HOWEVER we do want to retain these duplicates when they 
+#                      are across different Category_1 contexts, because 
+#                      they are used in different context comparisons
+#              e.g.  M1-COP1 vs. M2-SOLO1 is used for the COP test
+#              while M2-SOLO1 vs. M1-COP1 is used for the SOLO test
+#              Because every unique combination of UID1 and UID2 are 
+#                      in the table, we can do this by
+#                      excluding the rows where 
+#                       UID_1 < UID_2 and Category_1 == Category_2
+#                      this will retain the row where
+#                       UID_1 > UID_2 or Context_1 == Context_2
+#                      and retains all combinations across Contexts
+# [Mutate] Calculate Jaro distance between the two display strings
+# [Mutate] Classify the Jaro comparison type
+#          (see jaroComparisonType() function, above)
+distances <- expand_grid(data_analyzed$UID, data_analyzed$UID) |>
+          select(UID_1=1, UID_2=2) |>
+          filter(UID_1 != UID_2) |>
+          left_join(data_analyzed, by=c("UID_1"="UID")) |>
+          select(UID_1, UID_2, 
+                 Category_1=Category, Male_1=Male1ID, DisplayCode_1=DisplayCode) |>
+          left_join(data_analyzed, by=c("UID_2"="UID")) |>
+          select(UID_1, UID_2,
+                 Category_1, Male_1, DisplayCode_1,
+                 Category_2=Category, Male_2=Male1ID, DisplayCode_2=DisplayCode) |>
+          filter(Male_1 < 8000 & Male_2 < 8000) |>    
+          filter(!(UID_1 < UID_2 & Category_1 == Category_2)) |>    
+          mutate(Jaro_Distance = map2_dbl(DisplayCode_1, DisplayCode_2, 
+                                          ~ stringdist(.x, .y, method="jw")),
+                 .after=UID_2) |>
+          mutate(Comparison_Type = pmap_chr(list(Category_1, Category_2, Male_1, Male_2),
+                                            jaroComparisonType),
+                 .before=1)
+
+# Save for plotting later
+saveRDS(distances, file="Output/distances.rds")
+
 # Randomization tools (for small COP sample sizes) ---------------------------------------------
+
 n_draws <- nrow(filter(data_analyzed, Category=="COP"))
 # Custom function for a single random 
 randomDraw <- function(i, variable) {
@@ -70,7 +138,7 @@ writeSummaryBlock <- function(df, header, append=TRUE) {
 	while(sink.number()>0) { sink() }
 }
 
-# REPORT Tallies) ---------------------------------------------
+# REPORT Tallies ---------------------------------------------
 
 # Tally display categories 
 data_analyzed |>
@@ -297,54 +365,4 @@ data_analyzed |>
     select(UID, Male1ID, DisplayCode) |>
     writeSummaryBlock("COP display codes")
 
-
-# JARO DISTANCES ---------------------------------------------
-# Jaro string distances
-# uids <- data_clean |>
-#      filter(Male1ID != 8000) |>
-#      pull(UID)
-
-# distMat <- matrix(data=NA, nrow=length(uids), ncol=length(uids),
-#                   dimnames=list(uids, uids))
-
-# for (r in 1:length(uids)) {
-#     rID <- uids[r]
-#     rD <- data_clean[data_clean$UID==rID,"DisplayCode"][[1]]
-#     for (c in 1:length(uids)) {
-#         cID <- uids[c]
-#         cD <- data_clean[data_clean$UID==cID,"DisplayCode"][[1]]
-#         dist <- stringdist(rD, cD, method="jw")
-#         distMat[r,c] <- dist
-#     }
-# }
-# getDistanceType <- function(d1_m, d1_type, d2_m, d2_type) {
-#      distanceType <- "Diff Male / Diff Type"
-#      if (d1_m == d2_m) {
-#         if (d1_type == d2_type) {
-#             distanceType <- "Same Male / Same Type"
-#         } else {
-#             distanceType <- "Same Male / Diff Type"
-#         }
-#      } else if (d1_type == d2_type) {
-#         distanceType <- "Diff Male / Same Type"
-#      }
-#      return(distanceType)
-# }
-# distances <- distMat |>
-#           as.data.frame() %>%
-#           mutate(D1_UID=row.names(.)) |>
-#           pivot_longer(cols=-D1_UID, names_to="D2_UID", values_to="Distance") |>
-#           mutate(D1_Male1ID = map_chr(D1_UID, ~ data_clean[data_clean$UID==., "Male1ID"][[1]]),
-#                  D1_DisplayType = map_chr(D1_UID, ~ data_clean[data_clean$UID==., "DisplayType"][[1]]),
-#                  D2_Male1ID = map_chr(D2_UID, ~ data_clean[data_clean$UID==., "Male1ID"][[1]]),
-#                  D2_DisplayType = map_chr(D2_UID, ~ data_clean[data_clean$UID==., "DisplayType"][[1]])) |>
-#           mutate(DistanceType = pmap_chr(list(D1_Male1ID, D1_DisplayType, D2_Male1ID, D2_DisplayType), getDistanceType)) |>
-#           filter(D1_UID != D2_UID)
-# ggplot(distances) +
-#     geom_boxplot(aes(x=DistanceType, y=Distance)) +
-#     theme_bw() +
-#     ylab("Jaro distance") +
-#     theme(panel.grid=element_blank(),
-#           axis.title.x=element_blank()) +
-#     facet_grid(rows=vars(D1_DisplayType), 
-#                cols=vars(D2_DisplayType)) 
+# Jaro distances --  ---------------------------------------------
