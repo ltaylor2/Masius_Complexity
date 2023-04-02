@@ -153,7 +153,6 @@ plot_compression <- ggplot(data_analyzed, aes(x=Category, y=Compression_Ratio, f
                  customTheme
 
 # Correlation plot of entropy and compression          
-
 # Compute convex hulls
 hulls <- data_analyzed |>
       group_by(Category) |>
@@ -503,6 +502,53 @@ plots_randComparions <- plot_randComp_uniqueElements /
                         plot_randComp_compressionRatio
 
 ggsave(plots_randComparions, file="Plots/FIGURE_S2.png", width=6, height=5) 
+
+# FIGURE S3 ---------------------------------------------
+# Correlation plot of display length and compression ratio          
+
+# Linear regression
+model_displayLength_compressionRatio <- lm(Compression_Ratio ~ DisplayLength, 
+                                           data=data_analyzed) |>
+                                     summary()
+
+# Compute convex hulls
+hulls <- data_analyzed |>
+      group_by(Category) |>
+      slice(chull(DisplayLength, Compression_Ratio))
+                             
+# # Arrange hull labels
+labels <- tibble(Category=c("SOLO", "AUDI", "COP"),
+                 x       =c(20,     300,     48),
+                 y       =c(0.4,    3.5,    4.2),
+                 angle   =c(0,      28,    75))
+
+plot_lengthCompression <- ggplot(data_analyzed) +
+                       geom_point(aes(x=DisplayLength, y=Compression_Ratio, colour=Category), 
+                                  size=0.6, alpha=0.9) +
+                       geom_polygon(data=hulls, 
+                                    aes(x=DisplayLength, y=Compression_Ratio, fill=Category), alpha=0.4) +
+                       geom_smooth(aes(x=DisplayLength, y=Compression_Ratio), 
+                                   formula="y~x", method="lm", 
+                                   colour="black", se=FALSE) +
+                       geom_text(data=labels, 
+                                 aes(label=Category, colour=Category,
+                                     x=x, y=y, angle=angle),
+                                     size=4) + 
+                       scale_colour_manual(values=categoryColors) +
+                       scale_fill_manual(values=categoryColors) +
+                       scale_x_continuous(breaks=seq(0, 400, by=100), limits=c(0, 400)) +                
+                       scale_y_continuous(breaks=seq(0, 8, by=2), limits=c(0, 8)) +
+                       guides(fill="none", colour="none") +
+                       xlab("Length (elements)") +
+                       ylab("Compression ratio") +
+                       customTheme
+
+ggsave(plot_lengthCompression, file="Plots/FIGURE_S3.png", width=4, height=4)
+
+
+
+
+
 
 
 
