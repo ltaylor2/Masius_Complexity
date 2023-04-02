@@ -1,5 +1,6 @@
 # Packages
 suppressPackageStartupMessages(library(tidyverse))
+suppressPackageStartupMessages(library(ggstance))
 suppressPackageStartupMessages(library(lubridate))
 suppressPackageStartupMessages(library(acss))
 suppressPackageStartupMessages(library(brotli))
@@ -17,3 +18,8 @@ SUMMARY_TEXT_OUTPUT_PATH <- "Output/REPORT.txt"
 RANDOMIZATION_REPLICATES <- 10000
 
 setwd(WD)
+
+# Source behavior element dictionaries 
+# See Data/dictionary_behaviors.r for details
+source("Data/dictionary_behaviors.r")
+

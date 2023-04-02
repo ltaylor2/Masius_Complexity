@@ -28,7 +28,7 @@ data_raw <- read_csv(RAW_DATA_PATH,
 #             in which case we want the most recent sex/age information
 bands <- read_csv("Data/data_banding.csv", show_col_types=FALSE) |>
       select(Band_ID = "Alum#", Date="Date Banded", Sex, Age) |>
-      mutate(Date = ymd(Date)) |>
+      mutate(Date = dmy(Date)) |>
       group_by(Band_ID) |>
       slice_max(order_by=Date, n=1, with_ties=FALSE)
       
@@ -115,11 +115,6 @@ specifyOtherBehaviors <- function(behavior, details) {
     }
     return(paste(behavior, details))
 }
-
-# Source behavior element dictionaries 
-# See Data/dictionary_behaviors.r for details
-source("Data/dictionary_behaviors.r")
-
 # Organize raw data
 # [Left join] Displays to get display categories
 # [Filter] out MULTI displays (should retain SOLO, AUDI, COP only)
