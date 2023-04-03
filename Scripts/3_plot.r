@@ -79,13 +79,64 @@ table_1 <- data_analyzed |>
 write_csv(table_1, file="Output/TABLE_1.csv")
 
 # FIGURE 1 ------------------------------------------------------
+
+# Custom function to plot brackets with Tukey's for variable
+geom_tukeyBracket <- function(category1, category2, variable, min, max) {
+    # Tukey P Value label
+    tukey <- aov(pull(data_analyzed, variable) ~ data_analyzed$Category) |>
+          TukeyHSD() %>%
+          .[[1]]
+    
+    if (category1=="SOLO"&category2=="AUDI") {x1<-0.9;x2<-2.1}
+    else if (category1=="SOLO"&category2=="COP") {x1<-0.9;x2<-3.1}
+    else if (category1=="COP"&category2=="AUDI") {x1<-1.9;x2<-3.1}
+
+    p <- tukey[,4][paste(category1, category2, sep="-")]
+
+    range <- max-min
+    offset <- max*-0.03
+    
+    label <- ""
+    linetype <- "dashed"
+    if (p <= 0.001) {label<-"***"; linetype<-"solid"}
+    else if (p <= 0.01) {label<-"**"; linetype<-"solid"}
+    else if (p <= 0.05) {label<-"*"; linetype<-"solid"}
+
+    # Y axis 
+    if (category1=="SOLO" & category2=="AUDI") {
+        y = min + range * 0.90
+    } else if (category1=="COP" & category2=="AUDI") {
+        y = min + range * 0.95
+    } else if (category1=="SOLO" & category2=="COP") {
+        y = min + range * 1.00
+    }
+    bracketCorner <- range * 0.015
+    g1 <- geom_segment(x=x1, xend=x2, 
+                       y=y, yend=y, 
+                       linetype=linetype, colour="gray",
+                       linewidth=0.35)
+    g2 <- geom_segment(x=x1, xend=x1, 
+                       y=y+bracketCorner, yend=y-bracketCorner, 
+                       colour="gray")
+    g3 <- geom_segment(x=x2, xend=x2, 
+                       y=y+bracketCorner, yend=y-bracketCorner, 
+                       colour="gray")
+    g4 <- geom_text(label=label, x=(x1+x2)/2, 
+                    y=y+offset, colour="gray", vjust=0, size=3)
+    
+    return(list(g1, g2, g3, g4))
+}
+
 # Boxplot of Duration
 plot_duration <- ggplot(data_analyzed, aes(x=Category, y=Duration, fill=Category)) +
+              geom_tukeyBracket("SOLO", "AUDI", "Duration", 0, 740) +
+              geom_tukeyBracket("COP", "AUDI", "Duration", 0, 740) +
+              geom_tukeyBracket("SOLO", "COP", "Duration", 0, 740) +
               geom_jitter(width=0.15, height=0,
                           colour="black", size=0.5) +
-                   geom_boxplot(alpha=0.5, outlier.shape=NA) +
+              geom_boxplot(alpha=0.5, outlier.shape=NA) +
               scale_x_discrete(limits=c("SOLO", "AUDI", "COP")) +
-              scale_y_continuous(breaks=seq(0, 780, by=120)) +
+              scale_y_continuous(breaks=seq(0, 720, by=120), limits=c(0, 740)) +
               scale_fill_manual(values=categoryColors) +
               guides(fill="none") +
               ylab("Duration (s)") +
@@ -94,11 +145,14 @@ plot_duration <- ggplot(data_analyzed, aes(x=Category, y=Duration, fill=Category
 
 # Boxplot of Display Length                      
 plot_displayLength <- ggplot(data_analyzed, aes(x=Category, y=DisplayLength, fill=Category)) +
+                   geom_tukeyBracket("SOLO", "AUDI", "DisplayLength", 0, 420) +
+                   geom_tukeyBracket("COP", "AUDI", "DisplayLength", 0, 420) +
+                   geom_tukeyBracket("SOLO", "COP", "DisplayLength", 0, 420) +
                    geom_jitter(width=0.15, height=0,
                                colour="black", size=0.5) +
                    geom_boxplot(alpha=0.5, outlier.shape=NA) +
                    scale_x_discrete(limits=c("SOLO", "AUDI", "COP")) +   
-                   scale_y_continuous(breaks=seq(0, 400, by=100), limits=c(0, 400)) +                
+                   scale_y_continuous(breaks=seq(0, 400, by=100), limits=c(0, 420)) +                
                    scale_fill_manual(values=categoryColors) +
                    guides(fill="none") +
                    xlab("Display context") +
@@ -107,11 +161,14 @@ plot_displayLength <- ggplot(data_analyzed, aes(x=Category, y=DisplayLength, fil
 
 # Boxplot of Unique Elements                      
 plot_uniqueElements <- ggplot(data_analyzed, aes(x=Category, y=UniqueDisplayElements, fill=Category)) +
+                    geom_tukeyBracket("SOLO", "AUDI", "UniqueDisplayElements", 0, 11) +
+                    geom_tukeyBracket("COP", "AUDI", "UniqueDisplayElements", 0, 11) +
+                    geom_tukeyBracket("SOLO", "COP", "UniqueDisplayElements", 0, 11) +
                     geom_jitter(width=0.15, height=0,
                                 colour="black", size=0.5) +
                     geom_boxplot(alpha=0.5, outlier.shape=NA) +
                     scale_x_discrete(limits=c("SOLO", "AUDI", "COP")) +     
-                    scale_y_continuous(breaks=seq(0, 10, by=2)) +              
+                    scale_y_continuous(breaks=seq(0, 10, by=2), limits=c(0, 11)) +              
                     scale_fill_manual(values=categoryColors) +
                     guides(fill="none") +
                     ylab("Unique elements") +
@@ -128,11 +185,14 @@ ggsave(plots_repertoire, file="Plots/FIGURE_1.png", width=6, height=2)
 # FIGURE 2 ------------------------------------------------------
 # Boxplot of scaled entropy
 plot_entropy <- ggplot(data_analyzed, aes(x=Category, y=Entropy_Scaled, fill=Category)) +
+             geom_tukeyBracket("SOLO", "AUDI", "Entropy_Scaled", 0, 1.2) +
+             geom_tukeyBracket("COP", "AUDI", "Entropy_Scaled", 0, 1.2) +
+             geom_tukeyBracket("SOLO", "COP", "Entropy_Scaled", 0, 1.2) +
              geom_jitter(width=0.15, height=0,
                          colour="black", size=0.5) +
-                  geom_boxplot(alpha=0.5, outlier.shape=NA) +
+             geom_boxplot(alpha=0.5, outlier.shape=NA) +
              scale_x_discrete(limits=c("SOLO", "AUDI", "COP")) +
-             scale_y_continuous(breaks=seq(0, 1, by=0.2), limits=c(0,1)) +
+             scale_y_continuous(breaks=seq(0, 1, by=0.2), limits=c(0,1.2)) +
              scale_fill_manual(values=categoryColors) +
              guides(fill="none") +
              xlab("Display context") +
@@ -141,6 +201,9 @@ plot_entropy <- ggplot(data_analyzed, aes(x=Category, y=Entropy_Scaled, fill=Cat
 
 # Boxplot of compression ratio                      
 plot_compression <- ggplot(data_analyzed, aes(x=Category, y=Compression_Ratio, fill=Category)) +
+                 geom_tukeyBracket("SOLO", "AUDI", "Compression_Ratio", 0, 8) +
+                 geom_tukeyBracket("COP", "AUDI", "Compression_Ratio", 0, 8) +
+                 geom_tukeyBracket("SOLO", "COP", "Compression_Ratio", 0, 8) +
                  geom_jitter(width=0.15, height=0,
                              colour="black", size=0.5) +
                  geom_boxplot(alpha=0.5, outlier.shape=NA) +
@@ -160,9 +223,9 @@ hulls <- data_analyzed |>
 
 # Arrange hull labels
 labels <- tibble(Category=c("SOLO", "AUDI", "COP"),
-                 x       =c(0.88,    0.75,    0.15),
-                 y       =c(0.19,    6.60,    2.75),
-                 angle   =c(0,       -59,      -63))
+                 x       =c(0.88,    0.75,    0.13),
+                 y       =c(0.19,    6.60,    2.80),
+                 angle   =c(0,       -63.5,    -60))
 
 plot_syntaxCorrelation <- ggplot(data_analyzed) +
                        geom_point(aes(x=Entropy_Scaled, y=Compression_Ratio, colour=Category), 
@@ -544,17 +607,3 @@ plot_lengthCompression <- ggplot(data_analyzed) +
                        customTheme
 
 ggsave(plot_lengthCompression, file="Plots/FIGURE_S3.png", width=4, height=4)
-
-
-
-
-
-
-
-
-
-
-
-
-
-
