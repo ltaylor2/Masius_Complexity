@@ -20,7 +20,10 @@ data_analyzed <- read_csv(ANALYZED_DATA_PATH, show_col_types=FALSE)
 # Load jaro distances
 # [Mutate] Category_1 to Factor to order facets in plot
 distances <- readRDS("Output/distances.rds") |>
-          mutate(Category_1 = factor(Category_1, levels=c("SOLO", "AUDI", "COP")))
+          mutate(Focal_Label = ifelse(Category_1=="SOLO", "Focal display context: SOLO", Category_1)) |>
+          mutate(Focal_Label = factor(Focal_Label, levels=c("Focal display context: SOLO", "AUDI", "COP")))
+
+          
 
 # TABLE 1 ------------------------------------------------------
 # Table of core behavioral elements and descriptions, with category-specific frequencies
@@ -259,7 +262,7 @@ ggsave(plots_syntax, file="Plots/FIGURE_2.png", width=6, height=2)
 # Jaro distance comparison
 
 comparisonSampleSizes <- distances |>
-                      group_by(Category_1, Comparison_Type) |>
+                      group_by(Category_1, Focal_Label, Comparison_Type) |>
                       tally()
                       
 comparisonOrder <- c("Same Male/Same Context",
@@ -280,23 +283,21 @@ plot_jaro <- ggplot(distances,
           geom_boxplot(alpha=0.5, outlier.shape=NA) +
           geom_text(data=comparisonSampleSizes,
                     aes(label=n, x=Comparison_Type, 
-                        y=-Inf), vjust=-0.5, size=3) +
+                        y=-Inf), vjust=-0.5, size=2.5) +
           xlab("Comparison display") +
           ylab("Jaro distance") +
-          ggtitle("Focal display context") +
-          facet_wrap(facet=vars(Category_1)) +
+          facet_wrap(facet=vars(Focal_Label)) +
           scale_x_discrete(limits=comparisonOrder,
                            labels=comparisonLabels) +
           scale_y_continuous(limits=c(0,1), breaks=seq(0, 1, by=0.2)) +
           scale_fill_manual(values=categoryColors) +
           guides(fill="none") +
           customTheme +
-          theme(plot.title = element_text(hjust=0.5, size=12),
-                strip.text = element_text(size=12),
+          theme(strip.text = element_text(size=11, hjust=1),
                 axis.text.x = element_text(size=6, angle=30, vjust=0.87),
-                strip.background = element_rect(colour="black", fill=NA))
+                strip.background = element_rect(colour=NA, fill=NA))
       
-ggsave(plot_jaro, file="Plots/FIGURE_3.png", width=7, height=4)
+ggsave(plot_jaro, file="Plots/FIGURE_3.png", width=7, height=3)
 
 # TABLE S2 ---------------------------------------------
 # Male performance patterns 

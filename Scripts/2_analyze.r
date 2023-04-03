@@ -366,3 +366,22 @@ data_analyzed |>
     writeSummaryBlock("COP display codes")
 
 # Jaro distances --  ---------------------------------------------
+distances |>
+    group_by(Comparison_Type) |>
+    summarize(mean(Jaro_Distance), sd(Jaro_Distance)) |>
+    writeSummaryBlock("Jaro distances by comparison type")    
+
+distances |>
+    filter(Comparison_Type == "Diff Male/Same Context") |>                        
+    group_by(Category_1, Comparison_Type) |>
+    summarize(mean(Jaro_Distance), sd(Jaro_Distance), .groups="keep") |>
+    writeSummaryBlock("Diff Male/Same Context Jaro comparisons SOLO vs. AUDI vs. COP")
+
+distances |>
+    filter(Category_1 == "COP") |>
+    group_by(UID_1) |>
+    filter(Jaro_Distance == min(Jaro_Distance)) |>
+    group_by(Category_1, Category_2, Comparison_Type) |>
+    tally() |>
+    writeSummaryBlock("COP closest partner")
+

@@ -1,6 +1,5 @@
 # Packages
 suppressPackageStartupMessages(library(tidyverse))
-suppressPackageStartupMessages(library(ggstance))
 suppressPackageStartupMessages(library(lubridate))
 suppressPackageStartupMessages(library(acss))
 suppressPackageStartupMessages(library(brotli))

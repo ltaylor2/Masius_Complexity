@@ -379,12 +379,11 @@ SOLO-COP  -37.98284 -63.31964 -12.64604 0.0013727
 **UNIQUE ELEMENTS -- Key values**
 
 # A tibble: 3 x 5
-  Category `mean(UniqueDisplayElements)` `sd(UniqueDisplayElements)` `min(UniqueDisplayElements)` max(UniqueDi~1
-  <chr>                            <dbl>                       <dbl>                        <dbl>          <dbl>
-1 AUDI                              5.87                       0.968                            4              8
-2 COP                               3.15                       0.801                            2              5
-3 SOLO                              5.91                       1.05                             4             10
-# ... with abbreviated variable name 1: `max(UniqueDisplayElements)`
+  Category `mean(UniqueDisplayElements)` `sd(UniqueDisplayElements)` `min(UniqueDisplayElements)` `max(UniqueDisplayElements)`
+  <chr>                            <dbl>                       <dbl>                        <dbl>                        <dbl>
+1 AUDI                              5.87                       0.968                            4                            8
+2 COP                               3.15                       0.801                            2                            5
+3 SOLO                              5.91                       1.05                             4                           10
 
 
 ------------------------------
@@ -581,9 +580,9 @@ F-statistic: 391.7 on 1 and 351 DF,  p-value: < 2.2e-16
 **Highest Compression Ratio**
 
 # A tibble: 1 x 6
-  UID   Category Entropy_Scaled Compression_Ratio DisplayLength DisplayCode                                     
-  <chr> <chr>             <dbl>             <dbl>         <int> <chr>                                           
-1 1487  AUDI              0.633              7.45           365 DDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDIIIIIIIDDBFFFFF~
+  UID   Category Entropy_Scaled Compression_Ratio DisplayLength DisplayCode                                                                                               
+  <chr> <chr>             <dbl>             <dbl>         <int> <chr>                                                                                                     
+1 1487  AUDI              0.633              7.45           365 DDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDIIIIIIIDDBFFFFFFFFFFFFFFFFFIIHHHHHHHHHHHHHHHHIIIIIIIIHHHHIIIIIIIIIIIIIIII~
 
 
 ------------------------------
@@ -593,9 +592,9 @@ F-statistic: 391.7 on 1 and 351 DF,  p-value: < 2.2e-16
 **Compression rate comparison**
 
 # A tibble: 1 x 6
-  UID   Category Entropy_Scaled Compression_Ratio DisplayLength DisplayCode                                     
-  <chr> <chr>             <dbl>             <dbl>         <int> <chr>                                           
-1 453   AUDI              0.639              2.53            81 JJDBAIIIIIIHHIIIIIIIIIIIIIIIIIIIIIIIIIDDDDDDDDD~
+  UID   Category Entropy_Scaled Compression_Ratio DisplayLength DisplayCode                                                                      
+  <chr> <chr>             <dbl>             <dbl>         <int> <chr>                                                                            
+1 453   AUDI              0.639              2.53            81 JJDBAIIIIIIHHIIIIIIIIIIIIIIIIIIIIIIIIIDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDBFFFFIIIIEDBA
 
 
 ------------------------------
@@ -605,9 +604,9 @@ F-statistic: 391.7 on 1 and 351 DF,  p-value: < 2.2e-16
 **Lowest Entropy display**
 
 # A tibble: 1 x 6
-  UID   Category Entropy_Scaled Compression_Ratio DisplayLength DisplayCode                                     
-  <chr> <chr>             <dbl>             <dbl>         <int> <chr>                                           
-1 1533  COP               0.113              4.71            66 DDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDD~
+  UID   Category Entropy_Scaled Compression_Ratio DisplayLength DisplayCode                                                       
+  <chr> <chr>             <dbl>             <dbl>         <int> <chr>                                                             
+1 1533  COP               0.113              4.71            66 DDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDB
 
 
 ------------------------------
@@ -632,6 +631,277 @@ F-statistic: 391.7 on 1 and 351 DF,  p-value: < 2.2e-16
 11 989       980 DDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDB                           
 12 991       980 IIIIIDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDB          
 13 992       980 IDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDB          
+
+
+------------------------------
+
+------------------------------
+
+**Broad jaro comparisons**
+
+# A tibble: 2 x 3
+  Bulk_Comparison `mean(Jaro_Distance)` `sd(Jaro_Distance)`
+  <chr>                           <dbl>               <dbl>
+1 Diff Context                    0.532               0.102
+2 Same Context                    0.381               0.107
+
+
+------------------------------
+
+------------------------------
+
+**Same context Jaro comparisons SOLO vs. AUDI vs. COP**
+
+# A tibble: 3 x 3
+  Category_1 `mean(Jaro_Distance)` `sd(Jaro_Distance)`
+  <chr>                      <dbl>               <dbl>
+1 AUDI                       0.362               0.103
+2 COP                        0.156               0.118
+3 SOLO                       0.384               0.107
+
+
+------------------------------
+
+------------------------------
+
+**Jaro distances by comparison type**
+
+# A tibble: 4 x 3
+  Comparison_Type        `mean(Jaro_Distance)` `sd(Jaro_Distance)`
+  <chr>                                  <dbl>               <dbl>
+1 Diff Male/Diff Context                 0.536               0.103
+2 Diff Male/Same Context                 0.385               0.106
+3 Same Male/Diff Context                 0.526               0.101
+4 Same Male/Same Context                 0.372               0.107
+
+
+------------------------------
+
+------------------------------
+
+**Jaro distances by focal display category and comparison type**
+
+# A tibble: 12 x 4
+# Groups:   Category_1 [3]
+   Category_1 Comparison_Type        `mean(Jaro_Distance)` `sd(Jaro_Distance)`
+   <chr>      <chr>                                  <dbl>               <dbl>
+ 1 AUDI       Diff Male/Diff Context                 0.534              0.105 
+ 2 AUDI       Diff Male/Same Context                 0.360              0.104 
+ 3 AUDI       Same Male/Diff Context                 0.524              0.103 
+ 4 AUDI       Same Male/Same Context                 0.368              0.101 
+ 5 COP        Diff Male/Diff Context                 0.492              0.137 
+ 6 COP        Diff Male/Same Context                 0.138              0.101 
+ 7 COP        Same Male/Diff Context                 0.492              0.126 
+ 8 COP        Same Male/Same Context                 0.175              0.132 
+ 9 SOLO       Diff Male/Diff Context                 0.544              0.0931
+10 SOLO       Diff Male/Same Context                 0.389              0.106 
+11 SOLO       Same Male/Diff Context                 0.536              0.0898
+12 SOLO       Same Male/Same Context                 0.373              0.107 
+
+
+------------------------------
+
+------------------------------
+
+**Broad jaro comparisons**
+
+# A tibble: 2 x 3
+  Bulk_Comparison `mean(Jaro_Distance)` `sd(Jaro_Distance)`
+  <chr>                           <dbl>               <dbl>
+1 Diff Context                    0.532               0.102
+2 Same Context                    0.381               0.107
+
+
+------------------------------
+
+------------------------------
+
+**Same context Jaro comparisons SOLO vs. AUDI vs. COP**
+
+# A tibble: 3 x 3
+  Category_1 `mean(Jaro_Distance)` `sd(Jaro_Distance)`
+  <chr>                      <dbl>               <dbl>
+1 AUDI                       0.362               0.103
+2 COP                        0.156               0.118
+3 SOLO                       0.384               0.107
+
+
+------------------------------
+
+------------------------------
+
+**Jaro distances by comparison type**
+
+# A tibble: 4 x 3
+  Comparison_Type        `mean(Jaro_Distance)` `sd(Jaro_Distance)`
+  <chr>                                  <dbl>               <dbl>
+1 Diff Male/Diff Context                 0.536               0.103
+2 Diff Male/Same Context                 0.385               0.106
+3 Same Male/Diff Context                 0.526               0.101
+4 Same Male/Same Context                 0.372               0.107
+
+
+------------------------------
+
+------------------------------
+
+**Jaro distances by focal display category and comparison type**
+
+# A tibble: 12 x 4
+# Groups:   Category_1 [3]
+   Category_1 Comparison_Type        `mean(Jaro_Distance)` `sd(Jaro_Distance)`
+   <chr>      <chr>                                  <dbl>               <dbl>
+ 1 AUDI       Diff Male/Diff Context                 0.534              0.105 
+ 2 AUDI       Diff Male/Same Context                 0.360              0.104 
+ 3 AUDI       Same Male/Diff Context                 0.524              0.103 
+ 4 AUDI       Same Male/Same Context                 0.368              0.101 
+ 5 COP        Diff Male/Diff Context                 0.492              0.137 
+ 6 COP        Diff Male/Same Context                 0.138              0.101 
+ 7 COP        Same Male/Diff Context                 0.492              0.126 
+ 8 COP        Same Male/Same Context                 0.175              0.132 
+ 9 SOLO       Diff Male/Diff Context                 0.544              0.0931
+10 SOLO       Diff Male/Same Context                 0.389              0.106 
+11 SOLO       Same Male/Diff Context                 0.536              0.0898
+12 SOLO       Same Male/Same Context                 0.373              0.107 
+
+
+------------------------------
+
+------------------------------
+
+**Jaro distances by focal display category and comparison type**
+
+# A tibble: 12 x 4
+# Groups:   Category_1, Comparison_Type [12]
+   Category_1 Comparison_Type        `mean(Jaro_Distance)` `sd(Jaro_Distance)`
+   <chr>      <chr>                                  <dbl>               <dbl>
+ 1 AUDI       Diff Male/Diff Context                 0.534              0.105 
+ 2 AUDI       Diff Male/Same Context                 0.360              0.104 
+ 3 AUDI       Same Male/Diff Context                 0.524              0.103 
+ 4 AUDI       Same Male/Same Context                 0.368              0.101 
+ 5 COP        Diff Male/Diff Context                 0.492              0.137 
+ 6 COP        Diff Male/Same Context                 0.138              0.101 
+ 7 COP        Same Male/Diff Context                 0.492              0.126 
+ 8 COP        Same Male/Same Context                 0.175              0.132 
+ 9 SOLO       Diff Male/Diff Context                 0.544              0.0931
+10 SOLO       Diff Male/Same Context                 0.389              0.106 
+11 SOLO       Same Male/Diff Context                 0.536              0.0898
+12 SOLO       Same Male/Same Context                 0.373              0.107 
+
+
+------------------------------
+
+------------------------------
+
+**Jaro distances by comparison type**
+
+# A tibble: 4 x 3
+  Comparison_Type        `mean(Jaro_Distance)` `sd(Jaro_Distance)`
+  <chr>                                  <dbl>               <dbl>
+1 Diff Male/Diff Context                 0.536               0.103
+2 Diff Male/Same Context                 0.385               0.106
+3 Same Male/Diff Context                 0.526               0.101
+4 Same Male/Same Context                 0.372               0.107
+
+
+------------------------------
+
+------------------------------
+
+**Same context Jaro comparisons SOLO vs. AUDI vs. COP**
+
+# A tibble: 3 x 3
+  Category_1 `mean(Jaro_Distance)` `sd(Jaro_Distance)`
+  <chr>                      <dbl>               <dbl>
+1 AUDI                       0.362               0.103
+2 COP                        0.156               0.118
+3 SOLO                       0.384               0.107
+
+
+------------------------------
+
+------------------------------
+
+**COP closest partner**
+
+# A tibble: 13 x 2
+   UID_1     n
+   <chr> <int>
+ 1 1455      1
+ 2 1533      1
+ 3 1558      1
+ 4 1817      1
+ 5 1824      1
+ 6 1878      1
+ 7 1920      1
+ 8 1987      1
+ 9 2020      1
+10 5005      1
+11 989       1
+12 991       1
+13 992       1
+
+
+------------------------------
+
+------------------------------
+
+**COP closest partner**
+
+# A tibble: 4 x 3
+# Groups:   Category_1 [1]
+  Category_1 Comparison_Type            n
+  <chr>      <chr>                  <int>
+1 COP        Diff Male/Diff Context     2
+2 COP        Diff Male/Same Context     3
+3 COP        Same Male/Diff Context     2
+4 COP        Same Male/Same Context     6
+
+
+------------------------------
+
+------------------------------
+
+**COP closest partner**
+
+# A tibble: 4 x 4
+# Groups:   Category_1, Category_2 [2]
+  Category_1 Category_2 Comparison_Type            n
+  <chr>      <chr>      <chr>                  <int>
+1 COP        AUDI       Diff Male/Diff Context     2
+2 COP        AUDI       Same Male/Diff Context     2
+3 COP        COP        Diff Male/Same Context     3
+4 COP        COP        Same Male/Same Context     6
+
+
+------------------------------
+
+------------------------------
+
+**Diff Male/Same Context Jaro comparisons SOLO vs. AUDI vs. COP**
+
+# A tibble: 3 x 4
+# Groups:   Category_1 [3]
+  Category_1 Comparison_Type        `mean(Jaro_Distance)` `sd(Jaro_Distance)`
+  <chr>      <chr>                                  <dbl>               <dbl>
+1 AUDI       Diff Male/Same Context                 0.360               0.104
+2 COP        Diff Male/Same Context                 0.138               0.101
+3 SOLO       Diff Male/Same Context                 0.389               0.106
+
+
+------------------------------
+
+------------------------------
+
+**Diff Male/Same Context Jaro comparisons SOLO vs. AUDI vs. COP**
+
+# A tibble: 3 x 4
+# Groups:   Category_1, Comparison_Type [3]
+  Category_1 Comparison_Type        `mean(Jaro_Distance)` `sd(Jaro_Distance)`
+  <chr>      <chr>                                  <dbl>               <dbl>
+1 AUDI       Diff Male/Same Context                 0.360               0.104
+2 COP        Diff Male/Same Context                 0.138               0.101
+3 SOLO       Diff Male/Same Context                 0.389               0.106
 
 
 ------------------------------
