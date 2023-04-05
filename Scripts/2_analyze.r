@@ -384,4 +384,3 @@ distances |>
     group_by(Category_1, Category_2, Comparison_Type) |>
     tally() |>
     writeSummaryBlock("COP closest partner")
-

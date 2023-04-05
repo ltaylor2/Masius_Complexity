@@ -608,3 +608,47 @@ plot_lengthCompression <- ggplot(data_analyzed) +
                        customTheme
 
 ggsave(plot_lengthCompression, file="Plots/FIGURE_S3.png", width=4, height=4)
+
+
+# TABLE S6 ---------------------------------------------
+# COP vs. after-COP displays, raw element frequencies
+# [Filter] to include only COP displays
+# [Select] the before- and after- display codes 
+#          NOTE includes both "Attempted Copulation" and "Copulation" elements
+#               which are excluded in the main analyses
+# [Pivot longer] So each row is one DisplayCode (before or after)
+# [Separate] DisplayCode into single-character elements
+# [Pivot longer] So each row is on behavioral element 
+# [Group by] Section (i.e., before or after first copulation) and Code
+# [Tally] The frequency of elements for before- and after
+# [Pivot wider] so each row is an individual element, 
+#               including columns for Before- and After- copulation frequencies
+# [Mutate] map the single-character element code to the shortened behavior name
+# [Mutate] replace NAs with 0s in the Before and After cols
+# [Arrange] by code (i.e., alphabetical order)
+# [Select] to reorder columns 
+table_s6 <- data_analyzed |>
+         filter(Category=="COP") |>
+         select(Before=DisplayCode_withCops, After=DisplayCode_AfterCop) |>
+         pivot_longer(cols=everything(), names_to="Section", values_to="DisplayCode") |>
+         separate(DisplayCode, into=as.character(0:400), sep="", fill="right") |>
+         pivot_longer(-c(Section), names_to="Index", values_to="Code") |>
+         filter(Code!="" & !is.na(Code)) |>
+         group_by(Section, Code) |>
+         tally() |>
+         pivot_wider(id_cols=Code, names_from=Section, values_from=n) |>
+         mutate(Element = map_chr(Code, ~ names(behavior_code[behavior_code==.])),
+                .after=Code) |>
+         mutate(across(c(Before, After), ~ ifelse(is.na(.x), 0, .x))) |>
+         arrange(Code) |>
+         select(Code, Element, Before, After)
+
+# Write table to file
+write_csv(table_s6, file="Output/TABLE_S6.csv")
+
+# TABLE S7 ---------------------------------------------
+# Full display strings of each before- and after-copulation displays
+
+table_s7 <- data_analyzed |>
+         filter(Category=="COP") |>
+         select(UID, Male1ID, Before=DisplayCode_withCops, After=DisplayCode_AfterCop)

@@ -180,6 +180,8 @@ displayDuration <- function(uid, coded=FALSE) {
 # [Ungroup] To avoid any errors
 # [Filter] out displays <60s
 # [Filter] out displays that are missing ALAD or Bows
+# [Mutate] make a copy that does not cut Attempted Copulation or Copulation 
+#          used in before vs. after cop comparisons
 # [Mutate] cut Attempted Copulation ("AttC", should be code "M") from final display strings
 # [Mutate] cut Copulation ("Cop", should be code "N") from final display strings
 data_clean_wide <- data_clean_long |>
@@ -198,11 +200,9 @@ data_clean_wide <- data_clean_long |>
                 ungroup() |>
                 filter(Duration >= 60) |>
                 filter(grepl("ALAD", DisplayShort) & grepl("Bow", DisplayShort)) |>
-                mutate(DisplayCode = str_replace(DisplayCode, behavior_code["AttC"], ""),
-                       DisplayCode_AfterCop = str_replace(DisplayCode_AfterCop, behavior_code["AttC"], "")) |>
-                mutate(DisplayCode = str_replace(DisplayCode, behavior_code["Cop"], ""),
-                       DisplayCode_AfterCop = str_replace(DisplayCode_AfterCop, behavior_code["Cop"], ""))
-
+                mutate(DisplayCode_withCops = DisplayCode) |>
+                mutate(DisplayCode = str_replace(DisplayCode, behavior_code["AttC"], "")) |>
+                mutate(DisplayCode = str_replace(DisplayCode, behavior_code["Cop"], ""))
 
 # Write clean datasheet for analysis
 write_csv(data_clean_wide, CLEAN_DATA_PATH)
