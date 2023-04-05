@@ -1,42 +1,42 @@
-I,Element,Frequency,Classification
-1,Attempted Copulation,11,
-2,Bird2 ALAD,55,
-3,Bird2 BowLeft,695,
-4,Bird2 BowRight,677,
-5,Bird2 Half-bow Left,26,
-6,Bird2 Half-bow Right,21,
-7,Bird2 HeadDownBowing,56,
-8,Bird2 Mixed Element,13,
-9,Bird2 NeckTwist,1693,
-10,Bird2 On-log NO display,79,
-11,Bird2 SLAD,1,
-12,Bird2 TafLF_Off,28,
-13,Bird2 TafLF_On,26,
-14,Copulation,24,
-15,End,486,
-16,Female Looking Away,1736,
-17,Female Movement,978,
-18,Female Off Log,320,
-19,Female On Log,320,
-20,Female ResponseToALAD,188,
-21,Female Tracking Male,1924,
-22,FemaleSwitch,406,
-23,Male1 ALAD,1104,
-24,Male1 BowLeft,8088,
-25,Male1 BowRight,7950,
-26,Male1 Half-bow Left,296,
-27,Male1 Half-bow Right,258,
-28,Male1 HeadDownBowing,2360,
-29,Male1 Metronome_Left,11,
-30,Male1 Metronome_Right,25,
-31,Male1 Mixed Element,361,
-32,Male1 NeckTwist,5618,
-33,Male1 Off Log,41,
-34,Male1 On Log,39,
-35,Male1 On Log No Display,2225,
-36,Male1 Other Behavior,2142,
-37,Male1 SLAD,655,
-38,Male1 Switch,1145,
-39,Male1 TafLF_Off,1193,
-40,Male1 TafLF_On,1223,
-41,Start,486,
+Behavior,n
+Attempted Copulation,11
+Bird2 ALAD,55
+Bird2 BowLeft,695
+Bird2 BowRight,677
+Bird2 Half-bow Left,26
+Bird2 Half-bow Right,21
+Bird2 HeadDownBowing,56
+Bird2 Mixed Element,13
+Bird2 NeckTwist,1693
+Bird2 On-log NO display,79
+Bird2 SLAD,1
+Bird2 TafLF_Off,28
+Bird2 TafLF_On,26
+Copulation,24
+End,486
+Female Looking Away,1736
+Female Movement,978
+Female Off Log,320
+Female On Log,320
+Female ResponseToALAD,188
+Female Tracking Male,1924
+FemaleSwitch,406
+Male1 ALAD,1104
+Male1 BowLeft,8088
+Male1 BowRight,7950
+Male1 Half-bow Left,296
+Male1 Half-bow Right,258
+Male1 HeadDownBowing,2360
+Male1 Metronome_Left,11
+Male1 Metronome_Right,25
+Male1 Mixed Element,361
+Male1 NeckTwist,5618
+Male1 Off Log,41
+Male1 On Log,39
+Male1 On Log No Display,2225
+Male1 Other Behavior,2142
+Male1 SLAD,655
+Male1 Switch,1145
+Male1 TafLF_Off,1193
+Male1 TafLF_On,1223
+Start,486

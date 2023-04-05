@@ -1,7 +1,3 @@
-# Set random seed to Tinbergen's birthday
-#   To replicate randomizationr results
-set.seed(1973)
-
 # Read data (cleaned up in Scripts/1_parse_data.r)
 data_clean <- read_csv(CLEAN_DATA_PATH, show_col_types=FALSE)
 
@@ -117,7 +113,7 @@ saveRDS(distances, file="Output/distances.rds")
 # Randomization tools (for small COP sample sizes) ---------------------------------------------
 
 n_draws <- nrow(filter(data_analyzed, Category=="COP"))
-# Custom function for a single random 
+# Custom function for a single random draw of Display metric
 randomDraw <- function(i, variable) {
     if (i==1 | (i %% 5000) == 0) { cat(paste("Random draw", i, "for variable", variable, "\n")) }
 
@@ -127,6 +123,28 @@ randomDraw <- function(i, variable) {
     return(tibble(Variable=variable, Mean=mean(draw)))
 }
 
+# Custom function for a single random draw of Jaro distances
+#   for two key COP-related distances
+randomDrawJaro <- function(i, comparison=c("Diff Male/Same Context vs. Same Male/Diff Context COP",
+                                           "Diff Male/Same Context COP vs. AUDI vs. SOLO")) {
+
+    if (i==1 | (i %% 5000) == 0) { cat(paste("Random draw", i, "for Jaro distances", comparison, "\n")) }
+
+    if (comparison == "Diff Male/Same Context vs. Same Male/Diff Context COP") {
+        draw <- distances |>
+             filter(Category_1 == "COP" & Comparison_Type == "Same Male/Diff Context") |>
+             slice_sample(n=n_draws, replace=FALSE) |>
+             pull(Jaro_Distance)
+    } else if (comparison == "Diff Male/Same Context COP vs. AUDI + SOLO") {
+        draw <- distances |>
+             filter(Comparison_Type == "Diff Male/Same Context") |>
+             slice_sample(n=n_draws, replace=FALSE) |>
+             pull(Jaro_Distance)
+    }
+    return(tibble(Comparison = comparison, Mean=mean(draw)))
+}
+
+# REPORT Tallies ---------------------------------------------
 # Custom function to write a summary block
 # for output text files
 writeSummaryBlock <- function(df, header, append=TRUE) {
@@ -137,8 +155,6 @@ writeSummaryBlock <- function(df, header, append=TRUE) {
 	cat("\n\n------------------------------\n\n")
 	while(sink.number()>0) { sink() }
 }
-
-# REPORT Tallies ---------------------------------------------
 
 # Tally display categories 
 data_analyzed |>
@@ -257,12 +273,14 @@ aov(UniqueDisplayElements ~ Category, data=data_analyzed) |>
 
 # RANDOMIZATION Unique elements ---------------------------------------------
 
-# Generate random distribution
-randomDistribution_uniqueElements <- map_df(1:RANDOMIZATION_REPLICATES, ~randomDraw(., "UniqueDisplayElements"))
-
-# Save for plotting later
-saveRDS(randomDistribution_uniqueElements, file="Output/randomDistribution_uniqueElements.rds")
-
+# Generate random distribution (if needed)
+#   or load random distribution saved from previous run
+if (RUN_RANDOM) {
+    randomDistribution_uniqueElements <- map_df(1:RANDOMIZATION_REPLICATES, ~randomDraw(., "UniqueDisplayElements"))
+    saveRDS(randomDistribution_uniqueElements, file="Output/randomDistribution_uniqueElements.rds")
+} else {
+    randomDistribution_uniqueElements <- readRDS("Output/randomDistribution_uniqueElements.rds")
+}
 # Summarize for report
 cop_UniqueDisplayElements <- data_analyzed |>
                           filter(Category == "COP") |>
@@ -289,10 +307,12 @@ aov(Entropy_Scaled ~ Category, data=data_analyzed) |>
     writeSummaryBlock("Entropy (scaled) -- Tukey")
 
 # RANDOMIZATION (Entropy, scaled) ---------------------------------------------
-randomDistribution_entropy <- map_df(1:RANDOMIZATION_REPLICATES, ~randomDraw(., "Entropy_Scaled"))
-
-# Save for plotting later
-saveRDS(randomDistribution_entropy, file="Output/randomDistribution_entropy.rds")
+if (RUN_RANDOM) {
+    randomDistribution_entropy <- map_df(1:RANDOMIZATION_REPLICATES, ~randomDraw(., "Entropy_Scaled"))
+    saveRDS(randomDistribution_entropy, file="Output/randomDistribution_entropy.rds")
+} else {
+    randomDistribution_entropy <- readRDS("Output/randomDistribution_entropy.rds")
+}
 
 # Summarize for report
 cop_Entropy <- data_analyzed |>
@@ -384,3 +404,42 @@ distances |>
     group_by(Category_1, Category_2, Comparison_Type) |>
     tally() |>
     writeSummaryBlock("COP closest partner")
+
+# RANDOMIZATION Jaro distances ---------------------------------------------
+
+# Random draws for COP, Diff Male/Same Context vs. Same Male/Diff Context
+if (RUN_RANDOM) {
+    randomDistribution_Jaro_SameDiffMaleCOP <- map_df(1:RANDOMIZATION_REPLICATES, 
+                                                    ~randomDrawJaro(., "Diff Male/Same Context vs. Same Male/Diff Context COP"))
+    saveRDS(randomDistribution_Jaro_SameDiffMaleCOP, file="Output/randomDistribution_Jaro_SameDiffMaleCOP.rds")
+} else {
+    randomDistribution_Jaro_SameDiffMaleCOP <- readRDS("Output/randomDistribution_Jaro_SameDiffMaleCOP.rds")
+}
+
+# Summarize for report
+cop_Jaro_DiffMaleSameContext  <- distances |>
+                              filter(Category_1 == "COP", Comparison_Type == "Diff Male/Same Context") |>
+                              pull(Jaro_Distance) |>
+                              mean()
+
+randomDistribution_Jaro_SameDiffMaleCOP |> 
+    group_by(Mean < cop_Jaro_DiffMaleSameContext) |>
+    tally() |>
+    writeSummaryBlock("RANDOMIZATION -- Jaro -- Diff Male/Same Context COP vs. Same Male/Diff Context COP")
+
+
+
+# Random draws for COP, Diff Male/Same Context vs. Same Male/Diff Context
+if (RUN_RANDOM) {
+    randomDistribution_Jaro_DiffMaleAcrossContexts <- map_df(1:RANDOMIZATION_REPLICATES, 
+                                                            ~randomDrawJaro(., "Diff Male/Same Context COP vs. AUDI + SOLO"))
+    saveRDS(randomDistribution_Jaro_DiffMaleAcrossContexts, file="Output/randomDistribution_Jaro_DiffMaleAcrossContexts.rds")
+} else {
+    randomDistribution_Jaro_DiffMaleAcrossContexts <- readRDS("Output/randomDistribution_Jaro_DiffMaleAcrossContexts.rds")
+}
+
+# Summarize for report
+randomDistribution_Jaro_DiffMaleAcrossContexts |> 
+    group_by(Mean < cop_Jaro_DiffMaleSameContext) |>
+    tally() |>
+    writeSummaryBlock("RANDOMIZATION -- Jaro -- Diff Male/Same Context COP vs. AUDI + SOLO")

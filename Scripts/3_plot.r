@@ -610,6 +610,81 @@ plot_lengthCompression <- ggplot(data_analyzed) +
 ggsave(plot_lengthCompression, file="Plots/FIGURE_S3.png", width=4, height=4)
 
 
+# FIGURE S4 ---------------------------------------------
+# Jaro Randomization Results       
+
+# Empirical distances
+#   Diff-Male/Same-Context COP displays
+empiricalCop_Jaro_DiffMaleSameContext  <- distances |>
+                                      filter(Category_1 == "COP" & Comparison_Type == "Diff Male/Same Context") |>
+                                      select(Category_1, Comparison_Type, Jaro_Distance)
+empiricalCop_Jaro_DiffMaleSameContext_MEAN <- mean(empiricalCop_Jaro_DiffMaleSameContext$Jaro_Distance)
+
+# Randomly drawn Jaro distances, empirical Diff Male/Same Context COP vs. Same Male/Diff Context COP
+randomDistribution_Jaro_SameDiffMaleCOP <- readRDS("Output/randomDistribution_Jaro_SameDiffMaleCOP.rds") |>
+                                  mutate(Category = "Random",
+                                         Jaro_Distance=Mean) |>
+                                  select(Category, Jaro_Distance)
+
+plot_randComp_jaroSameDiffMaleCOP <- ggplot(randomDistribution_Jaro_SameDiffMaleCOP) +
+                                  geom_vline(xintercept=empiricalCop_Jaro_DiffMaleSameContext_MEAN, 
+                                             colour="red", linetype="dashed") +
+                                  geom_histogram(aes(x=Jaro_Distance, fill=Category),
+                                                 alpha=0.3, colour="black", bins=40) +
+                                  geom_point(data=empiricalCop_Jaro_DiffMaleSameContext,
+                                             aes(x=Jaro_Distance), 
+                                             fill="black", shape=21, alpha=0.75, y=50, size=2) +
+                                  scale_x_continuous(limit = c(0, 1), oob = function(x, limits) x) +
+                                #   scale_y_continuous(limits=c(0, 3500), breaks=seq(0, 3500, by=1000), oob = function(y, limits) y) +
+                                  scale_fill_manual(values=categoryColors) +
+                                  guides(colour="none", fill="none") +
+                                  ggtitle(paste0("Empirical: COP vs. Diff Male/Same Context (n = ", 
+                                                  nrow(filter(distances, Category_1=="COP" & Comparison_Type=="Diff Male/Same Context")),
+                                                  ")\n",
+                                                  "Randomized: COP vs. Same Male/Diff Context (n = ",
+                                                  nrow(filter(distances, Category_1=="COP" & Comparison_Type=="Diff Male/Same Context")),
+                                                  "/", nrow(filter(distances, Category_1=="COP" & Comparison_Type=="Same Male/Diff Context")),
+                                                  ")")) +
+                                  xlab("Jaro distance") +
+                                  ylab("Random sample mean") +
+                                  customTheme
+
+# Randomly drawn Jaro distance, empirical Diff Male/Same Context COP vs. Diff Male/Same Context AUDI plus SOLO
+randomDistribution_Jaro_DiffMaleAcrossContexts <- readRDS("Output/randomDistribution_Jaro_DiffMaleAcrossContexts.rds") |>
+                                               mutate(Category = "Random",
+                                                      Jaro_Distance=Mean) |>
+                                               select(Category, Jaro_Distance)
+
+plot_randComp_jaroDiffMaleAcrossContext <- ggplot(randomDistribution_Jaro_DiffMaleAcrossContexts) +
+                                        geom_vline(xintercept=empiricalCop_Jaro_DiffMaleSameContext_MEAN, 
+                                                   colour="red", linetype="dashed") +
+                                        geom_histogram(aes(x=Jaro_Distance, fill=Category),
+                                                       alpha=0.3, colour="black", bins=40) +
+                                        geom_point(data=empiricalCop_Jaro_DiffMaleSameContext,
+                                                   aes(x=Jaro_Distance), 
+                                                   fill="black", shape=21, alpha=0.75, y=50, size=2) +
+                                        scale_x_continuous(limit = c(0, 1), oob = function(x, limits) x) +
+                                        # scale_y_continuous(limits=c(0, 3500), breaks=seq(0, 3500, by=1000), oob = function(y, limits) y) +
+                                        scale_fill_manual(values=categoryColors) +
+                                        guides(colour="none", fill="none") +
+                                        ggtitle(paste0("Empirical: COP vs. Diff Male/Same Context COP (n = ", 
+                                                      nrow(filter(distances, Category_1=="COP" & Comparison_Type=="Diff Male/Same Context")),
+                                                      ")\n",
+                                                      "Randomized: AUDI or SOLO vs. Diff Male/Same Context (n = ",
+                                                      nrow(filter(distances, Category_1=="COP" & Comparison_Type=="Diff Male/Same Context")),
+                                                      "/", nrow(filter(distances, Category_1%in%c("AUDI", "SOLO") & Comparison_Type=="Diff Male/Same Context")),
+                                                      ")")) +
+                                        xlab("Jaro distance") +
+                                        ylab("Random sample mean") +
+                                        customTheme
+
+# Create combined plot and write to file              
+plots_randComparionsJaro <- plot_randComp_jaroSameDiffMaleCOP /
+                            plot_randComp_jaroDiffMaleAcrossContext
+
+ggsave(plots_randComparionsJaro, file="Plots/FIGURE_S4.png", width=6, height=5) 
+
+
 # TABLE S6 ---------------------------------------------
 # COP vs. after-COP displays, raw element frequencies
 # [Filter] to include only COP displays
