@@ -340,11 +340,12 @@ aov(Compression_Ratio ~ Category, data=data_analyzed) |>
     writeSummaryBlock("Compression Ratio -- Tukey")
 
 # RANDOMIZATION (Compression ratio) ---------------------------------------------
-randomDistribution_compressionRatio <- map_df(1:RANDOMIZATION_REPLICATES, ~randomDraw(., "Compression_Ratio"))
-
-# Save for plotting later
-saveRDS(randomDistribution_compressionRatio, file="Output/randomDistribution_compressionRatio.rds")
-
+if (RUN_RANDOM) {
+    randomDistribution_compressionRatio <- map_df(1:RANDOMIZATION_REPLICATES, ~randomDraw(., "Compression_Ratio"))
+    saveRDS(randomDistribution_compressionRatio, file="Output/randomDistribution_compressionRatio.rds")
+} else {
+    randomDistribution_compressionRatio <- readRDS("Output/randomDistribution_compressionRatio.rds")   
+}
 # Summarize for report
 cop_compressionRatio <- data_analyzed |>
             filter(Category == "COP") |>

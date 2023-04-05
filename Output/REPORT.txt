@@ -536,3 +536,148 @@ SOLO-COP  -2.5826504 -3.0205201 -2.144781 0.00e+00
 
 ------------------------------
 
+------------------------------
+
+**RANDOMIZATION -- Compression Ratio**
+
+# A tibble: 1 x 2
+  `Mean > cop_compressionRatio`      n
+  <lgl>                          <int>
+1 FALSE                         100000
+
+
+------------------------------
+
+------------------------------
+
+**Entropy vs. Compressibility correlation**
+
+
+Call:
+lm(formula = Compression_Ratio ~ Entropy_Scaled, data = data_analyzed)
+
+Residuals:
+    Min      1Q  Median      3Q     Max 
+-2.0976 -0.3983 -0.1151  0.1965  4.9831 
+
+Coefficients:
+               Estimate Std. Error t value Pr(>|t|)    
+(Intercept)      5.5958     0.2055   27.23   <2e-16 ***
+Entropy_Scaled  -4.9479     0.2500  -19.79   <2e-16 ***
+---
+Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
+
+Residual standard error: 0.7368 on 351 degrees of freedom
+Multiple R-squared:  0.5274,	Adjusted R-squared:  0.526 
+F-statistic: 391.7 on 1 and 351 DF,  p-value: < 2.2e-16
+
+
+
+------------------------------
+
+------------------------------
+
+**Highest Compression Ratio**
+
+# A tibble: 1 x 6
+  UID   Category Entropy_Scaled Compression_Ratio DisplayLength DisplayCode                                                                                               
+  <chr> <chr>             <dbl>             <dbl>         <int> <chr>                                                                                                     
+1 1487  AUDI              0.633              7.45           365 DDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDIIIIIIIDDBFFFFFFFFFFFFFFFFFIIHHHHHHHHHHHHHHHHIIIIIIIIHHHHIIIIIIIIIIIIIIII~
+
+
+------------------------------
+
+------------------------------
+
+**Compression rate comparison**
+
+# A tibble: 1 x 6
+  UID   Category Entropy_Scaled Compression_Ratio DisplayLength DisplayCode                                                                      
+  <chr> <chr>             <dbl>             <dbl>         <int> <chr>                                                                            
+1 453   AUDI              0.639              2.53            81 JJDBAIIIIIIHHIIIIIIIIIIIIIIIIIIIIIIIIIDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDBFFFFIIIIEDBA
+
+
+------------------------------
+
+------------------------------
+
+**Lowest Entropy display**
+
+# A tibble: 1 x 6
+  UID   Category Entropy_Scaled Compression_Ratio DisplayLength DisplayCode                                                       
+  <chr> <chr>             <dbl>             <dbl>         <int> <chr>                                                             
+1 1533  COP               0.113              4.71            66 DDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDB
+
+
+------------------------------
+
+------------------------------
+
+**COP display codes**
+
+# A tibble: 13 x 3
+   UID   Male1ID DisplayCode                                                                    
+   <chr>   <dbl> <chr>                                                                          
+ 1 1455      296 IIDDDDDDDEDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDEB
+ 2 1533      296 DDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDB             
+ 3 1558      296 EDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDB 
+ 4 1817      296 IIDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDB                                 
+ 5 1824      296 IIIIIIIIIIIDDDIIIIIIIIDDDIIIIIIIIDDDDDDDDDDDDDIIIIIIIIIIIIIDDDDDIIIIIIIIIIIDB  
+ 6 1878      296 JJHHHHHHIIIIDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDB
+ 7 1920      296 IDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDB                                  
+ 8 1987      296 IIDDDDDDDDDDDDDDDDDDDDDDDDDDDDJJJIIDDDB                                        
+ 9 2020      296 DDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDLDDDDB        
+10 5005      940 IDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDB                                            
+11 989       980 DDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDB                           
+12 991       980 IIIIIDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDB          
+13 992       980 IDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDB          
+
+
+------------------------------
+
+------------------------------
+
+**Jaro distances by comparison type**
+
+# A tibble: 4 x 3
+  Comparison_Type        `mean(Jaro_Distance)` `sd(Jaro_Distance)`
+  <chr>                                  <dbl>               <dbl>
+1 Diff Male/Diff Context                 0.536               0.103
+2 Diff Male/Same Context                 0.385               0.106
+3 Same Male/Diff Context                 0.526               0.101
+4 Same Male/Same Context                 0.372               0.107
+
+
+------------------------------
+
+------------------------------
+
+**Diff Male/Same Context Jaro comparisons SOLO vs. AUDI vs. COP**
+
+# A tibble: 3 x 4
+# Groups:   Category_1, Comparison_Type [3]
+  Category_1 Comparison_Type        `mean(Jaro_Distance)` `sd(Jaro_Distance)`
+  <chr>      <chr>                                  <dbl>               <dbl>
+1 AUDI       Diff Male/Same Context                 0.360               0.104
+2 COP        Diff Male/Same Context                 0.138               0.101
+3 SOLO       Diff Male/Same Context                 0.389               0.106
+
+
+------------------------------
+
+------------------------------
+
+**COP closest partner**
+
+# A tibble: 4 x 4
+# Groups:   Category_1, Category_2 [2]
+  Category_1 Category_2 Comparison_Type            n
+  <chr>      <chr>      <chr>                  <int>
+1 COP        AUDI       Diff Male/Diff Context     2
+2 COP        AUDI       Same Male/Diff Context     2
+3 COP        COP        Diff Male/Same Context     3
+4 COP        COP        Same Male/Same Context     6
+
+
+------------------------------
+
