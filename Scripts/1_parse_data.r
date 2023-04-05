@@ -14,9 +14,12 @@ data_raw <- read_csv(RAW_DATA_PATH,
                                    "MaleOtherBeh1"='c')) |>
         mutate(ObsDate = mdy(ObsDate))
 
-# Before filtering any elements,
-#   categorize the type of each display
-#  (SOLO, MULT, AUDI, or COP)
+# Write T S1, with raw element frequencies
+table_s1 <- data_raw |>
+         group_by(Behavior) |>
+         tally() |>
+         arrange(Behavior)
+write_csv(table_s1, "Output/TABLE_S1.csv")
 
 # Read in banding dataset
 ## Also note : 8200 (unknown, suspected females), 8300 (unknown sex), 8400 (unknown, suspected pre-def males)
