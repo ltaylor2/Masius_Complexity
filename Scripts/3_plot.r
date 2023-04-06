@@ -400,20 +400,42 @@ table_s3 <- data_analyzed |>
 write_csv(table_s3, file="Output/TABLE_S3.csv")
 
 # TABLE S4 ---------------------------------------------
-# COP display strings
+
+# Custom function to add line breaks for consistent
+#   display code table formatting
+displayCodeLineBreak <- function(s) {
+    chars <- strsplit(s, "")[[1]]
+    newString <- ""
+    for (i in 1:length(chars)) {
+        newString <- paste0(newString, chars[i], collapse="")
+        if (i %% 40 == 0) { newString <- paste0(newString, "\n", collapse="") }
+    }
+    return(newString)
+}
+
+# COP display code strings, with associated metrics
+# [Filter] COP displays only
+# [Select] Relevant metrics and DisplayCode string
+# [Mutate] add line breaks to display code
+#          see displayCodeLineBreak()
+# [Mutate] Round metrics for display
+# [Arrange] to sort
 table_s4 <- data_analyzed |>
          filter(Category=="COP") |>
          select(UID, Male1ID, ObsDate, 
                 Duration, DisplayLength, Entropy_Scaled, Compression_Ratio,
                 DisplayCode) |>
-         mutate(Duration = round(Duration, 0)) |>
+         mutate(DisplayCode = map_chr(DisplayCode, displayCodeLineBreak)) |>
+         mutate(Duration = round(Duration, 0),
+                Entropy_Scaled = round(Entropy_Scaled, 2),
+                Compression_Ratio = round(Compression_Ratio, 1)) |>
          arrange(UID, Male1ID, ObsDate)
 
 # Write table to file
 write_csv(table_s4, file="Output/TABLE_S4.csv")
 
 # TABLE S5 ---------------------------------------------
-# Table of core behavioral elements and descriptions, with category-specific frequencies
+# Table of core behavioral elements with category-specific frequencies
 # [Select] UID, Category, and DisplayCode string cols
 # [Separate] Display code into any number of single-column character columns
 #            NOTE this gives each row the number of columns matching the max number
@@ -698,10 +720,12 @@ ggsave(plots_randComparionsJaro, file="Plots/FIGURE_S4.png", width=6, height=5)
 # [Tally] The frequency of elements for before- and after
 # [Pivot wider] so each row is an individual element, 
 #               including columns for Before- and After- copulation frequencies
-# [Mutate] map the single-character element code to the shortened behavior name
+# [Right join] to full-dataset behavioral element frequency table, which gives us
+#              a row for elements even if they are missing from the COP or after-COP displays
+#              NOTE also gives us the "Element" short name col
+# [Select] Only Code, Element, Before, and After cols
 # [Mutate] replace NAs with 0s in the Before and After cols
-# [Arrange] by code (i.e., alphabetical order)
-# [Select] to reorder columns 
+# [Arrange] alphabetical code order
 table_s6 <- data_analyzed |>
          filter(Category=="COP") |>
          select(Before=DisplayCode_withCops, After=DisplayCode_AfterCop) |>
@@ -712,18 +736,28 @@ table_s6 <- data_analyzed |>
          group_by(Section, Code) |>
          tally() |>
          pivot_wider(id_cols=Code, names_from=Section, values_from=n) |>
-         mutate(Element = map_chr(Code, ~ names(behavior_code[behavior_code==.])),
-                .after=Code) |>
-         mutate(across(c(Before, After), ~ ifelse(is.na(.x), 0, .x))) |>
-         arrange(Code) |>
-         select(Code, Element, Before, After)
+         right_join(table_s5, by="Code") |>
+         select(Code, Element, Before, After) |>
+         mutate(across(c(Before, After), ~ifelse(is.na(.x), 0, .x))) |>
+         arrange(Code)
 
 # Write table to file
 write_csv(table_s6, file="Output/TABLE_S6.csv")
 
 # TABLE S7 ---------------------------------------------
 # Full display strings of each before- and after-copulation displays
-
+# [Filter] Copulation displays only
+# [Select] Before and After display code columns 
+#          (choosing the version of the main, before-COP displaycode that includes
+#           Attempted copulation and Copulation elements)
+# [Mutate] Mark whether After-copulation displays have attempted or succesful copulations
+# [Mutate] Add line breaks to 
 table_s7 <- data_analyzed |>
          filter(Category=="COP") |>
-         select(UID, Male1ID, Before=DisplayCode_withCops, After=DisplayCode_AfterCop)
+         select(UID, Male1ID, Before=DisplayCode_withCops, After=DisplayCode_AfterCop) |>
+         mutate(After_HasAttC = grepl("N", After),
+                After_HasCop = grepl("M", After))
+
+
+# Write table to file
+write_csv(table_s6, file="Output/TABLE_S6.csv")
