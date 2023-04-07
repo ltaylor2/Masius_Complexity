@@ -521,9 +521,11 @@ beforeAfterCompare("Compression_Ratio") |>
 # Custom function to classify before vs. after cop jaro distance 
 #   comparison type
 beforeAfterJaroType <- function(UID_1, UID_2, Section_1, Section_2) {
-    if (UID_1 == UID_2) { return("Same display/Diff section") } 
-    else if (Section_1 == Section_2) { return("Diff display/Same section") }
-    return("Diff display/Diff section")
+    levels <- c("Diff display/Same section", "Diff display/Diff section", "Same display/Diff section")
+    if (UID_1 == UID_2) { ret <- "Same display/Diff section" } 
+    else if (Section_1 == Section_2) { ret <- "Diff display/Same section" }
+    else { ret <- "Diff display/Diff section" }
+    return(factor(ret, levels=levels))
 }
 
 # TODO
@@ -541,13 +543,24 @@ beforeAfterDistances <- expand_grid(afterCop_comparison$UID_Section,
                      select(UID_Section_1, UID_Section_2, DisplayCode_1, DisplayCode_2=DisplayCode) |>
                      separate(UID_Section_1, into=c("UID_1", "Section_1"), sep="-") |>
                      separate(UID_Section_2, into=c("UID_2", "Section_2"), sep="-") |>
+                     filter(Section_1 == "Before") |>
                      mutate(Jaro_Distance = map2_dbl(DisplayCode_1, DisplayCode_2, 
                                           ~ stringdist(.x, .y, method="jw")),
                                           .after=UID_2) |>
                      mutate(Comparison_Type = pmap_chr(list(UID_1, UID_2, Section_1, Section_2), beforeAfterJaroType))
 
-ggplot(beforeAfterDistances,
-       aes(x=Comparison_Type, y=Jaro_Distance)) +
-    geom_line(aes(group="UID_Section_1"))
-    geom_point() +
-    geom_boxplot()
+
+plot_beforeAfterJaro <- ggplot(beforeAfterDistances,
+                               aes(x=Comparison_Type, y=Jaro_Distance)) +
+                     geom_boxplot() +
+                     facet_wrap(facets=vars(UID_1), ncol=3) +
+                     scale_x_discrete(labels=c("Other\ndisplays\nbefore","Other\ndisplays\nafter", "Same\ndisplay\nafter")) +
+                     scale_y_continuous(limits=c(0, 1), breaks=seq(0, 1, by=0.5)) +
+                     xlab("Comparison type") +
+                     ylab("Jaro distance") +
+                     customTheme +
+                     theme(strip.background=element_rect(colour="black", fill="#f3f3f3"),
+                           axis.text.x=element_text(size=6),
+                           axis.title.x=element_text(size=10, hjust=0.025))
+
+ggsave(plot_beforeAfterJaro, file="Plots/FIGURE_S6.png", width=4, height=5)                    

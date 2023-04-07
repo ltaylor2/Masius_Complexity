@@ -580,9 +580,9 @@ F-statistic: 391.7 on 1 and 351 DF,  p-value: < 2.2e-16
 **Highest Compression Ratio**
 
 # A tibble: 1 x 6
-  UID   Category Entropy_Scaled Compression_Ratio DisplayLength DisplayCode                                                                                                                  
-  <chr> <chr>             <dbl>             <dbl>         <int> <chr>                                                                                                                        
-1 1487  AUDI              0.633              7.45           365 DDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDIIIIIIIDDBFFFFFFFFFFFFFFFFFIIHHHHHHHHHHHHHHHHIIIIIIIIHHHHIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIII~
+  UID   Category Entropy_Scaled Compression_Ratio DisplayLength DisplayCode                                                                                                                 
+  <chr> <chr>             <dbl>             <dbl>         <int> <chr>                                                                                                                       
+1 1487  AUDI              0.633              7.45           365 DDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDIIIIIIIDDBFFFFFFFFFFFFFFFFFIIHHHHHHHHHHHHHHHHIIIIIIIIHHHHIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIII~
 
 
 ------------------------------
