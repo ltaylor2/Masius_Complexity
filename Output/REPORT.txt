@@ -580,9 +580,9 @@ F-statistic: 391.7 on 1 and 351 DF,  p-value: < 2.2e-16
 **Highest Compression Ratio**
 
 # A tibble: 1 x 6
-  UID   Category Entropy_Scaled Compression_Ratio DisplayLength DisplayCode                                                                                                                                                
-  <chr> <chr>             <dbl>             <dbl>         <int> <chr>                                                                                                                                                      
-1 1487  AUDI              0.633              7.45           365 DDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDIIIIIIIDDBFFFFFFFFFFFFFFFFFIIHHHHHHHHHHHHHHHHIIIIIIIIHHHHIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIHH~
+  UID   Category Entropy_Scaled Compression_Ratio DisplayLength DisplayCode                                                                                                                  
+  <chr> <chr>             <dbl>             <dbl>         <int> <chr>                                                                                                                        
+1 1487  AUDI              0.633              7.45           365 DDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDIIIIIIIDDBFFFFFFFFFFFFFFFFFIIHHHHHHHHHHHHHHHHIIIIIIIIHHHHIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIII~
 
 
 ------------------------------
@@ -701,6 +701,135 @@ F-statistic: 391.7 on 1 and 351 DF,  p-value: < 2.2e-16
   `Mean < cop_Jaro_DiffMaleSameContext`      n
   <lgl>                                  <int>
 1 FALSE                                 100000
+
+
+------------------------------
+
+------------------------------
+
+**AFTER-COP DISPLAYS -- LENGTH (elements) range**
+
+# A tibble: 1 x 2
+  `min(DisplayLength)` `max(DisplayLength)`
+                 <int>                <int>
+1                   12                  139
+
+
+------------------------------
+
+------------------------------
+
+**BEFORE- VS. AFTER-COP -- Unique Display Elements**
+
+[[1]]
+[1] "UniqueDisplayElements"
+
+[[2]]
+# A tibble: 2 x 3
+  Section  mean    sd
+  <chr>   <dbl> <dbl>
+1 After    3.31 0.947
+2 Before   3.15 0.801
+
+[[3]]
+# A tibble: 2 x 2
+  `Before < After`     n
+  <lgl>            <int>
+1 FALSE                7
+2 TRUE                 6
+
+[[4]]
+
+	Paired t-test
+
+data:  comp$Before and comp$After
+t = -0.45683, df = 12, p-value = 0.656
+alternative hypothesis: true mean difference is not equal to 0
+95 percent confidence interval:
+ -0.8875991  0.5799068
+sample estimates:
+mean difference 
+     -0.1538462 
+
+
+
+
+------------------------------
+
+------------------------------
+
+**BEFORE- VS. AFTER-COP -- Entropy (scaled)**
+
+[[1]]
+[1] "Entropy_Scaled"
+
+[[2]]
+# A tibble: 2 x 3
+  Section  mean    sd
+  <chr>   <dbl> <dbl>
+1 After   0.521 0.185
+2 Before  0.262 0.162
+
+[[3]]
+# A tibble: 2 x 2
+  `Before < After`     n
+  <lgl>            <int>
+1 FALSE                2
+2 TRUE                11
+
+[[4]]
+
+	Paired t-test
+
+data:  comp$Before and comp$After
+t = -3.9055, df = 12, p-value = 0.002089
+alternative hypothesis: true mean difference is not equal to 0
+95 percent confidence interval:
+ -0.4043814 -0.1147587
+sample estimates:
+mean difference 
+       -0.25957 
+
+
+
+
+------------------------------
+
+------------------------------
+
+**BEFORE- VS. AFTER-COP -- Compression Ratio**
+
+[[1]]
+[1] "Compression_Ratio"
+
+[[2]]
+# A tibble: 2 x 3
+  Section  mean    sd
+  <chr>   <dbl> <dbl>
+1 After    2.62  1.48
+2 Before   3.65  1.01
+
+[[3]]
+# A tibble: 2 x 2
+  `Before < After`     n
+  <lgl>            <int>
+1 FALSE               11
+2 TRUE                 2
+
+[[4]]
+
+	Paired t-test
+
+data:  comp$Before and comp$After
+t = 3.0724, df = 12, p-value = 0.009674
+alternative hypothesis: true mean difference is not equal to 0
+95 percent confidence interval:
+ 0.3018587 1.7738967
+sample estimates:
+mean difference 
+       1.037878 
+
+
 
 
 ------------------------------

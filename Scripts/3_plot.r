@@ -12,7 +12,9 @@ customTheme <- theme_bw() +
 categoryColors <- c("SOLO" = "#a6cee3",
                     "AUDI" = "#b2df8a",
                     "COP" = "#2c4a11",
-                    "Random" = "#d3d3d388")
+                    "Random" = "#d3d3d388",
+                    "Before" = "#2c4a11",
+                    "After" = NA)
 
 # Read in analyzed data
 data_analyzed <- read_csv(ANALYZED_DATA_PATH, show_col_types=FALSE)
@@ -466,7 +468,6 @@ table_s5 <- data_analyzed |>
 write_csv(table_s5, file="Output/TABLE_S5.csv")
 
 # FIGURE S1 ---------------------------------------------
-
 dateBreaks <- c("1999-01-01",
                 "1999-02-01",
                 "1999-06-01",
@@ -751,13 +752,117 @@ write_csv(table_s6, file="Output/TABLE_S6.csv")
 #          (choosing the version of the main, before-COP displaycode that includes
 #           Attempted copulation and Copulation elements)
 # [Mutate] Mark whether After-copulation displays have attempted or succesful copulations
-# [Mutate] Add line breaks to 
+# [Mutate] Add line breaks to display strings
 table_s7 <- data_analyzed |>
          filter(Category=="COP") |>
          select(UID, Male1ID, Before=DisplayCode_withCops, After=DisplayCode_AfterCop) |>
-         mutate(After_HasAttC = grepl("N", After),
-                After_HasCop = grepl("M", After))
-
+         mutate(After_HasAttC = grepl(behavior_code["AttC"], After),
+                After_HasCop = grepl(behavior_code["Cop"], After)) |>
+         mutate(Before = map_chr(Before, displayCodeLineBreak),
+                After = map_chr(After, displayCodeLineBreak))
 
 # Write table to file
-write_csv(table_s6, file="Output/TABLE_S6.csv")
+write_csv(table_s7, file="Output/TABLE_S7.csv")
+
+# FIGURE S5 ---------------------------------------------
+
+# Read in before vs. after cop comparisons
+afterCop_comparison <- readRDS("Output/afterCop_comparison.rds")
+
+# Custom function to plot brackets with T-test for 
+#   before and after cop compraisons
+geom_tTestBracket <- function(metric, min, max) {
+    # Widen by-UID comparison dataset for t.test 
+    comp <- afterCop_comparison |>
+         select(UID, Section, all_of(metric)) |>
+         pivot_wider(id_cols=UID, names_from=Section, values_from=metric)
+
+    # Pairwise t.test
+    t <- t.test(x=comp$Before, y=comp$After, 
+                alternative = "two.sided",
+                paired=TRUE)
+
+    p <- t$p.value
+
+    label <- ""
+    linetype <- "dashed"
+    if (p <= 0.001) {label<-"***"; linetype<-"solid"}
+    else if (p <= 0.01) {label<-"**"; linetype<-"solid"}
+    else if (p <= 0.05) {label<-"*"; linetype<-"solid"}
+
+    range <- max-min
+    y = min + range * 0.90
+    offset <- max*0
+    bracketCorner <- range * 0.015
+    
+    g1 <- geom_segment(x=0.8, xend=2.2, 
+                       y=y, yend=y, 
+                       linetype=linetype, colour="gray",
+                       linewidth=0.35)
+    g2 <- geom_segment(x=0.8, xend=0.8, 
+                       y=y+bracketCorner, yend=y-bracketCorner, 
+                       colour="gray")
+    g3 <- geom_segment(x=2.2, xend=2.2, 
+                       y=y+bracketCorner, yend=y-bracketCorner, 
+                       colour="gray")
+    g4 <- geom_text(label=label, x=1.5, 
+                    y=y+offset, colour="gray", vjust=0, size=3)
+    
+    return(list(g1, g2, g3, g4))
+}
+
+# Boxplot of Before vs. After copulation display length
+plot_afterCop_uniqueElements <- ggplot(afterCop_comparison, 
+                                       aes(x=Section, y=UniqueDisplayElements, fill=Section)) +
+                             geom_tTestBracket("UniqueDisplayElements", 1, 6) +
+                             geom_point(alpha=0.75, size=0.5, colour="black") +
+                             geom_line(aes(group=UID)) +
+                             geom_boxplot(alpha=0.5, outlier.shape=NA) +
+                             scale_x_discrete(limits=c("Before", "After"), 
+                                              labels=c("Before\ncopulation", "After\ncopulation")) +
+                             scale_y_continuous(limits=c(1, 6)) +                                              
+                             scale_fill_manual(values=categoryColors) +
+                             ylab("Unique elements") +
+                             guides(fill="none") +
+                             customTheme +
+                             theme(axis.title.x=element_blank())
+
+# Boxplot of Before vs. After copulation entropy
+plot_afterCop_entropy <- ggplot(afterCop_comparison, 
+                                aes(x=Section, y=Entropy_Scaled, fill=Section)) +
+                      geom_tTestBracket("Entropy_Scaled", 0, 1.05) +                      
+                      geom_point(alpha=0.75, size=0.5, colour="black") +
+                      geom_line(aes(group=UID)) +
+                      geom_boxplot(alpha=0.5, outlier.shape=NA) +
+                      scale_x_discrete(limits=c("Before", "After"), 
+                                       labels=c("Before\ncopulation", "After\ncopulation")) +
+                      scale_y_continuous(limits=c(0, 1.05), breaks=seq(0, 1, by=0.2)) +                                       
+                      scale_fill_manual(values=categoryColors) +
+                      ylab("Entropy (scaled)") +
+                      guides(fill="none") +
+                      customTheme +
+                      theme(axis.title.x=element_blank())
+
+# Boxplot of Before vs. After compression ratio
+plot_afterCop_compression <- ggplot(afterCop_comparison, 
+                                    aes(x=Section, y=Compression_Ratio, fill=Section)) +
+                          geom_tTestBracket("Compression_Ratio", 0, 6.5) +
+                          geom_point(alpha=0.75, size=0.5, colour="black") +
+                          geom_line(aes(group=UID)) +
+                          geom_boxplot(alpha=0.5, outlier.shape=NA) +
+                          scale_x_discrete(limits=c("Before", "After"), 
+                                           labels=c("Before\ncopulation", "After\ncopulation")) +
+                          scale_y_continuous(limits=c(0, 6.5)) +                                           
+                          scale_fill_manual(values=categoryColors) +
+                          ylab("Compression ratio") +
+                          guides(fill="none") +
+                          customTheme +
+                          theme(axis.title.x=element_blank())
+
+# Combine plots and save to file
+plots_afterCop <- plot_afterCop_uniqueElements +
+                  plot_afterCop_entropy +
+                  plot_afterCop_compression
+
+ggsave(plots_afterCop, file="Plots/FIGURE_S5.png", width=6, height=2)
+

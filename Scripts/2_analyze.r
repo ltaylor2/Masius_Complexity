@@ -444,3 +444,110 @@ randomDistribution_Jaro_DiffMaleAcrossContexts |>
     group_by(Mean < cop_Jaro_DiffMaleSameContext) |>
     tally() |>
     writeSummaryBlock("RANDOMIZATION -- Jaro -- Diff Male/Same Context COP vs. AUDI + SOLO")
+
+# SUPPLEMENTARY MATERIAL -- Before vs after copulation ---------------------------------------------
+
+# Prepare the before- and after-copulation display code metrics
+# [Filter] to include only COP displays
+# [Select] only the UID, standard COP DisplayCode, and AfterCop DisplayCode strings
+# [Mutate] exclude the Attempted copulation behavioral element from the AfterCop Display String
+# [Mutate] exclude the Copulation behavioral element from the AfterCop display string
+# [Pivot longer] to get one DisplayCode string per row, Before or After, retaining the UID to match them up
+# [MUTATESx] Duplicate repertoire and syntax analyses (see LL 17-41 above)
+# [Select] Only relevant cols for comparison
+afterCop_comparison <- data_analyzed |>
+                    filter(Category=="COP") |>
+                    select(UID, Before=DisplayCode, After=DisplayCode_AfterCop) |>
+                    mutate(After = str_replace(After, behavior_code["AttC"], "")) |>
+                    mutate(After = str_replace(After, behavior_code["Cop"], "")) |>
+                    pivot_longer(cols=c(Before, After), names_to="Section", values_to="DisplayCode") |>
+                    mutate(DisplayCode_Raw = map(DisplayCode, charToRaw)) |>
+                    mutate(DisplayCode_Compressed = map(DisplayCode_Raw, brotli::brotli_compress)) |>
+			        mutate(DisplayLength = nchar(DisplayCode),
+                           UniqueDisplayElements = map_dbl(DisplayCode, countUniqueChars), 
+                           Entropy_Unscaled = acss::entropy(DisplayCode),
+                           Entropy_Scaled = Entropy_Unscaled / log(UniqueDisplayElements, base=2),
+                           Compression_Length = map_dbl(DisplayCode_Compressed, length),
+                           Compression_Ratio = map2_dbl(DisplayCode_Raw, DisplayCode_Compressed, ~ length(.x) / length(.y))) |>
+                    mutate(Entropy_Scaled = ifelse(Entropy_Unscaled==0, 0, Entropy_Scaled)) |>
+                    select(UID, Section, DisplayCode, DisplayLength, UniqueDisplayElements, Entropy_Scaled, Compression_Ratio) |>
+                    unite("UID_Section", UID, Section, sep="-", remove=FALSE)
+
+# Save object to read in for plotting
+saveRDS(afterCop_comparison, file="Output/afterCop_comparison.rds")
+
+# Custom function to extract metric comparison values
+beforeAfterCompare <- function(metric) {
+    # Summarize mean and sd of metric
+    means <- afterCop_comparison |>
+          group_by(Section) |>
+          summarize_at(.vars=metric, .funs=list(mean=mean, sd=sd))
+
+    # Tally which BEFORE values are < AFTER values for given metric 
+    tallies <- afterCop_comparison |>
+            select(UID, Section, all_of(metric)) |>
+            pivot_wider(id_cols=UID, names_from=Section, 
+                        values_from=metric) |>
+            group_by(Before<After) |>
+            tally()
+
+    # Widen by-UID comparison dataset for t.test 
+    comp <- afterCop_comparison |>
+         select(UID, Section, all_of(metric)) |>
+         pivot_wider(id_cols=UID, names_from=Section, values_from=metric)
+
+    # Paired t.test
+    t <- t.test(x=comp$Before, y=comp$After, 
+                alternative = "two.sided",
+                paired=TRUE)
+    return(list(metric, means, tallies, t))
+}
+
+# REPORT key values for supplementary report
+afterCop_comparison |>
+    filter(Section == "After") |>
+    summarize(min(DisplayLength), max(DisplayLength)) |>
+    writeSummaryBlock("AFTER-COP DISPLAYS -- LENGTH (elements) range")
+
+beforeAfterCompare("UniqueDisplayElements") |>
+    writeSummaryBlock("BEFORE- VS. AFTER-COP -- Unique Display Elements")
+
+beforeAfterCompare("Entropy_Scaled") |>
+    writeSummaryBlock("BEFORE- VS. AFTER-COP -- Entropy (scaled)")
+
+beforeAfterCompare("Compression_Ratio") |>
+    writeSummaryBlock("BEFORE- VS. AFTER-COP -- Compression Ratio")
+
+# Custom function to classify before vs. after cop jaro distance 
+#   comparison type
+beforeAfterJaroType <- function(UID_1, UID_2, Section_1, Section_2) {
+    if (UID_1 == UID_2) { return("Same display/Diff section") } 
+    else if (Section_1 == Section_2) { return("Diff display/Same section") }
+    return("Diff display/Diff section")
+}
+
+# TODO
+#   Expand grid filter duplicate comparisons?
+#   Compare same/diff to diff/same
+# PLOT
+# Jaro distances, before vs. after cop
+beforeAfterDistances <- expand_grid(afterCop_comparison$UID_Section, 
+                                    afterCop_comparison$UID_Section) |>
+                     select(UID_Section_1=1, UID_Section_2=2) |>
+                     filter(UID_Section_1 != UID_Section_2) |>
+                     left_join(afterCop_comparison, by=c("UID_Section_1"="UID_Section")) |>
+                     select(UID_Section_1, UID_Section_2, DisplayCode_1=DisplayCode) |>
+                     left_join(afterCop_comparison, by=c("UID_Section_2"="UID_Section")) |>
+                     select(UID_Section_1, UID_Section_2, DisplayCode_1, DisplayCode_2=DisplayCode) |>
+                     separate(UID_Section_1, into=c("UID_1", "Section_1"), sep="-") |>
+                     separate(UID_Section_2, into=c("UID_2", "Section_2"), sep="-") |>
+                     mutate(Jaro_Distance = map2_dbl(DisplayCode_1, DisplayCode_2, 
+                                          ~ stringdist(.x, .y, method="jw")),
+                                          .after=UID_2) |>
+                     mutate(Comparison_Type = pmap_chr(list(UID_1, UID_2, Section_1, Section_2), beforeAfterJaroType))
+
+ggplot(beforeAfterDistances,
+       aes(x=Comparison_Type, y=Jaro_Distance)) +
+    geom_line(aes(group="UID_Section_1"))
+    geom_point() +
+    geom_boxplot()
