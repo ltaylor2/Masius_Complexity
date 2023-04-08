@@ -65,8 +65,12 @@ jaroComparisonType <- function(category_1, category_2,
 # [Filter] out rows with the same display
 # [Left join] UID_1 information from full dataset
 # [Select] Category, Male, and Display string for display 1
+#          Includes display length and uniquedisplay elements for
+#               distance correlations
 # [Left join] UID_2 information frm full dataset
 # [Select] Category, Male, and Display string for display 2
+#          Includes display length and uniquedisplay elements for
+#               distance correlations
 # [Filter] to include only identified males
 # [Filter] out redundant comparisons
 #              NOTE we have to cut this because we don't want to double count 
@@ -88,16 +92,22 @@ jaroComparisonType <- function(category_1, category_2,
 # [Mutate] Calculate Jaro distance between the two display strings
 # [Mutate] Classify the Jaro comparison type
 #          (see jaroComparisonType() function, above)
+# [Mutate] Calculate the absolute value difference for
+#          display length and unique elements for
+#          each comparison, for supplementary correlations
 distances <- expand_grid(data_analyzed$UID, data_analyzed$UID) |>
           select(UID_1=1, UID_2=2) |>
           filter(UID_1 != UID_2) |>
           left_join(data_analyzed, by=c("UID_1"="UID")) |>
           select(UID_1, UID_2, 
-                 Category_1=Category, Male_1=Male1ID, DisplayCode_1=DisplayCode) |>
+                 Category_1=Category, Male_1=Male1ID, DisplayCode_1=DisplayCode,
+                 DisplayLength_1=DisplayLength, UniqueDisplayElements_1=UniqueDisplayElements) |>
           left_join(data_analyzed, by=c("UID_2"="UID")) |>
           select(UID_1, UID_2,
                  Category_1, Male_1, DisplayCode_1,
-                 Category_2=Category, Male_2=Male1ID, DisplayCode_2=DisplayCode) |>
+                 DisplayLength_1, UniqueDisplayElements_1, 
+                 Category_2=Category, Male_2=Male1ID, DisplayCode_2=DisplayCode,
+                 DisplayLength_2=DisplayLength, UniqueDisplayElements_2=UniqueDisplayElements) |>
           filter(Male_1 < 8000 & Male_2 < 8000) |>    
           filter(!(UID_1 < UID_2 & Category_1 == Category_2)) |>    
           mutate(Jaro_Distance = map2_dbl(DisplayCode_1, DisplayCode_2, 
@@ -105,7 +115,9 @@ distances <- expand_grid(data_analyzed$UID, data_analyzed$UID) |>
                  .after=UID_2) |>
           mutate(Comparison_Type = pmap_chr(list(Category_1, Category_2, Male_1, Male_2),
                                             jaroComparisonType),
-                 .before=1)
+                 .before=1) |>
+          mutate(Difference_DisplayLength = abs(DisplayLength_1 - DisplayLength_2),
+                 Difference_UniqueDisplayElements = abs(UniqueDisplayElements_1 - UniqueDisplayElements_2))
 
 # Save for plotting later
 saveRDS(distances, file="Output/distances.rds")
@@ -406,6 +418,18 @@ distances |>
     tally() |>
     writeSummaryBlock("COP closest partner")
 
+# CORRELATIONS Jaro distances ---------------------------------------------
+
+# Diff display length vs Jaro distance 
+lm(Jaro_Distance ~ Difference_DisplayLength, data=distances) |>
+    summary() |>
+    writeSummaryBlock("CORRELATION Jaro Difference Display Length vs. Jaro distance")
+
+# Unique display elements vs Jaro distance 
+lm(Jaro_Distance ~ Difference_UniqueDisplayElements, data=distances) |>
+    summary() |>
+    writeSummaryBlock("CORRELATION Jaro Difference Unique Elements vs. Jaro distance")
+
 # RANDOMIZATION Jaro distances ---------------------------------------------
 
 # Random draws for COP, Diff Male/Same Context vs. Same Male/Diff Context
@@ -427,8 +451,6 @@ randomDistribution_Jaro_SameDiffMaleCOP |>
     group_by(Mean < cop_Jaro_DiffMaleSameContext) |>
     tally() |>
     writeSummaryBlock("RANDOMIZATION -- Jaro -- Diff Male/Same Context COP vs. Same Male/Diff Context COP")
-
-
 
 # Random draws for COP, Diff Male/Same Context vs. Same Male/Diff Context
 if (RUN_RANDOM) {
@@ -528,11 +550,25 @@ beforeAfterJaroType <- function(UID_1, UID_2, Section_1, Section_2) {
     return(factor(ret, levels=levels))
 }
 
-# TODO
-#   Expand grid filter duplicate comparisons?
-#   Compare same/diff to diff/same
-# PLOT
-# Jaro distances, before vs. after cop
+# Before vs. After-copulation Jaro distance comparisons
+
+# Compute Jaro distances
+# [Expand Grid] produce two columns, with all combinations
+#               of display UID_Before/After
+# [Select] to rename col names
+# [Filter] out rows with the same display
+# [Left join] First display information from full dataset
+# [Select] Display string for display 1
+# [Left join] Second display information from full dataset
+# [Select] Display string for display 2
+# [Separates] UID_Before/After into separate columns,
+#            back into col for UID and col for Before/After
+# [Filter] out redundant or unecessary comparisons
+#          by retaining only comparisons with the before-copulation display
+#          as the focal display 
+# [Mutate] Calculate Jaro distance between the two display strings
+# [Mutate] Classify the Jaro comparison type
+#          (see beforeAfterJaroType() function, above)
 beforeAfterDistances <- expand_grid(afterCop_comparison$UID_Section, 
                                     afterCop_comparison$UID_Section) |>
                      select(UID_Section_1=1, UID_Section_2=2) |>
@@ -549,18 +585,5 @@ beforeAfterDistances <- expand_grid(afterCop_comparison$UID_Section,
                                           .after=UID_2) |>
                      mutate(Comparison_Type = pmap_chr(list(UID_1, UID_2, Section_1, Section_2), beforeAfterJaroType))
 
-
-plot_beforeAfterJaro <- ggplot(beforeAfterDistances,
-                               aes(x=Comparison_Type, y=Jaro_Distance)) +
-                     geom_boxplot() +
-                     facet_wrap(facets=vars(UID_1), ncol=3) +
-                     scale_x_discrete(labels=c("Other\ndisplays\nbefore","Other\ndisplays\nafter", "Same\ndisplay\nafter")) +
-                     scale_y_continuous(limits=c(0, 1), breaks=seq(0, 1, by=0.5)) +
-                     xlab("Comparison type") +
-                     ylab("Jaro distance") +
-                     customTheme +
-                     theme(strip.background=element_rect(colour="black", fill="#f3f3f3"),
-                           axis.text.x=element_text(size=6),
-                           axis.title.x=element_text(size=10, hjust=0.025))
-
-ggsave(plot_beforeAfterJaro, file="Plots/FIGURE_S6.png", width=4, height=5)                    
+# Save for plotting later
+saveRDS(beforeAfterDistances, file="Output/beforeAfterDistances.rds")

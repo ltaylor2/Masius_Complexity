@@ -632,8 +632,37 @@ plot_lengthCompression <- ggplot(data_analyzed) +
 
 ggsave(plot_lengthCompression, file="Plots/FIGURE_S3.png", width=4, height=4)
 
-
 # FIGURE S4 ---------------------------------------------
+# Difference in Display Length vs. Jaro Distance
+# Dot plot with correlation line 
+plot_jaroDisplayLength <- ggplot(distances,
+                                 aes(x=Difference_DisplayLength, y=Jaro_Distance)) +
+                       geom_point(size=0.5, alpha=0.1) +
+                       geom_smooth(formula="y~x", method="lm", colour="red", se=FALSE) +
+                       scale_y_continuous(limits=c(0, 1), breaks=seq(0, 1, by=0.2)) +
+                       xlab("Difference in display length") +
+                       ylab("Jaro distance") +
+                       customTheme
+
+# Difference in Unique Display Elements vs. Jaro Distance
+# Dot plot with correlation line
+plot_jaroDisplayElements <- ggplot(distances,
+                                   aes(x=Difference_UniqueDisplayElements, y=Jaro_Distance)) +
+                         geom_point(size=0.5, alpha=0.1) +
+                         geom_smooth(formula="y~x", method="lm", colour="red", se=FALSE) +
+                         scale_y_continuous(limits=c(0, 1), breaks=seq(0, 1, by=0.2)) +
+                         xlab("Difference in unique elements") +
+                         customTheme +
+                         theme(axis.title.y=element_blank())
+
+# Combine plots and save to file
+plots_jaroCorrelations <- plot_jaroDisplayLength +
+                          plot_jaroDisplayElements
+
+ggsave(plots_jaroCorrelations, file="Plots/FIGURE_S4.png",
+       width=6, height=3)
+
+# FIGURE S5 ---------------------------------------------
 # Jaro Randomization Results       
 
 # Empirical distances
@@ -705,7 +734,7 @@ plot_randComp_jaroDiffMaleAcrossContext <- ggplot(randomDistribution_Jaro_DiffMa
 plots_randComparionsJaro <- plot_randComp_jaroSameDiffMaleCOP /
                             plot_randComp_jaroDiffMaleAcrossContext
 
-ggsave(plots_randComparionsJaro, file="Plots/FIGURE_S4.png", width=6, height=5) 
+ggsave(plots_randComparionsJaro, file="Plots/FIGURE_S5.png", width=6, height=5) 
 
 
 # TABLE S6 ---------------------------------------------
@@ -764,7 +793,7 @@ table_s7 <- data_analyzed |>
 # Write table to file
 write_csv(table_s7, file="Output/TABLE_S7.csv")
 
-# FIGURE S5 ---------------------------------------------
+# FIGURE S6 ---------------------------------------------
 
 # Read in before vs. after cop comparisons
 afterCop_comparison <- readRDS("Output/afterCop_comparison.rds")
@@ -864,5 +893,26 @@ plots_afterCop <- plot_afterCop_uniqueElements +
                   plot_afterCop_entropy +
                   plot_afterCop_compression
 
-ggsave(plots_afterCop, file="Plots/FIGURE_S5.png", width=6, height=2)
+ggsave(plots_afterCop, file="Plots/FIGURE_S6.png", width=6, height=2)
 
+# Before vs. After Jaro distances
+
+# Read in distances 
+beforeAfterDistances <- readRDS("Output/beforeAfterDistances.rds")
+
+# Separate boxplots with Before vs. (A) Other before, (B) Other after, (C) same after)
+plot_beforeAfterJaro <- ggplot(beforeAfterDistances,
+                               aes(x=Comparison_Type, y=Jaro_Distance)) +
+                     geom_boxplot() +
+                     facet_wrap(facets=vars(UID_1), ncol=3) +
+                     scale_x_discrete(labels=c("Other\ndisplays\nbefore","Other\ndisplays\nafter", "Same\ndisplay\nafter")) +
+                     scale_y_continuous(limits=c(0, 1), breaks=seq(0, 1, by=0.5)) +
+                     xlab("Comparison type") +
+                     ylab("Jaro distance") +
+                     customTheme +
+                     theme(strip.background=element_rect(colour="black", fill="#f3f3f3"),
+                           axis.text.x=element_text(size=6),
+                           axis.title.x=element_text(size=10, hjust=0.025))
+
+# Save to file
+ggsave(plot_beforeAfterJaro, file="Plots/FIGURE_S7.png", width=4, height=5)                    

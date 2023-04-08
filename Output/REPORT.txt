@@ -683,6 +683,61 @@ F-statistic: 391.7 on 1 and 351 DF,  p-value: < 2.2e-16
 
 ------------------------------
 
+**CORRELATION Jaro Difference Display Length vs. Jaro distance**
+
+
+Call:
+lm(formula = Jaro_Distance ~ Difference_DisplayLength, data = distances)
+
+Residuals:
+     Min       1Q   Median       3Q      Max 
+-0.43025 -0.08411  0.00354  0.08574  0.56338 
+
+Coefficients:
+                          Estimate Std. Error t value Pr(>|t|)    
+(Intercept)              4.302e-01  5.305e-04   811.1   <2e-16 ***
+Difference_DisplayLength 7.964e-04  6.494e-06   122.6   <2e-16 ***
+---
+Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
+
+Residual standard error: 0.1178 on 82728 degrees of freedom
+Multiple R-squared:  0.1538,	Adjusted R-squared:  0.1538 
+F-statistic: 1.504e+04 on 1 and 82728 DF,  p-value: < 2.2e-16
+
+
+
+------------------------------
+
+------------------------------
+
+**CORRELATION Jaro Difference Unique Elements vs. Jaro distance**
+
+
+Call:
+lm(formula = Jaro_Distance ~ Difference_UniqueDisplayElements, 
+    data = distances)
+
+Residuals:
+     Min       1Q   Median       3Q      Max 
+-0.46354 -0.09643  0.00898  0.09967  0.53016 
+
+Coefficients:
+                                  Estimate Std. Error t value Pr(>|t|)    
+(Intercept)                      0.4635449  0.0006798  681.87   <2e-16 ***
+Difference_UniqueDisplayElements 0.0062966  0.0004028   15.63   <2e-16 ***
+---
+Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
+
+Residual standard error: 0.1279 on 82728 degrees of freedom
+Multiple R-squared:  0.002946,	Adjusted R-squared:  0.002934 
+F-statistic: 244.4 on 1 and 82728 DF,  p-value: < 2.2e-16
+
+
+
+------------------------------
+
+------------------------------
+
 **RANDOMIZATION -- Jaro -- Diff Male/Same Context COP vs. Same Male/Diff Context COP**
 
 # A tibble: 1 x 2
