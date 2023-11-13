@@ -25,8 +25,7 @@ distances <- readRDS("Output/distances.rds") |>
           mutate(Focal_Label = ifelse(Category_1=="SOLO", "Focal display context: SOLO", Category_1)) |>
           mutate(Focal_Label = factor(Focal_Label, levels=c("Focal display context: SOLO", "AUDI", "COP")))
 
-          
-
+        
 # TABLE 1 ------------------------------------------------------
 # Table of core behavioral elements and descriptions, with category-specific frequencies
 # [Select] UID, Category, and DisplayCode string cols
@@ -83,60 +82,100 @@ table_1 <- data_analyzed |>
 # Write table to file            
 write_csv(table_1, file="Output/TABLE_1.csv")
 
+# TABLE 2 ------------------------------------------------------
+
+elements_femOn <- map2_df(data_analyzed$Category, data_analyzed$DisplayCode_FemOn, 
+                         ~ tibble(Element = str_split(.y, "")[[1]]) |> 
+                                  group_by(Element) |> 
+                                  tally() |> 
+                                  mutate(Category = .x)) |>
+                group_by(Category, Element) |>
+                summarize(.groups="keep", n = sum(n)) |>
+                group_by(Category) |>
+                mutate(Total = sum(n)) |>
+                mutate(Perc = round((n / Total) * 100), 3) |>
+                mutate(Perc = ifelse(Perc < 1, "<1", Perc)) |>
+                mutate(Category = paste0(Category, "-FemOn"))
+
+elements_femOff <- map2_df(data_analyzed$Category, data_analyzed$DisplayCode_FemOff, 
+                          ~ tibble(Element = str_split(.y, "")[[1]]) |> 
+                                   group_by(Element) |> 
+                                   tally() |> 
+                                   mutate(Category = .x)) |>
+                 group_by(Category, Element) |>
+                 summarize(.groups="keep", n = sum(n)) |>
+                 group_by(Category) |>
+                 mutate(Total = sum(n)) |>
+                 mutate(Perc = round((n / Total) * 100), 3) |>
+                 mutate(Category = paste0(Category, "-FemOff"))
+
+elements_femUp <- map2_df(data_analyzed$Category, data_analyzed$DisplayCode_FemUp, 
+                          ~ tibble(Element = str_split(.y, "")[[1]]) |> 
+                                   group_by(Element) |> 
+                                   tally() |> 
+                                   mutate(Category = .x)) |>
+                 group_by(Category, Element) |>
+                 summarize(.groups="keep", n = sum(n)) |>
+                 group_by(Category) |>
+                 mutate(Total = sum(n)) |>
+                 mutate(Perc = round((n / Total) * 100), 3) |>
+                 mutate(Perc = ifelse(Perc < 1))
+                 mutate(Category = paste0(Category, "-FemOff"))
+
 # FIGURE 1 ------------------------------------------------------
 
-# Custom function to plot brackets with Tukey's for variable
-geom_tukeyBracket <- function(category1, category2, variable, min, max) {
-    # Tukey P Value label
-    tukey <- aov(pull(data_analyzed, variable) ~ data_analyzed$Category) |>
-          TukeyHSD() %>%
-          .[[1]]
+# # Custom function to plot brackets with Tukey's for variable
+# geom_tukeyBracket <- function(category1, category2, variable, min, max) {
+#     # Tukey P Value label
+#     tukey <- aov(pull(data_analyzed, variable) ~ data_analyzed$Category) |>
+#           TukeyHSD() %>%
+#           .[[1]]
     
-    if (category1=="SOLO"&category2=="AUDI") {x1<-0.9;x2<-2.1}
-    else if (category1=="SOLO"&category2=="COP") {x1<-0.9;x2<-3.1}
-    else if (category1=="COP"&category2=="AUDI") {x1<-1.9;x2<-3.1}
+#     if (category1=="SOLO"&category2=="AUDI") {x1<-0.9;x2<-2.1}
+#     else if (category1=="SOLO"&category2=="COP") {x1<-0.9;x2<-3.1}
+#     else if (category1=="COP"&category2=="AUDI") {x1<-1.9;x2<-3.1}
 
-    p <- tukey[,4][paste(category1, category2, sep="-")]
+#     p <- tukey[,4][paste(category1, category2, sep="-")]
 
-    range <- max-min
-    offset <- max*-0.03
+#     range <- max-min
+#     offset <- max*-0.03
     
-    label <- ""
-    linetype <- "dashed"
-    if (p <= 0.001) {label<-"***"; linetype<-"solid"}
-    else if (p <= 0.01) {label<-"**"; linetype<-"solid"}
-    else if (p <= 0.05) {label<-"*"; linetype<-"solid"}
+#     label <- ""
+#     linetype <- "dashed"
+#     if (p <= 0.001) {label<-"***"; linetype<-"solid"}
+#     else if (p <= 0.01) {label<-"**"; linetype<-"solid"}
+#     else if (p <= 0.05) {label<-"*"; linetype<-"solid"}
 
-    # Y axis 
-    if (category1=="SOLO" & category2=="AUDI") {
-        y = min + range * 0.90
-    } else if (category1=="COP" & category2=="AUDI") {
-        y = min + range * 0.95
-    } else if (category1=="SOLO" & category2=="COP") {
-        y = min + range * 1.00
-    }
-    bracketCorner <- range * 0.015
-    g1 <- geom_segment(x=x1, xend=x2, 
-                       y=y, yend=y, 
-                       linetype=linetype, colour="gray",
-                       linewidth=0.35)
-    g2 <- geom_segment(x=x1, xend=x1, 
-                       y=y+bracketCorner, yend=y-bracketCorner, 
-                       colour="gray")
-    g3 <- geom_segment(x=x2, xend=x2, 
-                       y=y+bracketCorner, yend=y-bracketCorner, 
-                       colour="gray")
-    g4 <- geom_text(label=label, x=(x1+x2)/2, 
-                    y=y+offset, colour="gray", vjust=0, size=3)
+#     # Y axis 
+#     if (category1=="SOLO" & category2=="AUDI") {
+#         y = min + range * 0.90
+#     } else if (category1=="COP" & category2=="AUDI") {
+#         y = min + range * 0.95
+#     } else if (category1=="SOLO" & category2=="COP") {
+#         y = min + range * 1.00
+#     }
+#     bracketCorner <- range * 0.015
+#     g1 <- geom_segment(x=x1, xend=x2, 
+#                        y=y, yend=y, 
+#                        linetype=linetype, colour="gray",
+#                        linewidth=0.35)
+#     g2 <- geom_segment(x=x1, xend=x1, 
+#                        y=y+bracketCorner, yend=y-bracketCorner, 
+#                        colour="gray")
+#     g3 <- geom_segment(x=x2, xend=x2, 
+#                        y=y+bracketCorner, yend=y-bracketCorner, 
+#                        colour="gray")
+#     g4 <- geom_text(label=label, x=(x1+x2)/2, 
+#                     y=y+offset, colour="gray", vjust=0, size=3)
     
-    return(list(g1, g2, g3, g4))
-}
+#     return(list(g1, g2, g3, g4))
+# }
 
 # Boxplot of Duration
 plot_duration <- ggplot(data_analyzed, aes(x=Category, y=Duration, fill=Category)) +
-              geom_tukeyBracket("SOLO", "AUDI", "Duration", 0, 740) +
-              geom_tukeyBracket("COP", "AUDI", "Duration", 0, 740) +
-              geom_tukeyBracket("SOLO", "COP", "Duration", 0, 740) +
+            #   geom_tukeyBracket("SOLO", "AUDI", "Duration", 0, 740) +
+            #   geom_tukeyBracket("COP", "AUDI", "Duration", 0, 740) +
+            #   geom_tukeyBracket("SOLO", "COP", "Duration", 0, 740) +
               geom_jitter(width=0.15, height=0,
                           colour="black", size=0.5) +
               geom_boxplot(alpha=0.5, outlier.shape=NA) +
@@ -150,9 +189,9 @@ plot_duration <- ggplot(data_analyzed, aes(x=Category, y=Duration, fill=Category
 
 # Boxplot of Display Length                      
 plot_displayLength <- ggplot(data_analyzed, aes(x=Category, y=DisplayLength, fill=Category)) +
-                   geom_tukeyBracket("SOLO", "AUDI", "DisplayLength", 0, 420) +
-                   geom_tukeyBracket("COP", "AUDI", "DisplayLength", 0, 420) +
-                   geom_tukeyBracket("SOLO", "COP", "DisplayLength", 0, 420) +
+                #    geom_tukeyBracket("SOLO", "AUDI", "DisplayLength", 0, 420) +
+                #    geom_tukeyBracket("COP", "AUDI", "DisplayLength", 0, 420) +
+                #    geom_tukeyBracket("SOLO", "COP", "DisplayLength", 0, 420) +
                    geom_jitter(width=0.15, height=0,
                                colour="black", size=0.5) +
                    geom_boxplot(alpha=0.5, outlier.shape=NA) +
@@ -166,9 +205,9 @@ plot_displayLength <- ggplot(data_analyzed, aes(x=Category, y=DisplayLength, fil
 
 # Boxplot of Unique Elements                      
 plot_uniqueElements <- ggplot(data_analyzed, aes(x=Category, y=UniqueDisplayElements, fill=Category)) +
-                    geom_tukeyBracket("SOLO", "AUDI", "UniqueDisplayElements", 0, 11) +
-                    geom_tukeyBracket("COP", "AUDI", "UniqueDisplayElements", 0, 11) +
-                    geom_tukeyBracket("SOLO", "COP", "UniqueDisplayElements", 0, 11) +
+                    # geom_tukeyBracket("SOLO", "AUDI", "UniqueDisplayElements", 0, 11) +
+                    # geom_tukeyBracket("COP", "AUDI", "UniqueDisplayElements", 0, 11) +
+                    # geom_tukeyBracket("SOLO", "COP", "UniqueDisplayElements", 0, 11) +
                     geom_jitter(width=0.15, height=0,
                                 colour="black", size=0.5) +
                     geom_boxplot(alpha=0.5, outlier.shape=NA) +
@@ -190,9 +229,9 @@ ggsave(plots_repertoire, file="Plots/FIGURE_1.png", width=6, height=2)
 # FIGURE 2 ------------------------------------------------------
 # Boxplot of scaled entropy
 plot_entropy <- ggplot(data_analyzed, aes(x=Category, y=Entropy_Scaled, fill=Category)) +
-             geom_tukeyBracket("SOLO", "AUDI", "Entropy_Scaled", 0, 1.2) +
-             geom_tukeyBracket("COP", "AUDI", "Entropy_Scaled", 0, 1.2) +
-             geom_tukeyBracket("SOLO", "COP", "Entropy_Scaled", 0, 1.2) +
+            #  geom_tukeyBracket("SOLO", "AUDI", "Entropy_Scaled", 0, 1.2) +
+            #  geom_tukeyBracket("COP", "AUDI", "Entropy_Scaled", 0, 1.2) +
+            #  geom_tukeyBracket("SOLO", "COP", "Entropy_Scaled", 0, 1.2) +
              geom_jitter(width=0.15, height=0,
                          colour="black", size=0.5) +
              geom_boxplot(alpha=0.5, outlier.shape=NA) +
@@ -206,9 +245,9 @@ plot_entropy <- ggplot(data_analyzed, aes(x=Category, y=Entropy_Scaled, fill=Cat
 
 # Boxplot of compression ratio                      
 plot_compression <- ggplot(data_analyzed, aes(x=Category, y=Compression_Ratio, fill=Category)) +
-                 geom_tukeyBracket("SOLO", "AUDI", "Compression_Ratio", 0, 8) +
-                 geom_tukeyBracket("COP", "AUDI", "Compression_Ratio", 0, 8) +
-                 geom_tukeyBracket("SOLO", "COP", "Compression_Ratio", 0, 8) +
+                #  geom_tukeyBracket("SOLO", "AUDI", "Compression_Ratio", 0, 8) +
+                #  geom_tukeyBracket("COP", "AUDI", "Compression_Ratio", 0, 8) +
+                #  geom_tukeyBracket("SOLO", "COP", "Compression_Ratio", 0, 8) +
                  geom_jitter(width=0.15, height=0,
                              colour="black", size=0.5) +
                  geom_boxplot(alpha=0.5, outlier.shape=NA) +
@@ -437,7 +476,8 @@ table_s4 <- data_analyzed |>
 write_csv(table_s4, file="Output/TABLE_S4.csv")
 
 # TABLE S5 ---------------------------------------------
-# Table of core behavioral elements with category-specific frequencies
+
+# Overall counts core behavioral elements with category-specific frequencies
 # [Select] UID, Category, and DisplayCode string cols
 # [Separate] Display code into any number of single-column character columns
 #            NOTE this gives each row the number of columns matching the max number
@@ -450,19 +490,19 @@ write_csv(table_s4, file="Output/TABLE_S4.csv")
 # [Select] to reorder columns
 # [Mutate] an Element col with the shortened name of each behavioral code
 # [Mutate] to replace NAs with 0 for frequencies of each
-table_s5 <- data_analyzed |>
-         select(UID, Category, DisplayCode) |>
-         separate(DisplayCode, into=as.character(0:max(data_analyzed$DisplayLength)),
-                  sep="", fill="right") |>
-         pivot_longer(-c(UID, Category), names_to="Index", values_to="Code") |>
-         filter(Code!="" & !is.na(Code)) |>
-         group_by(Category, Code) |>
-         tally() |>
-         pivot_wider(id_cols=Code, names_from=Category, values_from=n) |>
-         select(Code, SOLO, AUDI, COP) |>
-         mutate(Element = map_chr(Code, ~ names(behavior_code)[behavior_code==.]),
-                .after=Code) |>
-         mutate(across(c(SOLO, AUDI, COP), ~ ifelse(is.na(.x), 0, .x)))
+elements_overall <- data_analyzed |>
+                 select(UID, Category, DisplayCode) |>
+                 separate(DisplayCode, into=as.character(0:max(data_analyzed$DisplayLength)),
+                          sep="", fill="right") |>
+                 pivot_longer(-c(UID, Category), names_to="Index", values_to="Code") |>
+                 filter(Code!="" & !is.na(Code)) |>
+                 group_by(Category, Code) |>
+                 tally() |>
+                 pivot_wider(id_cols=Code, names_from=Category, values_from=n) |>
+                 select(Code, SOLO, AUDI, COP) |>
+                 mutate(Element = map_chr(Code, ~ names(behavior_code)[behavior_code==.]),
+                        .after=Code) |>
+                 mutate(across(c(SOLO, AUDI, COP), ~ ifelse(is.na(.x), 0, .x)))
 
 # Write table to file
 write_csv(table_s5, file="Output/TABLE_S5.csv")

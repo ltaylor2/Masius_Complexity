@@ -29,6 +29,12 @@ compress <- function(raw) {
 #           Compression_Length (numeric) - Length of raw compressed display string
 #           Compression_Ratio (numeric, 0-1) - Relative length of raw compressed:uncompressed display string
 # [Mutate] If unscaled entropy is 0, scaled entropy is 0
+# [Mutate] Extract the display code with only elements when female ON log 
+#          Extract the display code with only elements when female OFF log
+#          Extract the display code with only elements when female UPSLOPE while on log
+#          Extract the display code with only elements when female DOWNSLOPE while on log
+# [Mutate] Calculate proportion of elements with female On log (including all elements)
+#          Calculate proportion of elements with female Above Male (excluding elements where female off)
 data_analyzed <- data_clean |>
               mutate(DisplayCode_Raw = map(DisplayCode, charToRaw)) |>
               mutate(DisplayCode_Compressed = map(DisplayCode_Raw, brotli::brotli_compress)) |>
@@ -38,7 +44,11 @@ data_analyzed <- data_clean |>
                      Entropy_Scaled        = Entropy_Unscaled / log(UniqueDisplayElements, base=2),
                      Compression_Length    = map_dbl(DisplayCode_Compressed, length),
                      Compression_Ratio     = map2_dbl(DisplayCode_Raw, DisplayCode_Compressed, ~ length(.x) / length(.y))) |>
-              mutate(Entropy_Scaled = ifelse(Entropy_Unscaled==0, 0, Entropy_Scaled))
+              mutate(Entropy_Scaled = ifelse(Entropy_Unscaled==0, 0, Entropy_Scaled)) |>
+              mutate(DisplayCode_FemOn = map2_chr(str_split(DisplayCode, ""), str_split(FemOnOff, ""), ~ paste(.x[grep("Y", .y)], collapse="")),
+                     DisplayCode_FemOff = map2_chr(str_split(DisplayCode, ""), str_split(FemOnOff, ""), ~ paste(.x[grep("N", .y)], collapse=""))) |>
+              mutate(Prop_FemON = map_dbl(FemOnOff, ~ str_count(., "Y") / nchar(.)),
+                     Prop_FemUp = map_dbl(FemUpDown, ~ str_count(., "U") / (str_count(., "U") + str_count(., "D"))))             
 
 # Write analyzed data file
 write_csv(data_analyzed, ANALYZED_DATA_PATH)
@@ -214,12 +224,6 @@ data_analyzed |>
     tally() |>
     writeSummaryBlock("Category Tally")
 
-# Category tally
-data_analyzed |>
-    group_by(Category) |>
-    tally() |>
-    writeSummaryBlock("Category Tally")
-
 # Female Identified Tally
 data_analyzed |>
     group_by(FemID < 8000, Category) |>
@@ -246,13 +250,17 @@ data_analyzed |>
     summarize(mean(Duration), sd(Duration), min(Duration), max(Duration)) |>
     writeSummaryBlock("DURATION -- Key values")
 
-aov(Duration ~ Category, data=data_analyzed) |>
+lm(Duration ~ Category + as.character(ObsMonth) + UniqueMale1ID, data = data_analyzed) |>
     summary() |>
-    writeSummaryBlock("DURATION -- ANOVA")
+    writeSummaryBlock("DURATION -- Linear Model")
 
-aov(Duration ~ Category, data=data_analyzed) |>
-    TukeyHSD() |>
-    writeSummaryBlock("DURATION -- Tukey")
+# aov(Duration ~ Category, data=data_analyzed) |>
+#     summary() |>
+#     writeSummaryBlock("DURATION -- ANOVA")
+
+# aov(Duration ~ Category, data=data_analyzed) |>
+#     TukeyHSD() |>
+#     writeSummaryBlock("DURATION -- Tukey")
 
 # REPORT Display Length ---------------------------------------------
 
@@ -261,13 +269,17 @@ data_analyzed |>
     summarize(mean(DisplayLength), sd(DisplayLength), min(DisplayLength), max(DisplayLength)) |>
     writeSummaryBlock("DISPLAY LENGTH -- Key values")
 
-aov(DisplayLength ~ Category, data=data_analyzed) |>
+lm(DisplayLength ~ Category + as.character(ObsMonth) + UniqueMale1ID, data = data_analyzed) |>
     summary() |>
-    writeSummaryBlock("DISPLAY LENGTH -- ANOVA")
+    writeSummaryBlock("DISPLAY LENGTH -- Linear Model")
 
-aov(DisplayLength ~ Category, data=data_analyzed) |>
-    TukeyHSD() |>
-    writeSummaryBlock("DISPLAY LENGTH -- Tukey")
+# aov(DisplayLength ~ Category, data=data_analyzed) |>
+#     summary() |>
+#     writeSummaryBlock("DISPLAY LENGTH -- ANOVA")
+
+# aov(DisplayLength ~ Category, data=data_analyzed) |>
+#     TukeyHSD() |>
+#     writeSummaryBlock("DISPLAY LENGTH -- Tukey")
 
 # REPORT Unique elements ---------------------------------------------
 data_analyzed |>
@@ -275,13 +287,17 @@ data_analyzed |>
     summarize(mean(UniqueDisplayElements), sd(UniqueDisplayElements), min(UniqueDisplayElements), max(UniqueDisplayElements)) |>
     writeSummaryBlock("UNIQUE ELEMENTS -- Key values")
 
-aov(UniqueDisplayElements ~ Category, data=data_analyzed) |>
+lm(UniqueDisplayElements ~ Category + as.character(ObsMonth) + UniqueMale1ID, data = data_analyzed) |>
     summary() |>
-    writeSummaryBlock("UNIQUE ELEMENTS -- ANOVA")
+    writeSummaryBlock("UNIQUE ELEMENTS -- Linear Model")
 
-aov(UniqueDisplayElements ~ Category, data=data_analyzed) |>
-    TukeyHSD() |>
-    writeSummaryBlock("UNIQUE ELEMENTS -- Tukey")
+# aov(UniqueDisplayElements ~ Category, data=data_analyzed) |>
+#     summary() |>
+#     writeSummaryBlock("UNIQUE ELEMENTS -- ANOVA")
+
+# aov(UniqueDisplayElements ~ Category, data=data_analyzed) |>
+#     TukeyHSD() |>
+#     writeSummaryBlock("UNIQUE ELEMENTS -- Tukey")
 
 # RANDOMIZATION Unique elements ---------------------------------------------
 
@@ -310,13 +326,17 @@ data_analyzed |>
     summarize(mean(Entropy_Scaled), sd(Entropy_Scaled), min(Entropy_Scaled), max(Entropy_Scaled)) |>
     writeSummaryBlock("Entropy (scaled) -- Key values")
 
-aov(Entropy_Scaled ~ Category, data=data_analyzed) |>
+lm(Entropy_Scaled ~ Category + as.character(ObsMonth) + UniqueMale1ID, data = data_analyzed) |>
     summary() |>
-    writeSummaryBlock("Entropy (scaled) -- ANOVA")
+    writeSummaryBlock("Entropy (scaled) -- Linear Model")
 
-aov(Entropy_Scaled ~ Category, data=data_analyzed) |>
-    TukeyHSD() |>
-    writeSummaryBlock("Entropy (scaled) -- Tukey")
+# aov(Entropy_Scaled ~ Category, data=data_analyzed) |>
+#     summary() |>
+#     writeSummaryBlock("Entropy (scaled) -- ANOVA")
+
+# aov(Entropy_Scaled ~ Category, data=data_analyzed) |>
+#     TukeyHSD() |>
+#     writeSummaryBlock("Entropy (scaled) -- Tukey")
 
 # RANDOMIZATION (Entropy, scaled) ---------------------------------------------
 if (RUN_RANDOM) {
@@ -343,13 +363,17 @@ data_analyzed |>
     summarize(mean(Compression_Ratio), sd(Compression_Ratio), min(Compression_Ratio), max(Compression_Ratio)) |>
     writeSummaryBlock("Compression Ratio -- Key values")
 
-aov(Compression_Ratio ~ Category, data=data_analyzed) |>
+lm(Compression_Ratio ~ Category + as.character(ObsMonth) + UniqueMale1ID, data = data_analyzed) |>
     summary() |>
-    writeSummaryBlock("Compression Ratio -- ANOVA")
+    writeSummaryBlock("Compression Ratio -- Linear Model")
 
-aov(Compression_Ratio ~ Category, data=data_analyzed) |>
-    TukeyHSD() |>
-    writeSummaryBlock("Compression Ratio -- Tukey")
+# aov(Compression_Ratio ~ Category, data=data_analyzed) |>
+#     summary() |>
+#     writeSummaryBlock("Compression Ratio -- ANOVA")
+
+# aov(Compression_Ratio ~ Category, data=data_analyzed) |>
+#     TukeyHSD() |>
+#     writeSummaryBlock("Compression Ratio -- Tukey")
 
 # RANDOMIZATION (Compression ratio) ---------------------------------------------
 if (RUN_RANDOM) {
@@ -358,6 +382,7 @@ if (RUN_RANDOM) {
 } else {
     randomDistribution_compressionRatio <- readRDS("Output/randomDistribution_compressionRatio.rds")   
 }
+
 # Summarize for report
 cop_compressionRatio <- data_analyzed |>
             filter(Category == "COP") |>
@@ -374,23 +399,17 @@ lm(Compression_Ratio ~ Entropy_Scaled, data=data_analyzed) |>
     summary() |>
     writeSummaryBlock("Entropy vs. Compressibility correlation")
 
-# Most compressible string ---------------------------------------------
-data_analyzed |>
-    filter(Compression_Ratio == max(Compression_Ratio)) |>
-    select(UID, Category, Entropy_Scaled, Compression_Ratio, DisplayLength, DisplayCode) |>
-    writeSummaryBlock("Highest Compression Ratio")
+# # Most compressible string ---------------------------------------------
+# data_analyzed |>
+#     filter(Compression_Ratio == max(Compression_Ratio)) |>
+#     select(UID, Category, Entropy_Scaled, Compression_Ratio, DisplayLength, DisplayCode) |>
+#     writeSummaryBlock("Highest Compression Ratio")
 
-# Compression ratio comparison string ---------------------------------------------
-data_analyzed |>
-    filter(UID == 453) |>
-    select(UID, Category, Entropy_Scaled, Compression_Ratio, DisplayLength, DisplayCode) |>
-    writeSummaryBlock("Compression rate comparison")
-
-# Lowest entropy string ---------------------------------------------
-data_analyzed |>
-    filter(Entropy_Scaled == min(Entropy_Unscaled)) |>
-    select(UID, Category, Entropy_Scaled, Compression_Ratio, DisplayLength, DisplayCode) |>
-    writeSummaryBlock("Lowest Entropy display")
+# # Compression ratio comparison string ---------------------------------------------
+# data_analyzed |>
+#     filter(UID == 453) |>
+#     select(UID, Category, Entropy_Scaled, Compression_Ratio, DisplayLength, DisplayCode) |>
+#     writeSummaryBlock("Compression rate comparison")
 
 # Cop strings ---------------------------------------------
 data_analyzed |>
@@ -466,6 +485,33 @@ randomDistribution_Jaro_DiffMaleAcrossContexts |>
     group_by(Mean < cop_Jaro_DiffMaleSameContext) |>
     tally() |>
     writeSummaryBlock("RANDOMIZATION -- Jaro -- Diff Male/Same Context COP vs. AUDI + SOLO")
+
+# FEMALE BEHAVIOR ---------------------------------------------
+
+# Female On or Off Log 
+data_analyzed |>
+    group_by(Category) |>
+    summarize(mean(Prop_FemON, na.rm=TRUE), sd(Prop_FemON, na.rm=TRUE)) |>
+    writeSummaryBlock("FEMALE BEHAVIOR -- Proportion Female On Log -- Key Values")
+
+t.test(x = filter(data_analyzed, Category == "AUDI")$Prop_FemON,
+       y = filter(data_analyzed, Category == "COP")$Prop_FemON,
+       paired = FALSE, alternative = "two.sided",
+       na.action = "exclude") |>
+    writeSummaryBlock("FEMALE BEHAVIOR -- Proportion Female On Log -- T Test")
+
+# Female Upslope or Downslop 
+data_analyzed |>
+    group_by(Category) |>
+    summarize(mean(Prop_FemUp, na.rm=TRUE), sd(Prop_FemUp, na.rm=TRUE)) |>
+    writeSummaryBlock("FEMALE BEHAVIOR -- Proportion Female Upslope -- Key Values")
+
+t.test(x = filter(data_analyzed, Category == "AUDI")$Prop_FemUp,
+       y = filter(data_analyzed, Category == "COP")$Prop_FemUp,
+       paired = FALSE,
+       alternative = "two.sided",
+       na.action = "exclude") |>
+    writeSummaryBlock("FEMALE BEHAVIOR -- Proportion Female Upslope -- T Test")
 
 # SUPPLEMENTARY MATERIAL -- Before vs after copulation ---------------------------------------------
 

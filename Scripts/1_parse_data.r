@@ -1,5 +1,13 @@
 # Read data (raw)
 # [Mutate] convert Date column to Datetime object
+# [Mutate] add Month column
+# [Mutate] add UniqueMale1ID column, where each unidentified male (8000)
+#          is given a unique ID (i.e., assumed to be different)
+# [Mutate] clean FemOnOff to NA=X, On=Y, Off=N
+#          clean FemUpDown to NA=X, Up=U, Down=D
+# [Mutate] mark FemOnOff and FemUpDown = A for AttC or C for Cop elements
+#          NOTE this is used later to prune the FemOnOff and FemUpDown strings 
+#               to match the DisplayString
 data_raw <- read_csv(RAW_DATA_PATH, 
                      col_types = c("UID"='c',
                                    "ObsDate"='c',
@@ -12,7 +20,17 @@ data_raw <- read_csv(RAW_DATA_PATH,
                                    "FemOnOff"='c',
                                    "Behavior"='c',
                                    "MaleOtherBeh1"='c')) |>
-        mutate(ObsDate = mdy(ObsDate))
+        mutate(ObsDate = mdy(ObsDate)) |>
+        mutate(ObsMonth = as.character(month(ObsDate))) |>
+        mutate(UniqueMale1ID = map2_chr(Male1ID, UID, ~ifelse(.x==8000, paste(.x, .y, sep="-"), .x))) |>
+        mutate(FemOnOff = ifelse(is.na(FemOnOff), "X", FemOnOff),
+               FemUpDown = ifelse(is.na(FemUpDown) | FemUpDown == "Na", "X", FemUpDown)) |>
+        mutate(FemOnOff = c("X"="X", "Female On Log"="Y", "Female Off Log"="N")[FemOnOff],
+               FemUpDown = c("X"="X", "FemUp"="U", "FemDown"="D")[FemUpDown]) |>
+        mutate(FemOnOff = ifelse(Behavior=="Attempted Copulation", "A", FemOnOff),
+               FemUpDown = ifelse(Behavior=="Atempted Copulation", "A", FemUpDown)) |>
+        mutate(FemOnOff = ifelse(Behavior=="Copulation", "C", FemOnOff),
+               FemUpDown = ifelse(Behavior=="Copulation", "C", FemUpDown))
 
 # Write T S1, with raw element frequencies
 table_s1 <- data_raw |>
@@ -42,8 +60,7 @@ bands <- read_csv("Data/data_banding.csv", show_col_types=FALSE) |>
 # SOLO Displays: Performed by one male with no audience
 # MULT Displays: Performance with actions from multiple birds
 # AUDI Displays: Performance featuring female audience member(s) with no copulation
-# COP Displays:  Performance featuring female audience member(s) with successful
-
+# COP Displays:  Performance featuring female audience member(s) with successful copulation
 categorizeDisplayType <- function(uid) {
     display <- filter(data_raw, UID==uid)
 
@@ -118,6 +135,7 @@ specifyOtherBehaviors <- function(behavior, details) {
     }
     return(paste(behavior, details))
 }
+
 # Organize raw data
 # [Left join] Displays to get display categories
 # [Filter] out MULTI displays (should retain SOLO, AUDI, COP only)
@@ -175,8 +193,12 @@ displayDuration <- function(uid, coded=FALSE) {
 #           NOTE should be chronological order already, but just making sure! 
 # [Summarize] the DisplayShort col as the collapsed set of elements, semicolon deliminted, across the display
 #             the DisplayCode col as the collapsed set of single-character element for the final string
+#             the FemOnOff col as the collapsed set of FemOnOff codes for the string
+#             the FemUpDown col as the collapsed set of FemUpDown codes for the string
 # [Separate] After-cop DisplayShort strings for each display (will be NA if no Cop is present in the display)
 # [Separate] After-cop DisplayCode strings for each display (will be NA if no Cop is present)
+# [Separate] Before-cop FemOnOff col for each display only
+# [Separate] Before-cop FemUpDown col for each display only
 # [Mutate] Total duration (s) of display
 #          NOTE duration is calculated from raw data, including untracked elements
 #               but cuts off duration at Cop element, when relevant
@@ -187,11 +209,15 @@ displayDuration <- function(uid, coded=FALSE) {
 #          used in before vs. after cop comparisons
 # [Mutate] cut Attempted Copulation ("AttC", should be code "M") from final display strings
 # [Mutate] cut Copulation ("Cop", should be code "N") from final display strings
+# [Mutate] cut Attempted Copulation from FemUpDown and FemOnOff columns (code "A" here)
+# [Mutate] cut Copulation from FemUpDown and FemOnOff columns (code "C" here)
 data_clean_wide <- data_clean_long |>
-		        group_by(UID, Category, ObsDate, Log, Male1ID, FemID, Bird2ID) |>
+		        group_by(UID, Category, ObsDate, ObsMonth, Log, Male1ID, UniqueMale1ID, FemID, Bird2ID) |>
                 arrange(UID, Time) |>
 		        summarise(DisplayShort = paste(BehaviorShort, collapse=";"), 
                           DisplayCode = paste(BehaviorCode, collapse=""), 
+                          FemOnOff = paste(FemOnOff, collapse=""),
+                          FemUpDown = paste(FemUpDown, collapse=""),
                           .groups="keep") |>	
                 separate(DisplayShort, into=c("DisplayShort", "DisplayShort_AfterCop"), 
                          sep="(?<=;Cop)", 
@@ -199,13 +225,25 @@ data_clean_wide <- data_clean_long |>
                 separate(DisplayCode, into=c("DisplayCode", "DisplayCode_AfterCop"), 
                          sep=paste0("(?<=", behavior_code["Cop"], ")"),
                          fill="right", extra="merge") |>
+                separate(FemOnOff, into=c("FemOnOff", "FemOnOff_AfterCop"), 
+                         sep="(?<=C)", 
+                         fill="right", extra="merge") |>
+                select(-FemOnOff_AfterCop) |>
+                separate(FemUpDown, into=c("FemUpDown", "FemUpDown_AfterCop"), 
+                         sep="(?<=C)", 
+                         fill="right", extra="merge") |>
+                select(-FemUpDown_AfterCop) |>
                 mutate(Duration = map_dbl(UID, displayDuration)) |>
                 ungroup() |>
                 filter(Duration >= 60) |>
-                filter(grepl("ALAD", DisplayShort) & grepl("Bow", DisplayShort)) |>
+                filter(grepl("ALAD", DisplayShort) | grepl("Bow", DisplayShort)) |>
                 mutate(DisplayCode_withCops = DisplayCode) |>
                 mutate(DisplayCode = str_replace(DisplayCode, behavior_code["AttC"], "")) |>
-                mutate(DisplayCode = str_replace(DisplayCode, behavior_code["Cop"], ""))
+                mutate(DisplayCode = str_replace(DisplayCode, behavior_code["Cop"], "")) |>
+                mutate(FemOnOff = str_replace(FemOnOff, "A", ""),
+                       FemUpDown = str_replace(FemUpDown, "A", "")) |>
+                mutate(FemOnOff = str_replace(FemOnOff, "C", ""),
+                       FemUpDown = str_replace(FemUpDown, "C", ""))
 
 # Write clean datasheet for analysis
 write_csv(data_clean_wide, CLEAN_DATA_PATH)
