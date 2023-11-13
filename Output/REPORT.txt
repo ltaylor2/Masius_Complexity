@@ -727,42 +727,6 @@ F-statistic: 353.8 on 1 and 421 DF,  p-value: < 2.2e-16
 
 ------------------------------
 
-**Highest Compression Ratio**
-
-# A tibble: 1 x 6
-  UID   Category Entropy_Scaled Compression_Ratio DisplayLength DisplayCode                                                            
-  <chr> <chr>             <dbl>             <dbl>         <int> <chr>                                                                  
-1 1487  AUDI              0.633              7.45           365 DDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDIIIIIIIDDBFFFFFFFFFFFFFFFFFIIHHHHHHHHH~
-
-
-------------------------------
-
-------------------------------
-
-**Compression rate comparison**
-
-# A tibble: 1 x 6
-  UID   Category Entropy_Scaled Compression_Ratio DisplayLength DisplayCode                                                            
-  <chr> <chr>             <dbl>             <dbl>         <int> <chr>                                                                  
-1 453   AUDI              0.639              2.53            81 JJDBAIIIIIIHHIIIIIIIIIIIIIIIIIIIIIIIIIDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDBF~
-
-
-------------------------------
-
-------------------------------
-
-**Lowest Entropy display**
-
-# A tibble: 1 x 6
-  UID   Category Entropy_Scaled Compression_Ratio DisplayLength DisplayCode   
-  <chr> <chr>             <dbl>             <dbl>         <int> <chr>         
-1 969   AUDI                  0               1.4            14 DDDDDDDDDDDDDD
-
-
-------------------------------
-
-------------------------------
-
 **COP display codes**
 
 # A tibble: 13 x 3
@@ -912,6 +876,74 @@ F-statistic: 426.1 on 1 and 116034 DF,  p-value: < 2.2e-16
 
 ------------------------------
 
+**FEMALE BEHAVIOR -- Proportion Female On Log -- Key Values**
+
+# A tibble: 3 x 3
+  Category `mean(Prop_FemOn, na.rm = TRUE)` `sd(Prop_FemOn, na.rm = TRUE)`
+  <chr>                               <dbl>                          <dbl>
+1 AUDI                                0.535                          0.244
+2 COP                                 0.920                          0.133
+3 SOLO                                0                              0    
+
+
+------------------------------
+
+------------------------------
+
+**FEMALE BEHAVIOR -- Proportion Female On Log -- T Test**
+
+
+	Welch Two Sample t-test
+
+data:  filter(data_analyzed, Category == "AUDI")$Prop_FemOn and filter(data_analyzed, Category == "COP")$Prop_FemOn
+t = -8.71, df = 23.932, p-value = 6.947e-09
+alternative hypothesis: true difference in means is not equal to 0
+95 percent confidence interval:
+ -0.4758679 -0.2935260
+sample estimates:
+mean of x mean of y 
+0.5350845 0.9197815 
+
+
+
+------------------------------
+
+------------------------------
+
+**FEMALE BEHAVIOR -- Proportion Female Upslope -- Key Values**
+
+# A tibble: 3 x 3
+  Category `mean(Prop_FemUp, na.rm = TRUE)` `sd(Prop_FemUp, na.rm = TRUE)`
+  <chr>                               <dbl>                          <dbl>
+1 AUDI                               0.253                          0.230 
+2 COP                                0.0276                         0.0996
+3 SOLO                             NaN                             NA     
+
+
+------------------------------
+
+------------------------------
+
+**FEMALE BEHAVIOR -- Proportion Female Upslope -- T Test**
+
+
+	Welch Two Sample t-test
+
+data:  filter(data_analyzed, Category == "AUDI")$Prop_FemUp and filter(data_analyzed, Category == "COP")$Prop_FemUp
+t = 6.2862, df = 32.284, p-value = 4.575e-07
+alternative hypothesis: true difference in means is not equal to 0
+95 percent confidence interval:
+ 0.1523778 0.2983905
+sample estimates:
+ mean of x  mean of y 
+0.25299758 0.02761341 
+
+
+
+------------------------------
+
+------------------------------
+
 **AFTER-COP DISPLAYS -- LENGTH (elements) range**
 
 # A tibble: 1 x 2
@@ -1034,26 +1066,6 @@ sample estimates:
 mean difference 
        1.037878 
 
-
-
-
-------------------------------
-
-------------------------------
-
-**FEMALE BEHAVIOR -- Female On Log -- T Test**
-
-
-	Welch Two Sample t-test
-
-data:  filter(data_analyzed, Category == "AUDI")$Prop_FemON and filter(data_analyzed, Category == "COP")$Prop_FemON
-t = -8.71, df = 23.932, p-value = 6.947e-09
-alternative hypothesis: true difference in means is not equal to 0
-95 percent confidence interval:
- -0.4758679 -0.2935260
-sample estimates:
-mean of x mean of y 
-0.5350845 0.9197815 
 
 
 

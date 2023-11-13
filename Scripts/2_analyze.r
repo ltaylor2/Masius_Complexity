@@ -46,8 +46,10 @@ data_analyzed <- data_clean |>
                      Compression_Ratio     = map2_dbl(DisplayCode_Raw, DisplayCode_Compressed, ~ length(.x) / length(.y))) |>
               mutate(Entropy_Scaled = ifelse(Entropy_Unscaled==0, 0, Entropy_Scaled)) |>
               mutate(DisplayCode_FemOn = map2_chr(str_split(DisplayCode, ""), str_split(FemOnOff, ""), ~ paste(.x[grep("Y", .y)], collapse="")),
-                     DisplayCode_FemOff = map2_chr(str_split(DisplayCode, ""), str_split(FemOnOff, ""), ~ paste(.x[grep("N", .y)], collapse=""))) |>
-              mutate(Prop_FemON = map_dbl(FemOnOff, ~ str_count(., "Y") / nchar(.)),
+                     DisplayCode_FemOff = map2_chr(str_split(DisplayCode, ""), str_split(FemOnOff, ""), ~ paste(.x[grep("N", .y)], collapse="")),
+                     DisplayCode_FemUp = map2_chr(str_split(DisplayCode, ""), str_split(FemUpDown, ""), ~ paste(.x[grep("U", .y)], collapse="")),
+                     DisplayCode_FemDown = map2_chr(str_split(DisplayCode, ""), str_split(FemUpDown, ""), ~ paste(.x[grep("D", .y)], collapse=""))) |>
+              mutate(Prop_FemOn = map_dbl(FemOnOff, ~ str_count(., "Y") / nchar(.)),
                      Prop_FemUp = map_dbl(FemUpDown, ~ str_count(., "U") / (str_count(., "U") + str_count(., "D"))))             
 
 # Write analyzed data file
@@ -491,11 +493,11 @@ randomDistribution_Jaro_DiffMaleAcrossContexts |>
 # Female On or Off Log 
 data_analyzed |>
     group_by(Category) |>
-    summarize(mean(Prop_FemON, na.rm=TRUE), sd(Prop_FemON, na.rm=TRUE)) |>
+    summarize(mean(Prop_FemOn, na.rm=TRUE), sd(Prop_FemOn, na.rm=TRUE)) |>
     writeSummaryBlock("FEMALE BEHAVIOR -- Proportion Female On Log -- Key Values")
 
-t.test(x = filter(data_analyzed, Category == "AUDI")$Prop_FemON,
-       y = filter(data_analyzed, Category == "COP")$Prop_FemON,
+t.test(x = filter(data_analyzed, Category == "AUDI")$Prop_FemOn,
+       y = filter(data_analyzed, Category == "COP")$Prop_FemOn,
        paired = FALSE, alternative = "two.sided",
        na.action = "exclude") |>
     writeSummaryBlock("FEMALE BEHAVIOR -- Proportion Female On Log -- T Test")

@@ -83,7 +83,6 @@ table_1 <- data_analyzed |>
 write_csv(table_1, file="Output/TABLE_1.csv")
 
 # TABLE 2 ------------------------------------------------------
-
 elements_femOn <- map2_df(data_analyzed$Category, data_analyzed$DisplayCode_FemOn, 
                          ~ tibble(Element = str_split(.y, "")[[1]]) |> 
                                   group_by(Element) |> 
@@ -93,9 +92,9 @@ elements_femOn <- map2_df(data_analyzed$Category, data_analyzed$DisplayCode_FemO
                 summarize(.groups="keep", n = sum(n)) |>
                 group_by(Category) |>
                 mutate(Total = sum(n)) |>
-                mutate(Perc = round((n / Total) * 100), 3) |>
+                mutate(Perc = as.character(round((n / Total) * 100, 0))) |>
                 mutate(Perc = ifelse(Perc < 1, "<1", Perc)) |>
-                mutate(Category = paste0(Category, "-FemOn"))
+                mutate(Category = paste0(Category, "_FemOn"))
 
 elements_femOff <- map2_df(data_analyzed$Category, data_analyzed$DisplayCode_FemOff, 
                           ~ tibble(Element = str_split(.y, "")[[1]]) |> 
@@ -106,8 +105,9 @@ elements_femOff <- map2_df(data_analyzed$Category, data_analyzed$DisplayCode_Fem
                  summarize(.groups="keep", n = sum(n)) |>
                  group_by(Category) |>
                  mutate(Total = sum(n)) |>
-                 mutate(Perc = round((n / Total) * 100), 3) |>
-                 mutate(Category = paste0(Category, "-FemOff"))
+                 mutate(Perc = as.character(round((n / Total) * 100, 0))) |>
+                 mutate(Perc = ifelse(Perc < 1, "<1", Perc)) |>
+                 mutate(Category = paste0(Category, "_FemOff"))
 
 elements_femUp <- map2_df(data_analyzed$Category, data_analyzed$DisplayCode_FemUp, 
                           ~ tibble(Element = str_split(.y, "")[[1]]) |> 
@@ -118,9 +118,46 @@ elements_femUp <- map2_df(data_analyzed$Category, data_analyzed$DisplayCode_FemU
                  summarize(.groups="keep", n = sum(n)) |>
                  group_by(Category) |>
                  mutate(Total = sum(n)) |>
-                 mutate(Perc = round((n / Total) * 100), 3) |>
-                 mutate(Perc = ifelse(Perc < 1))
-                 mutate(Category = paste0(Category, "-FemOff"))
+                 mutate(Perc = as.character(round((n / Total) * 100, 0))) |>
+                 mutate(Perc = ifelse(Perc < 1, "<1", Perc)) |>
+                 mutate(Category = paste0(Category, "_FemUp"))
+
+elements_femDown <- map2_df(data_analyzed$Category, data_analyzed$DisplayCode_FemDown, 
+                            ~ tibble(Element = str_split(.y, "")[[1]]) |> 
+                                     group_by(Element) |> 
+                                     tally() |> 
+                                     mutate(Category = .x)) |>
+                    group_by(Category, Element) |>
+                    summarize(.groups="keep", n = sum(n)) |>
+                    group_by(Category) |>
+                    mutate(Total = sum(n)) |>
+                    mutate(Perc = as.character(round((n / Total) * 100, 0))) |>
+                    mutate(Perc = ifelse(Perc < 1, "<1", Perc)) |>
+                    mutate(Category = paste0(Category, "_FemDown"))
+
+
+table_2 <- bind_rows(elements_femOn, elements_femOff, elements_femUp, elements_femDown) |>
+        select(Element, Category, Perc) |>
+        pivot_wider(id_cols = Element, names_from=Category, values_from = Perc) |>
+        select(Code = Element, SOLO_FemOff, AUDI_FemOff, COP_FemOff, AUDI_FemOn, COP_FemOn, 
+               AUDI_FemUp, COP_FemUp,AUDI_FemDown, COP_FemDown) |>
+         mutate(Element = map_chr(Code, ~ names(behavior_code)[behavior_code==.]),
+                .after=Code)
+
+# Write table to file            
+write_csv(table_2, file="Output/TABLE_2.csv")
+
+## Calculate total male behavioral elements corresponding to female behavior subsets     
+table_2_totals <- bind_rows(elements_femOn, elements_femOff, elements_femUp, elements_femDown) |>
+              group_by(Category, Total) |>
+              tally() |>
+              mutate(drop="drop") |>
+              pivot_wider(id_cols = drop, names_from=Category, values_from=Total) |>
+              select(SOLO_FemOff, AUDI_FemOff, COP_FemOff, AUDI_FemOn, COP_FemOn, 
+                     AUDI_FemUp, COP_FemUp, AUDI_FemDown, COP_FemDown)
+
+# Write table to file            
+write_csv(table_2_totals, file="Output/TABLE_2_TOTALS.csv")
 
 # FIGURE 1 ------------------------------------------------------
 

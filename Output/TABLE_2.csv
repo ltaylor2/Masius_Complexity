@@ -1,0 +1,13 @@
+Code,Element,SOLO_FemOff,AUDI_FemOff,COP_FemOff,AUDI_FemOn,COP_FemOn,AUDI_FemUp,COP_FemUp,AUDI_FemDown,COP_FemDown
+A,Zro,27,1,NA,<1,NA,NA,NA,<1,NA
+B,ALAD,11,1,NA,3,2,NA,NA,<1,NA
+D,Bow,23,7,3,67,96,2,NA,97,99
+E,HafB,3,<1,1,<1,<1,NA,NA,<1,<1
+F,HdBw,12,3,NA,20,NA,68,NA,<1,NA
+I,Neck,2,57,80,10,2,30,100,2,<1
+J,Taf,5,15,7,<1,NA,NA,NA,<1,NA
+K,Mix,4,<1,NA,<1,NA,<1,NA,NA,NA
+L,Othr,2,<1,NA,<1,<1,NA,NA,<1,<1
+C,SLAD,8,<1,NA,NA,NA,NA,NA,NA,NA
+G,Metr,NA,<1,NA,NA,NA,NA,NA,NA,NA
+H,Swtc,3,16,9,NA,NA,NA,NA,NA,NA
