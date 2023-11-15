@@ -25,7 +25,6 @@ distances <- readRDS("Output/distances.rds") |>
           mutate(Focal_Label = ifelse(Category_1=="SOLO", "Focal display context: SOLO", Category_1)) |>
           mutate(Focal_Label = factor(Focal_Label, levels=c("Focal display context: SOLO", "AUDI", "COP")))
 
-        
 # TABLE 1 ------------------------------------------------------
 # Table of core behavioral elements and descriptions, with category-specific frequencies
 # [Select] UID, Category, and DisplayCode string cols
@@ -306,7 +305,6 @@ ggsave(plots_characteristics, file="Plots/FIGURE_1.png", width=8, height=2)
 
 # FIGURE 2 ------------------------------------------------------
 # Jaro distance comparison
-
 comparisonSampleSizes <- distances |>
                       group_by(Category_1, Focal_Label, Comparison_Type) |>
                       tally()
@@ -446,7 +444,6 @@ table_s3 <- data_analyzed |>
 write_csv(table_s3, file="Output/TABLE_S3.csv")
 
 # TABLE S4 ---------------------------------------------
-
 # Custom function to add line breaks for consistent
 #   display code table formatting
 displayCodeLineBreak <- function(s) {
@@ -541,11 +538,8 @@ figure_s1 <- ggplot(mutate(data_analyzed, Category=factor(Category, levels=c("CO
           customTheme +
           theme(strip.text = element_text(size=12, vjust=0.5),
                 strip.background = element_rect(colour="NA", fill=NA))
-          
 
 ggsave(figure_s1, file="Plots/FIGURE_S1.png", width=5, height=3.5)
-
-
 # FIGURE S2 ---------------------------------------------
 # Randomization results
 
@@ -575,7 +569,6 @@ plot_randComp_uniqueElements <- ggplot(randomDistribution_uniqueElements) +
                              ylab("Random sample mean") +
                              customTheme +
                              theme(axis.title.y=element_blank())
-
 
 # Entropy
 empiricalCop_entropy <- data_analyzed |>
@@ -636,8 +629,48 @@ plots_randComparions <- plot_randComp_uniqueElements /
 ggsave(plots_randComparions, file="Plots/FIGURE_S2.png", width=6, height=5) 
 
 # FIGURE S3 ---------------------------------------------
-# Correlation plot of display length and compression ratio          
+# Correlation plot of entropy and compression
 
+model_entropy_compressionRatio <- lm(Entropy_Scaled ~ Compression_Ratio, 
+                                     data=data_analyzed) |>
+                               summary()
+
+# Compute convex hulls
+hulls <- data_analyzed |>
+      group_by(Category) |>
+      slice(chull(Entropy_Scaled, Compression_Ratio))
+
+# Arrange hull labels
+labels <- tibble(Category=c("SOLO", "AUDI", "COP"),
+                 x       =c(0.88,    0.75,    0.13),
+                 y       =c(0.19,    6.60,    2.80),
+                 angle   =c(0,       -63.5,    -60))
+
+plot_syntaxCorrelation <- ggplot(data_analyzed) +
+                       geom_point(aes(x=Entropy_Scaled, y=Compression_Ratio, colour=Category), 
+                                  size=0.6, alpha=0.9) +
+                       geom_polygon(data=hulls, 
+                                    aes(x=Entropy_Scaled, y=Compression_Ratio, fill=Category), alpha=0.4) +
+                       geom_smooth(aes(x=Entropy_Scaled, y=Compression_Ratio), 
+                                   formula="y~x", method="lm", 
+                                   colour="black", se=FALSE) +
+                       geom_text(data=labels, 
+                                 aes(label=Category, colour=Category,
+                                     x=x, y=y, angle=angle),
+                                     size=3) + 
+                       scale_colour_manual(values=categoryColors) +
+                       scale_fill_manual(values=categoryColors) +
+                       scale_x_continuous(breaks=seq(0, 1, by=0.2), limits=c(0,1)) +
+                       scale_y_continuous(breaks=seq(0, 8, by=2), limits=c(0, 8)) +
+                       guides(fill="none", colour="none") +
+                       xlab("Entropy (scaled)") +
+                       ylab("Compression ratio") +
+                       customTheme
+
+ggsave(plot_syntaxCorrelation, file="Plots/FIGURE_S3.png", width=4, height=4)
+
+# FIGURE S4 ---------------------------------------------
+# Correlation plot of display length and compression ratio          
 # Linear regression
 model_displayLength_compressionRatio <- lm(Compression_Ratio ~ DisplayLength, 
                                            data=data_analyzed) |>
@@ -675,10 +708,19 @@ plot_lengthCompression <- ggplot(data_analyzed) +
                        ylab("Compression ratio") +
                        customTheme
 
-ggsave(plot_lengthCompression, file="Plots/FIGURE_S3.png", width=4, height=4)
+ggsave(plot_lengthCompression, file="Plots/FIGURE_S4.png", width=4, height=4)
 
-# FIGURE S4 ---------------------------------------------
+# FIGURE S5 ---------------------------------------------
 # Difference in Display Length vs. Jaro Distance
+# Linear regressions
+model_jaro_length <- lm(Jaro_Distance ~ Difference_DisplayLength, 
+                        data=distances) |>
+                  summary()
+
+model_jaro_uniqueElements <- lm(Jaro_Distance ~ Difference_UniqueDisplayElements, 
+                                data=distances) |>
+                          summary()
+
 # Dot plot with correlation line 
 plot_jaroDisplayLength <- ggplot(distances,
                                  aes(x=Difference_DisplayLength, y=Jaro_Distance)) +
@@ -704,10 +746,10 @@ plot_jaroDisplayElements <- ggplot(distances,
 plots_jaroCorrelations <- plot_jaroDisplayLength +
                           plot_jaroDisplayElements
 
-ggsave(plots_jaroCorrelations, file="Plots/FIGURE_S4.png",
+ggsave(plots_jaroCorrelations, file="Plots/FIGURE_S5.png",
        width=6, height=3)
 
-# FIGURE S5 ---------------------------------------------
+# FIGURE S6 ---------------------------------------------
 # Jaro Randomization Results       
 
 # Empirical distances
@@ -773,13 +815,14 @@ plot_randComp_jaroDiffMaleAcrossContext <- ggplot(randomDistribution_Jaro_DiffMa
                                                       ")")) +
                                         xlab("Jaro distance") +
                                         ylab("Random sample mean") +
-                                        customTheme
+                                        customTheme +
+                                        theme(plot.title = element_text(size=11.5))
 
 # Create combined plot and write to file              
 plots_randComparionsJaro <- plot_randComp_jaroSameDiffMaleCOP /
                             plot_randComp_jaroDiffMaleAcrossContext
 
-ggsave(plots_randComparionsJaro, file="Plots/FIGURE_S5.png", width=6, height=5) 
+ggsave(plots_randComparionsJaro, file="Plots/FIGURE_S6.png", width=6, height=5) 
 
 
 # TABLE S6 ---------------------------------------------
