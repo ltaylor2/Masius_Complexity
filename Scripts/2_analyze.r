@@ -50,7 +50,7 @@ data_analyzed <- data_clean |>
                      DisplayCode_FemUp = map2_chr(str_split(DisplayCode, ""), str_split(FemUpDown, ""), ~ paste(.x[grep("U", .y)], collapse="")),
                      DisplayCode_FemDown = map2_chr(str_split(DisplayCode, ""), str_split(FemUpDown, ""), ~ paste(.x[grep("D", .y)], collapse=""))) |>
               mutate(Prop_FemOn = map_dbl(FemOnOff, ~ str_count(., "Y") / nchar(.)),
-                     Prop_FemUp = map_dbl(FemUpDown, ~ str_count(., "U") / (str_count(., "U") + str_count(., "D"))))             
+                     Prop_FemDown = map_dbl(FemUpDown, ~ str_count(., "D") / (str_count(., "U") + str_count(., "D"))))             
 
 # Write analyzed data file
 write_csv(data_analyzed, ANALYZED_DATA_PATH)
@@ -502,18 +502,18 @@ t.test(x = filter(data_analyzed, Category == "AUDI")$Prop_FemOn,
        na.action = "exclude") |>
     writeSummaryBlock("FEMALE BEHAVIOR -- Proportion Female On Log -- T Test")
 
-# Female Upslope or Downslop 
+# Female Upslope or Downslope
 data_analyzed |>
     group_by(Category) |>
-    summarize(mean(Prop_FemUp, na.rm=TRUE), sd(Prop_FemUp, na.rm=TRUE)) |>
-    writeSummaryBlock("FEMALE BEHAVIOR -- Proportion Female Upslope -- Key Values")
+    summarize(mean(Prop_FemDown, na.rm=TRUE), sd(Prop_FemDown, na.rm=TRUE)) |>
+    writeSummaryBlock("FEMALE BEHAVIOR -- Proportion Female Downslope -- Key Values")
 
-t.test(x = filter(data_analyzed, Category == "AUDI")$Prop_FemUp,
-       y = filter(data_analyzed, Category == "COP")$Prop_FemUp,
+t.test(x = filter(data_analyzed, Category == "AUDI")$Prop_FemDown,
+       y = filter(data_analyzed, Category == "COP")$Prop_FemDown,
        paired = FALSE,
        alternative = "two.sided",
        na.action = "exclude") |>
-    writeSummaryBlock("FEMALE BEHAVIOR -- Proportion Female Upslope -- T Test")
+    writeSummaryBlock("FEMALE BEHAVIOR -- Proportion Female Downslope -- T Test")
 
 # SUPPLEMENTARY MATERIAL -- Before vs after copulation ---------------------------------------------
 

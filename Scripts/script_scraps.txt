@@ -195,3 +195,49 @@ after_cop <- data_analyzed |>
 #           axis.title.x=element_blank()) +
 #     facet_grid(rows=vars(D1_DisplayType), 
 #                cols=vars(D2_DisplayType)) 
+
+geom_tukeyBracket <- function(category1, category2, variable, min, max) {
+    # Tukey P Value label
+    tukey <- aov(pull(data_analyzed, variable) ~ data_analyzed$Category) |>
+          TukeyHSD() %>%
+          .[[1]]
+    
+    if (category1=="SOLO"&category2=="AUDI") {x1<-0.9;x2<-2.1}
+    else if (category1=="SOLO"&category2=="COP") {x1<-0.9;x2<-3.1}
+    else if (category1=="COP"&category2=="AUDI") {x1<-1.9;x2<-3.1}
+
+    p <- tukey[,4][paste(category1, category2, sep="-")]
+
+    range <- max-min
+    offset <- max*-0.03
+    
+    label <- ""
+    linetype <- "dashed"
+    if (p <= 0.001) {label<-"***"; linetype<-"solid"}
+    else if (p <= 0.01) {label<-"**"; linetype<-"solid"}
+    else if (p <= 0.05) {label<-"*"; linetype<-"solid"}
+
+    # Y axis 
+    if (category1=="SOLO" & category2=="AUDI") {
+        y = min + range * 0.90
+    } else if (category1=="COP" & category2=="AUDI") {
+        y = min + range * 0.95
+    } else if (category1=="SOLO" & category2=="COP") {
+        y = min + range * 1.00
+    }
+    bracketCorner <- range * 0.015
+    g1 <- geom_segment(x=x1, xend=x2, 
+                       y=y, yend=y, 
+                       linetype=linetype, colour="gray",
+                       linewidth=0.35)
+    g2 <- geom_segment(x=x1, xend=x1, 
+                       y=y+bracketCorner, yend=y-bracketCorner, 
+                       colour="gray")
+    g3 <- geom_segment(x=x2, xend=x2, 
+                       y=y+bracketCorner, yend=y-bracketCorner, 
+                       colour="gray")
+    g4 <- geom_text(label=label, x=(x1+x2)/2, 
+                    y=y+offset, colour="gray", vjust=0, size=3)
+    
+    return(list(g1, g2, g3, g4))
+}

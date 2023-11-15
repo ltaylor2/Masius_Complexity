@@ -21,8 +21,8 @@
    <chr>      <int>
  1 Bare         109
  2 Broken         8
- 3 Confluence    22
- 4 CR             5
+ 3 CR             5
+ 4 Confluence    22
  5 Creek         28
  6 CrossRiver     1
  7 DaveJr         2
@@ -910,33 +910,33 @@ mean of x mean of y
 
 ------------------------------
 
-**FEMALE BEHAVIOR -- Proportion Female Upslope -- Key Values**
+**FEMALE BEHAVIOR -- Proportion Female Downslope -- Key Values**
 
 # A tibble: 3 x 3
-  Category `mean(Prop_FemUp, na.rm = TRUE)` `sd(Prop_FemUp, na.rm = TRUE)`
-  <chr>                               <dbl>                          <dbl>
-1 AUDI                               0.253                          0.230 
-2 COP                                0.0276                         0.0996
-3 SOLO                             NaN                             NA     
+  Category `mean(Prop_FemDown, na.rm = TRUE)` `sd(Prop_FemDown, na.rm = TRUE)`
+  <chr>                                 <dbl>                            <dbl>
+1 AUDI                                  0.747                           0.230 
+2 COP                                   0.972                           0.0996
+3 SOLO                                NaN                              NA     
 
 
 ------------------------------
 
 ------------------------------
 
-**FEMALE BEHAVIOR -- Proportion Female Upslope -- T Test**
+**FEMALE BEHAVIOR -- Proportion Female Downslope -- T Test**
 
 
 	Welch Two Sample t-test
 
-data:  filter(data_analyzed, Category == "AUDI")$Prop_FemUp and filter(data_analyzed, Category == "COP")$Prop_FemUp
-t = 6.2862, df = 32.284, p-value = 4.575e-07
+data:  filter(data_analyzed, Category == "AUDI")$Prop_FemDown and filter(data_analyzed, Category == "COP")$Prop_FemDown
+t = -6.2862, df = 32.284, p-value = 4.575e-07
 alternative hypothesis: true difference in means is not equal to 0
 95 percent confidence interval:
- 0.1523778 0.2983905
+ -0.2983905 -0.1523778
 sample estimates:
- mean of x  mean of y 
-0.25299758 0.02761341 
+mean of x mean of y 
+0.7470024 0.9723866 
 
 
 

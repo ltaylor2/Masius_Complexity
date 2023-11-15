@@ -8,8 +8,8 @@ suppressPackageStartupMessages(library(patchwork))
 
 # SET ME
 
-WD <- "C:/Users/Liam/Documents/Masius_Complexity"
-# WD <- "C:/Users/ltayl/Documents/Masius_Complexity"
+# WD <- "C:/Users/Liam/Documents/Masius_Complexity"
+WD <- "C:/Users/ltayl/Documents/Masius_Complexity"
 # WD <- "/Users/liamtaylor/Documents/Masius_Complexity"
 
 RAW_DATA_PATH <- "Data/data_raw_2023-10-25.csv"

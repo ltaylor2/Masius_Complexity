@@ -87,7 +87,8 @@ elements_femOn <- map2_df(data_analyzed$Category, data_analyzed$DisplayCode_FemO
                          ~ tibble(Element = str_split(.y, "")[[1]]) |> 
                                   group_by(Element) |> 
                                   tally() |> 
-                                  mutate(Category = .x)) |>
+                                  mutate(Category = .x) |>
+                                  filter(!is.na(Element))) |>
                 group_by(Category, Element) |>
                 summarize(.groups="keep", n = sum(n)) |>
                 group_by(Category) |>
@@ -100,7 +101,8 @@ elements_femOff <- map2_df(data_analyzed$Category, data_analyzed$DisplayCode_Fem
                           ~ tibble(Element = str_split(.y, "")[[1]]) |> 
                                    group_by(Element) |> 
                                    tally() |> 
-                                   mutate(Category = .x)) |>
+                                   mutate(Category = .x) |>
+                                   filter(!is.na(Element))) |>
                  group_by(Category, Element) |>
                  summarize(.groups="keep", n = sum(n)) |>
                  group_by(Category) |>
@@ -113,7 +115,8 @@ elements_femUp <- map2_df(data_analyzed$Category, data_analyzed$DisplayCode_FemU
                           ~ tibble(Element = str_split(.y, "")[[1]]) |> 
                                    group_by(Element) |> 
                                    tally() |> 
-                                   mutate(Category = .x)) |>
+                                   mutate(Category = .x) |>
+                                   filter(!is.na(Element))) |>                                
                  group_by(Category, Element) |>
                  summarize(.groups="keep", n = sum(n)) |>
                  group_by(Category) |>
@@ -126,7 +129,8 @@ elements_femDown <- map2_df(data_analyzed$Category, data_analyzed$DisplayCode_Fe
                             ~ tibble(Element = str_split(.y, "")[[1]]) |> 
                                      group_by(Element) |> 
                                      tally() |> 
-                                     mutate(Category = .x)) |>
+                                     mutate(Category = .x) |>
+                                     filter(!is.na(Element))) |>                                
                     group_by(Category, Element) |>
                     summarize(.groups="keep", n = sum(n)) |>
                     group_by(Category) |>
@@ -135,14 +139,14 @@ elements_femDown <- map2_df(data_analyzed$Category, data_analyzed$DisplayCode_Fe
                     mutate(Perc = ifelse(Perc < 1, "<1", Perc)) |>
                     mutate(Category = paste0(Category, "_FemDown"))
 
-
 table_2 <- bind_rows(elements_femOn, elements_femOff, elements_femUp, elements_femDown) |>
         select(Element, Category, Perc) |>
         pivot_wider(id_cols = Element, names_from=Category, values_from = Perc) |>
         select(Code = Element, SOLO_FemOff, AUDI_FemOff, COP_FemOff, AUDI_FemOn, COP_FemOn, 
                AUDI_FemUp, COP_FemUp,AUDI_FemDown, COP_FemDown) |>
-         mutate(Element = map_chr(Code, ~ names(behavior_code)[behavior_code==.]),
-                .after=Code)
+        mutate(Element = map_chr(Code, ~ names(behavior_code)[behavior_code==.]),
+               .after=Code) |>
+        arrange(Code)
 
 # Write table to file            
 write_csv(table_2, file="Output/TABLE_2.csv")
@@ -161,58 +165,66 @@ write_csv(table_2_totals, file="Output/TABLE_2_TOTALS.csv")
 
 # FIGURE 1 ------------------------------------------------------
 
-# # Custom function to plot brackets with Tukey's for variable
-# geom_tukeyBracket <- function(category1, category2, variable, min, max) {
-#     # Tukey P Value label
-#     tukey <- aov(pull(data_analyzed, variable) ~ data_analyzed$Category) |>
-#           TukeyHSD() %>%
-#           .[[1]]
+# Custom function to plot brackets with linear models for variable
+geom_lmBracket <- function(category1="AUDI", category2=c("COP", "SOLO"), variable, min, max) {
     
-#     if (category1=="SOLO"&category2=="AUDI") {x1<-0.9;x2<-2.1}
-#     else if (category1=="SOLO"&category2=="COP") {x1<-0.9;x2<-3.1}
-#     else if (category1=="COP"&category2=="AUDI") {x1<-1.9;x2<-3.1}
+    # Reconstruct linear model from dataset with target variable
+    form <- paste(variable, "~ Category + as.character(ObsMonth) + UniqueMale1ID")
+    model <- lm(form, data = data_analyzed) |>
+          summary()
 
-#     p <- tukey[,4][paste(category1, category2, sep="-")]
+    # Extract p value for label will only work on COP or SOLO: AUDI is intercept variable)
+    p <- model$coefficients[paste0("Category", category2), "Pr(>|t|)"]
 
-#     range <- max-min
-#     offset <- max*-0.03
+    if (category1=="AUDI"&category2=="SOLO") {
+        x1<-0.9;x2<-2.1
+    } else if (category1=="AUDI"&category2=="COP") {
+        x1<-1.9;x2<-3.1
+    } else { 
+        print("ERROR, category1 mispecified in geom_lmBracket, returning with probable error.")
+        return()
+    }
+
+    range <- max-min
+    offset <- max*-0.03
     
-#     label <- ""
-#     linetype <- "dashed"
-#     if (p <= 0.001) {label<-"***"; linetype<-"solid"}
-#     else if (p <= 0.01) {label<-"**"; linetype<-"solid"}
-#     else if (p <= 0.05) {label<-"*"; linetype<-"solid"}
+    label <- ""
+    linetype <- "dashed"
+    if (p <= 0.001) {label<-"***"; linetype<-"solid"}
+    else if (p <= 0.01) {label<-"**"; linetype<-"solid"}
+    else if (p <= 0.05) {label<-"*"; linetype<-"solid"}
 
-#     # Y axis 
-#     if (category1=="SOLO" & category2=="AUDI") {
-#         y = min + range * 0.90
-#     } else if (category1=="COP" & category2=="AUDI") {
-#         y = min + range * 0.95
-#     } else if (category1=="SOLO" & category2=="COP") {
-#         y = min + range * 1.00
-#     }
-#     bracketCorner <- range * 0.015
-#     g1 <- geom_segment(x=x1, xend=x2, 
-#                        y=y, yend=y, 
-#                        linetype=linetype, colour="gray",
-#                        linewidth=0.35)
-#     g2 <- geom_segment(x=x1, xend=x1, 
-#                        y=y+bracketCorner, yend=y-bracketCorner, 
-#                        colour="gray")
-#     g3 <- geom_segment(x=x2, xend=x2, 
-#                        y=y+bracketCorner, yend=y-bracketCorner, 
-#                        colour="gray")
-#     g4 <- geom_text(label=label, x=(x1+x2)/2, 
-#                     y=y+offset, colour="gray", vjust=0, size=3)
+    # Y axis 
+    if (category1=="AUDI" & category2=="SOLO") {
+        y = min + range * 1.00
+    } else if (category1=="AUDI" & category2=="COP") {
+        y = min + range * 0.90
+    } else {
+        print("ERROR, category1 mispecified in geom_lmBracket, returning with probable error.")
+        return() 
+    }
+
+    bracketCorner <- range * 0.015
+    g1 <- geom_segment(x=x1, xend=x2, 
+                       y=y, yend=y, 
+                       linetype=linetype, colour="gray",
+                       linewidth=0.35)
+    g2 <- geom_segment(x=x1, xend=x1, 
+                       y=y+bracketCorner, yend=y-bracketCorner, 
+                       colour="gray")
+    g3 <- geom_segment(x=x2, xend=x2, 
+                       y=y+bracketCorner, yend=y-bracketCorner, 
+                       colour="gray")
+    g4 <- geom_text(label=label, x=(x1+x2)/2, 
+                    y=y+offset, colour="gray", vjust=0, size=3)
     
-#     return(list(g1, g2, g3, g4))
-# }
+    return(list(g1, g2, g3, g4))
+}
 
 # Boxplot of Duration
 plot_duration <- ggplot(data_analyzed, aes(x=Category, y=Duration, fill=Category)) +
-            #   geom_tukeyBracket("SOLO", "AUDI", "Duration", 0, 740) +
-            #   geom_tukeyBracket("COP", "AUDI", "Duration", 0, 740) +
-            #   geom_tukeyBracket("SOLO", "COP", "Duration", 0, 740) +
+              geom_lmBracket("AUDI", "SOLO", "Duration", 0, 720) +
+              geom_lmBracket("AUDI", "COP", "Duration", 0, 720) +
               geom_jitter(width=0.15, height=0,
                           colour="black", size=0.5) +
               geom_boxplot(alpha=0.5, outlier.shape=NA) +
@@ -220,15 +232,14 @@ plot_duration <- ggplot(data_analyzed, aes(x=Category, y=Duration, fill=Category
               scale_y_continuous(breaks=seq(0, 720, by=120), limits=c(0, 740)) +
               scale_fill_manual(values=categoryColors) +
               guides(fill="none") +
+              xlab("Context") +
               ylab("Duration (s)") +
-              customTheme +
-              theme(axis.title.x = element_blank())
+              customTheme
 
 # Boxplot of Display Length                      
 plot_displayLength <- ggplot(data_analyzed, aes(x=Category, y=DisplayLength, fill=Category)) +
-                #    geom_tukeyBracket("SOLO", "AUDI", "DisplayLength", 0, 420) +
-                #    geom_tukeyBracket("COP", "AUDI", "DisplayLength", 0, 420) +
-                #    geom_tukeyBracket("SOLO", "COP", "DisplayLength", 0, 420) +
+                   geom_lmBracket("AUDI", "SOLO", "DisplayLength", 0, 400) +
+                   geom_lmBracket("AUDI", "COP", "DisplayLength", 0, 400) +
                    geom_jitter(width=0.15, height=0,
                                colour="black", size=0.5) +
                    geom_boxplot(alpha=0.5, outlier.shape=NA) +
@@ -236,15 +247,14 @@ plot_displayLength <- ggplot(data_analyzed, aes(x=Category, y=DisplayLength, fil
                    scale_y_continuous(breaks=seq(0, 400, by=100), limits=c(0, 420)) +                
                    scale_fill_manual(values=categoryColors) +
                    guides(fill="none") +
-                   xlab("Display context") +
-                   ylab("Length (elements)") +
+                   xlab("Context") +
+                   ylab("Length (# elements)") +
                    customTheme
 
 # Boxplot of Unique Elements                      
 plot_uniqueElements <- ggplot(data_analyzed, aes(x=Category, y=UniqueDisplayElements, fill=Category)) +
-                    # geom_tukeyBracket("SOLO", "AUDI", "UniqueDisplayElements", 0, 11) +
-                    # geom_tukeyBracket("COP", "AUDI", "UniqueDisplayElements", 0, 11) +
-                    # geom_tukeyBracket("SOLO", "COP", "UniqueDisplayElements", 0, 11) +
+                    geom_lmBracket("AUDI", "SOLO", "UniqueDisplayElements", 0, 10) +
+                    geom_lmBracket("AUDI", "COP", "UniqueDisplayElements", 0, 10) +
                     geom_jitter(width=0.15, height=0,
                                 colour="black", size=0.5) +
                     geom_boxplot(alpha=0.5, outlier.shape=NA) +
@@ -252,23 +262,14 @@ plot_uniqueElements <- ggplot(data_analyzed, aes(x=Category, y=UniqueDisplayElem
                     scale_y_continuous(breaks=seq(0, 10, by=2), limits=c(0, 11)) +              
                     scale_fill_manual(values=categoryColors) +
                     guides(fill="none") +
-                    ylab("Unique elements") +
-                    customTheme +
-                    theme(axis.title.x = element_blank())
+                    xlab("Context") +
+                    ylab("Repertoire size") +
+                    customTheme
 
-# Create combined plot and write to file              
-plots_repertoire <- plot_duration + plot_displayLength + plot_uniqueElements +
-                 plot_annotation(tag_levels="A", tag_prefix="(", tag_suffix=")") &
-                 theme(plot.tag.position=c(0.89, 0.93)) 
-ggsave(plots_repertoire, file="Plots/FIGURE_1.png", width=6, height=2) 
-
-
-# FIGURE 2 ------------------------------------------------------
-# Boxplot of scaled entropy
+# Boxplot of scaled Entropy                      
 plot_entropy <- ggplot(data_analyzed, aes(x=Category, y=Entropy_Scaled, fill=Category)) +
-            #  geom_tukeyBracket("SOLO", "AUDI", "Entropy_Scaled", 0, 1.2) +
-            #  geom_tukeyBracket("COP", "AUDI", "Entropy_Scaled", 0, 1.2) +
-            #  geom_tukeyBracket("SOLO", "COP", "Entropy_Scaled", 0, 1.2) +
+             geom_lmBracket("AUDI", "SOLO", "Entropy_Scaled", 0, 1.1) +
+             geom_lmBracket("AUDI", "COP", "Entropy_Scaled", 0, 1.1) +
              geom_jitter(width=0.15, height=0,
                          colour="black", size=0.5) +
              geom_boxplot(alpha=0.5, outlier.shape=NA) +
@@ -276,15 +277,14 @@ plot_entropy <- ggplot(data_analyzed, aes(x=Category, y=Entropy_Scaled, fill=Cat
              scale_y_continuous(breaks=seq(0, 1, by=0.2), limits=c(0,1.2)) +
              scale_fill_manual(values=categoryColors) +
              guides(fill="none") +
-             xlab("Display context") +
+             xlab("Context") +
              ylab("Entropy (scaled)") +
              customTheme
 
-# Boxplot of compression ratio                      
+# Boxplot of Unique Elements                      
 plot_compression <- ggplot(data_analyzed, aes(x=Category, y=Compression_Ratio, fill=Category)) +
-                #  geom_tukeyBracket("SOLO", "AUDI", "Compression_Ratio", 0, 8) +
-                #  geom_tukeyBracket("COP", "AUDI", "Compression_Ratio", 0, 8) +
-                #  geom_tukeyBracket("SOLO", "COP", "Compression_Ratio", 0, 8) +
+                 geom_lmBracket("AUDI", "SOLO", "Compression_Ratio", 0, 7) +
+                 geom_lmBracket("AUDI", "COP", "Compression_Ratio", 0, 7) +
                  geom_jitter(width=0.15, height=0,
                              colour="black", size=0.5) +
                  geom_boxplot(alpha=0.5, outlier.shape=NA) +
@@ -292,51 +292,19 @@ plot_compression <- ggplot(data_analyzed, aes(x=Category, y=Compression_Ratio, f
                  scale_y_continuous(breaks=seq(0, 8, by=2), limits=c(0, 8)) +
                  scale_fill_manual(values=categoryColors) +
                  guides(fill="none") +
-                 xlab("Display context") +
+                 xlab("Context") +
                  ylab("Compression ratio") +
                  customTheme
 
-# Correlation plot of entropy and compression          
-# Compute convex hulls
-hulls <- data_analyzed |>
-      group_by(Category) |>
-      slice(chull(Entropy_Scaled, Compression_Ratio))
-
-# Arrange hull labels
-labels <- tibble(Category=c("SOLO", "AUDI", "COP"),
-                 x       =c(0.88,    0.75,    0.13),
-                 y       =c(0.19,    6.60,    2.80),
-                 angle   =c(0,       -63.5,    -60))
-
-plot_syntaxCorrelation <- ggplot(data_analyzed) +
-                       geom_point(aes(x=Entropy_Scaled, y=Compression_Ratio, colour=Category), 
-                                  size=0.6, alpha=0.9) +
-                       geom_polygon(data=hulls, 
-                                    aes(x=Entropy_Scaled, y=Compression_Ratio, fill=Category), alpha=0.4) +
-                       geom_smooth(aes(x=Entropy_Scaled, y=Compression_Ratio), 
-                                   formula="y~x", method="lm", 
-                                   colour="black", se=FALSE) +
-                       geom_text(data=labels, 
-                                 aes(label=Category, colour=Category,
-                                     x=x, y=y, angle=angle),
-                                     size=3) + 
-                       scale_colour_manual(values=categoryColors) +
-                       scale_fill_manual(values=categoryColors) +
-                       scale_x_continuous(breaks=seq(0, 1, by=0.2), limits=c(0,1)) +
-                       scale_y_continuous(breaks=seq(0, 8, by=2), limits=c(0, 8)) +
-                       guides(fill="none", colour="none") +
-                       xlab("Entropy (scaled)") +
-                       ylab("Compression ratio") +
-                       customTheme
-
-
 # Create combined plot and write to file              
-plots_syntax <- plot_entropy + plot_compression + plot_syntaxCorrelation +
-             plot_annotation(tag_levels="A", tag_prefix="(", tag_suffix=")") &
-             theme(plot.tag.position=c(0.89, 0.93)) 
-ggsave(plots_syntax, file="Plots/FIGURE_2.png", width=6, height=2) 
+plots_characteristics <- plot_duration + plot_displayLength + plot_uniqueElements +
+                      plot_entropy + plot_compression +
+                      plot_layout(nrow=1) +
+                      plot_annotation(tag_levels="A", tag_prefix="(", tag_suffix=")") &
+                      theme(plot.tag.position=c(0.89, 0.93)) 
+ggsave(plots_characteristics, file="Plots/FIGURE_1.png", width=8, height=2) 
 
-# FIGURE 3 ------------------------------------------------------
+# FIGURE 2 ------------------------------------------------------
 # Jaro distance comparison
 
 comparisonSampleSizes <- distances |>
@@ -375,7 +343,7 @@ plot_jaro <- ggplot(distances,
                 axis.text.x = element_text(size=6, angle=30, vjust=0.87),
                 strip.background = element_rect(colour=NA, fill=NA))
       
-ggsave(plot_jaro, file="Plots/FIGURE_3.png", width=7, height=3)
+ggsave(plot_jaro, file="Plots/FIGURE_2.png", width=8, height=3)
 
 # TABLE S2 ---------------------------------------------
 # Male performance patterns 
@@ -527,19 +495,19 @@ write_csv(table_s4, file="Output/TABLE_S4.csv")
 # [Select] to reorder columns
 # [Mutate] an Element col with the shortened name of each behavioral code
 # [Mutate] to replace NAs with 0 for frequencies of each
-elements_overall <- data_analyzed |>
-                 select(UID, Category, DisplayCode) |>
-                 separate(DisplayCode, into=as.character(0:max(data_analyzed$DisplayLength)),
-                          sep="", fill="right") |>
-                 pivot_longer(-c(UID, Category), names_to="Index", values_to="Code") |>
-                 filter(Code!="" & !is.na(Code)) |>
-                 group_by(Category, Code) |>
-                 tally() |>
-                 pivot_wider(id_cols=Code, names_from=Category, values_from=n) |>
-                 select(Code, SOLO, AUDI, COP) |>
-                 mutate(Element = map_chr(Code, ~ names(behavior_code)[behavior_code==.]),
-                        .after=Code) |>
-                 mutate(across(c(SOLO, AUDI, COP), ~ ifelse(is.na(.x), 0, .x)))
+table_s5 <- data_analyzed |>
+         select(UID, Category, DisplayCode) |>
+         separate(DisplayCode, into=as.character(0:max(data_analyzed$DisplayLength)),
+                  sep="", fill="right") |>
+         pivot_longer(-c(UID, Category), names_to="Index", values_to="Code") |>
+         filter(Code!="" & !is.na(Code)) |>
+         group_by(Category, Code) |>
+         tally() |>
+         pivot_wider(id_cols=Code, names_from=Category, values_from=n) |>
+         select(Code, SOLO, AUDI, COP) |>
+         mutate(Element = map_chr(Code, ~ names(behavior_code)[behavior_code==.]),
+                .after=Code) |>
+         mutate(across(c(SOLO, AUDI, COP), ~ ifelse(is.na(.x), 0, .x)))
 
 # Write table to file
 write_csv(table_s5, file="Output/TABLE_S5.csv")
@@ -993,3 +961,54 @@ plot_beforeAfterJaro <- ggplot(beforeAfterDistances,
 
 # Save to file
 ggsave(plot_beforeAfterJaro, file="Plots/FIGURE_S7.png", width=4, height=5)                    
+
+
+
+
+
+
+
+
+
+
+
+
+
+# FIGURE 2 ------------------------------------------------------
+# Boxplot of scaled entropy
+
+# Boxplot of compression ratio                      
+
+# Correlation plot of entropy and compression          
+# Compute convex hulls
+hulls <- data_analyzed |>
+      group_by(Category) |>
+      slice(chull(Entropy_Scaled, Compression_Ratio))
+
+# Arrange hull labels
+labels <- tibble(Category=c("SOLO", "AUDI", "COP"),
+                 x       =c(0.88,    0.75,    0.13),
+                 y       =c(0.19,    6.60,    2.80),
+                 angle   =c(0,       -63.5,    -60))
+
+plot_syntaxCorrelation <- ggplot(data_analyzed) +
+                       geom_point(aes(x=Entropy_Scaled, y=Compression_Ratio, colour=Category), 
+                                  size=0.6, alpha=0.9) +
+                       geom_polygon(data=hulls, 
+                                    aes(x=Entropy_Scaled, y=Compression_Ratio, fill=Category), alpha=0.4) +
+                       geom_smooth(aes(x=Entropy_Scaled, y=Compression_Ratio), 
+                                   formula="y~x", method="lm", 
+                                   colour="black", se=FALSE) +
+                       geom_text(data=labels, 
+                                 aes(label=Category, colour=Category,
+                                     x=x, y=y, angle=angle),
+                                     size=3) + 
+                       scale_colour_manual(values=categoryColors) +
+                       scale_fill_manual(values=categoryColors) +
+                       scale_x_continuous(breaks=seq(0, 1, by=0.2), limits=c(0,1)) +
+                       scale_y_continuous(breaks=seq(0, 8, by=2), limits=c(0, 8)) +
+                       guides(fill="none", colour="none") +
+                       xlab("Entropy (scaled)") +
+                       ylab("Compression ratio") +
+                       customTheme
+
