@@ -1,7 +1,6 @@
 Code,Element,Before,After
 A,Zro,0,4
 B,ALAD,13,12
-C,SLAD,0,0
 D,Bow,706,166
 E,HafB,3,0
 F,HdBw,0,9
@@ -9,5 +8,6 @@ G,Metr,0,8
 H,Swtc,6,0
 I,Neck,71,387
 J,Taf,5,0
-K,Mix,0,0
 L,Othr,1,2
+M,AttC,0,1
+N,Cop,13,9

@@ -1,3 +1,4 @@
+# LOGISTICS ------------------------------------------------------
 # Custom plotting theme
 customTheme <- theme_bw() +
             theme(panel.grid=element_blank(),
@@ -231,9 +232,9 @@ plot_duration <- ggplot(data_analyzed, aes(x=Category, y=Duration, fill=Category
               scale_y_continuous(breaks=seq(0, 720, by=120), limits=c(0, 740)) +
               scale_fill_manual(values=categoryColors) +
               guides(fill="none") +
-              xlab("Context") +
               ylab("Duration (s)") +
-              customTheme
+              customTheme +
+              theme(axis.title.x=element_blank())
 
 # Boxplot of Display Length                      
 plot_displayLength <- ggplot(data_analyzed, aes(x=Category, y=DisplayLength, fill=Category)) +
@@ -246,9 +247,9 @@ plot_displayLength <- ggplot(data_analyzed, aes(x=Category, y=DisplayLength, fil
                    scale_y_continuous(breaks=seq(0, 400, by=100), limits=c(0, 420)) +                
                    scale_fill_manual(values=categoryColors) +
                    guides(fill="none") +
-                   xlab("Context") +
                    ylab("Length (# elements)") +
-                   customTheme
+                   customTheme +
+                   theme(axis.title.x=element_blank())
 
 # Boxplot of Unique Elements                      
 plot_uniqueElements <- ggplot(data_analyzed, aes(x=Category, y=UniqueDisplayElements, fill=Category)) +
@@ -261,7 +262,7 @@ plot_uniqueElements <- ggplot(data_analyzed, aes(x=Category, y=UniqueDisplayElem
                     scale_y_continuous(breaks=seq(0, 10, by=2), limits=c(0, 11)) +              
                     scale_fill_manual(values=categoryColors) +
                     guides(fill="none") +
-                    xlab("Context") +
+                    xlab("Display context") +
                     ylab("Repertoire size") +
                     customTheme
 
@@ -276,9 +277,9 @@ plot_entropy <- ggplot(data_analyzed, aes(x=Category, y=Entropy_Scaled, fill=Cat
              scale_y_continuous(breaks=seq(0, 1, by=0.2), limits=c(0,1.2)) +
              scale_fill_manual(values=categoryColors) +
              guides(fill="none") +
-             xlab("Context") +
              ylab("Entropy (scaled)") +
-             customTheme
+             customTheme +
+             theme(axis.title.x=element_blank())
 
 # Boxplot of Unique Elements                      
 plot_compression <- ggplot(data_analyzed, aes(x=Category, y=Compression_Ratio, fill=Category)) +
@@ -291,9 +292,9 @@ plot_compression <- ggplot(data_analyzed, aes(x=Category, y=Compression_Ratio, f
                  scale_y_continuous(breaks=seq(0, 8, by=2), limits=c(0, 8)) +
                  scale_fill_manual(values=categoryColors) +
                  guides(fill="none") +
-                 xlab("Context") +
                  ylab("Compression ratio") +
-                 customTheme
+                 customTheme +
+                 theme(axis.title.x=element_blank())
 
 # Create combined plot and write to file              
 plots_characteristics <- plot_duration + plot_displayLength + plot_uniqueElements +
@@ -301,6 +302,7 @@ plots_characteristics <- plot_duration + plot_displayLength + plot_uniqueElement
                       plot_layout(nrow=1) +
                       plot_annotation(tag_levels="A", tag_prefix="(", tag_suffix=")") &
                       theme(plot.tag.position=c(0.89, 0.93)) 
+
 ggsave(plots_characteristics, file="Plots/FIGURE_1.png", width=8, height=2) 
 
 # FIGURE 2 ------------------------------------------------------
@@ -823,8 +825,6 @@ plots_randComparionsJaro <- plot_randComp_jaroSameDiffMaleCOP /
                             plot_randComp_jaroDiffMaleAcrossContext
 
 ggsave(plots_randComparionsJaro, file="Plots/FIGURE_S6.png", width=6, height=5) 
-
-
 # TABLE S6 ---------------------------------------------
 # COP vs. after-COP displays, raw element frequencies
 # [Filter] to include only COP displays
@@ -854,7 +854,8 @@ table_s6 <- data_analyzed |>
          group_by(Section, Code) |>
          tally() |>
          pivot_wider(id_cols=Code, names_from=Section, values_from=n) |>
-         right_join(table_s5, by="Code") |>
+         mutate(Element = map_chr(Code, ~ names(behavior_code)[behavior_code==.]),
+                .after=Code) |>
          select(Code, Element, Before, After) |>
          mutate(across(c(Before, After), ~ifelse(is.na(.x), 0, .x))) |>
          arrange(Code)
@@ -881,7 +882,7 @@ table_s7 <- data_analyzed |>
 # Write table to file
 write_csv(table_s7, file="Output/TABLE_S7.csv")
 
-# FIGURE S6 ---------------------------------------------
+# FIGURE S7 ---------------------------------------------
 
 # Read in before vs. after cop comparisons
 afterCop_comparison <- readRDS("Output/afterCop_comparison.rds")
@@ -955,10 +956,10 @@ plot_afterCop_entropy <- ggplot(afterCop_comparison,
                                        labels=c("Before\ncopulation", "After\ncopulation")) +
                       scale_y_continuous(limits=c(0, 1.05), breaks=seq(0, 1, by=0.2)) +                                       
                       scale_fill_manual(values=categoryColors) +
+                      xlab("Display section") +
                       ylab("Entropy (scaled)") +
                       guides(fill="none") +
-                      customTheme +
-                      theme(axis.title.x=element_blank())
+                      customTheme
 
 # Boxplot of Before vs. After compression ratio
 plot_afterCop_compression <- ggplot(afterCop_comparison, 
@@ -981,7 +982,7 @@ plots_afterCop <- plot_afterCop_uniqueElements +
                   plot_afterCop_entropy +
                   plot_afterCop_compression
 
-ggsave(plots_afterCop, file="Plots/FIGURE_S6.png", width=6, height=2)
+ggsave(plots_afterCop, file="Plots/FIGURE_S7.png", width=6, height=2)
 
 # Before vs. After Jaro distances
 
@@ -1003,55 +1004,4 @@ plot_beforeAfterJaro <- ggplot(beforeAfterDistances,
                            axis.title.x=element_text(size=10, hjust=0.025))
 
 # Save to file
-ggsave(plot_beforeAfterJaro, file="Plots/FIGURE_S7.png", width=4, height=5)                    
-
-
-
-
-
-
-
-
-
-
-
-
-
-# FIGURE 2 ------------------------------------------------------
-# Boxplot of scaled entropy
-
-# Boxplot of compression ratio                      
-
-# Correlation plot of entropy and compression          
-# Compute convex hulls
-hulls <- data_analyzed |>
-      group_by(Category) |>
-      slice(chull(Entropy_Scaled, Compression_Ratio))
-
-# Arrange hull labels
-labels <- tibble(Category=c("SOLO", "AUDI", "COP"),
-                 x       =c(0.88,    0.75,    0.13),
-                 y       =c(0.19,    6.60,    2.80),
-                 angle   =c(0,       -63.5,    -60))
-
-plot_syntaxCorrelation <- ggplot(data_analyzed) +
-                       geom_point(aes(x=Entropy_Scaled, y=Compression_Ratio, colour=Category), 
-                                  size=0.6, alpha=0.9) +
-                       geom_polygon(data=hulls, 
-                                    aes(x=Entropy_Scaled, y=Compression_Ratio, fill=Category), alpha=0.4) +
-                       geom_smooth(aes(x=Entropy_Scaled, y=Compression_Ratio), 
-                                   formula="y~x", method="lm", 
-                                   colour="black", se=FALSE) +
-                       geom_text(data=labels, 
-                                 aes(label=Category, colour=Category,
-                                     x=x, y=y, angle=angle),
-                                     size=3) + 
-                       scale_colour_manual(values=categoryColors) +
-                       scale_fill_manual(values=categoryColors) +
-                       scale_x_continuous(breaks=seq(0, 1, by=0.2), limits=c(0,1)) +
-                       scale_y_continuous(breaks=seq(0, 8, by=2), limits=c(0, 8)) +
-                       guides(fill="none", colour="none") +
-                       xlab("Entropy (scaled)") +
-                       ylab("Compression ratio") +
-                       customTheme
-
+ggsave(plot_beforeAfterJaro, file="Plots/FIGURE_S8.png", width=4, height=5)                    
