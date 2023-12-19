@@ -1,3 +1,0 @@
-1. I stopped displays at Cop -- thoughts?
-2. Simple details for banding codes? Which ones are females/males? 8200-8400 summaries in file. 
-3. Right now assume no multiple males present unless B2 display element present -- correct? As a result, we have 3 displays where there are multiple males present and a female present (UID 1327, 1516, and 273)
