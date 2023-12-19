@@ -740,7 +740,7 @@ plot_jaroDisplayElements <- ggplot(distances,
                          geom_point(size=0.5, alpha=0.1) +
                          geom_smooth(formula="y~x", method="lm", colour="red", se=FALSE) +
                          scale_y_continuous(limits=c(0, 1), breaks=seq(0, 1, by=0.2)) +
-                         xlab("Difference in unique elements") +
+                         xlab("Difference in distinct elements") +
                          customTheme +
                          theme(axis.title.y=element_blank())
 
@@ -779,10 +779,10 @@ plot_randComp_jaroSameDiffMaleCOP <- ggplot(randomDistribution_Jaro_SameDiffMale
                                 #   scale_y_continuous(limits=c(0, 3500), breaks=seq(0, 3500, by=1000), oob = function(y, limits) y) +
                                   scale_fill_manual(values=categoryColors) +
                                   guides(colour="none", fill="none") +
-                                  ggtitle(paste0("Empirical: COP vs. Diff Male/Same Context (n = ", 
+                                  ggtitle(paste0("Empirical: COP Diff Male/Same Context (n = ", 
                                                   nrow(filter(distances, Category_1=="COP" & Comparison_Type=="Diff Male/Same Context")),
                                                   ")\n",
-                                                  "Randomized: COP vs. Same Male/Diff Context (n = ",
+                                                  "Randomized: COP Same Male/Diff Context (n = ",
                                                   nrow(filter(distances, Category_1=="COP" & Comparison_Type=="Diff Male/Same Context")),
                                                   "/", nrow(filter(distances, Category_1=="COP" & Comparison_Type=="Same Male/Diff Context")),
                                                   ")")) +
@@ -940,7 +940,7 @@ plot_afterCop_uniqueElements <- ggplot(afterCop_comparison,
                                               labels=c("Before\ncopulation", "After\ncopulation")) +
                              scale_y_continuous(limits=c(1, 6)) +                                              
                              scale_fill_manual(values=categoryColors) +
-                             ylab("Unique elements") +
+                             ylab("Distinct elements") +
                              guides(fill="none") +
                              customTheme +
                              theme(axis.title.x=element_blank())
@@ -1005,3 +1005,90 @@ plot_beforeAfterJaro <- ggplot(beforeAfterDistances,
 
 # Save to file
 ggsave(plot_beforeAfterJaro, file="Plots/FIGURE_S8.png", width=4, height=5)                    
+
+# TABLE S8 ---------------------------------------------
+
+elements_femOn_beforeAfter <- map2_df(afterCop_comparison$Section, afterCop_comparison$DisplayCode_FemOn, 
+                                      ~ tibble(Element = str_split(.y, "")[[1]]) |> 
+                                               group_by(Element) |> 
+                                               tally() |> 
+                                               mutate(Section = .x) |>
+                                               filter(!is.na(Element))) |>
+                            group_by(Section, Element) |>
+                            summarize(.groups="keep", n = sum(n)) |>
+                            group_by(Section) |>
+                            mutate(Total = sum(n)) |>
+                            mutate(Perc = as.character(round((n / Total) * 100, 0))) |>
+                            mutate(Perc = ifelse(Perc < 1, "<1", Perc)) |>
+                            mutate(Section = paste0(Section, "_FemOn"))
+
+elements_femOff_beforeAfter <- map2_df(afterCop_comparison$Section, afterCop_comparison$DisplayCode_FemOff, 
+                                      ~ tibble(Element = str_split(.y, "")[[1]]) |> 
+                                               group_by(Element) |> 
+                                               tally() |> 
+                                               mutate(Section = .x) |>
+                                               filter(!is.na(Element))) |>
+                            group_by(Section, Element) |>
+                            summarize(.groups="keep", n = sum(n)) |>
+                            group_by(Section) |>
+                            mutate(Total = sum(n)) |>
+                            mutate(Perc = as.character(round((n / Total) * 100, 0))) |>
+                            mutate(Perc = ifelse(Perc < 1, "<1", Perc)) |>
+                            mutate(Section = paste0(Section, "_FemOff"))
+
+elements_femUp_beforeAfter <- map2_df(afterCop_comparison$Section, afterCop_comparison$DisplayCode_FemUp, 
+                                      ~ tibble(Element = str_split(.y, "")[[1]]) |> 
+                                               group_by(Element) |> 
+                                               tally() |> 
+                                               mutate(Section = .x) |>
+                                               filter(!is.na(Element))) |>
+                            group_by(Section, Element) |>
+                            summarize(.groups="keep", n = sum(n)) |>
+                            group_by(Section) |>
+                            mutate(Total = sum(n)) |>
+                            mutate(Perc = as.character(round((n / Total) * 100, 0))) |>
+                            mutate(Perc = ifelse(Perc < 1, "<1", Perc)) |>
+                            mutate(Section = paste0(Section, "_FemUp"))
+
+elements_femDown_beforeAfter <- map2_df(afterCop_comparison$Section, afterCop_comparison$DisplayCode_FemDown, 
+                                        ~ tibble(Element = str_split(.y, "")[[1]]) |> 
+                                                 group_by(Element) |> 
+                                                 tally() |> 
+                                                 mutate(Section = .x) |>
+                                                 filter(!is.na(Element))) |>
+                             group_by(Section, Element) |>
+                             summarize(.groups="keep", n = sum(n)) |>
+                             group_by(Section) |>
+                             mutate(Total = sum(n)) |>
+                             mutate(Perc = as.character(round((n / Total) * 100, 0))) |>
+                             mutate(Perc = ifelse(Perc < 1, "<1", Perc)) |>
+                             mutate(Section = paste0(Section, "_FemDown"))
+
+table_s8 <- bind_rows(elements_femOn_beforeAfter, elements_femOff_beforeAfter, elements_femUp_beforeAfter, elements_femDown_beforeAfter) |>
+         select(Element, Section, Perc) |>
+         pivot_wider(id_cols = Element, names_from = Section, values_from = Perc) |>
+         select(Code = Element, 
+                Before_FemOff, After_FemOff, 
+                Before_FemOn, After_FemOn, 
+                Before_FemUp, After_FemUp, 
+                Before_FemDown, After_FemDown) |>
+         mutate(Element = map_chr(Code, ~ names(behavior_code)[behavior_code==.]),
+                .after=Code) |>
+         arrange(Code)
+
+# Write table to file            
+write_csv(table_s8, file="Output/TABLE_S8.csv")
+
+## Calculate total male behavioral elements corresponding to female behavior subsets     
+table_s8_totals <- bind_rows(elements_femOn_beforeAfter, elements_femOff_beforeAfter, elements_femUp_beforeAfter, elements_femDown_beforeAfter) |>
+                group_by(Section, Total) |>
+                tally() |>
+                mutate(drop="drop") |>
+                pivot_wider(id_cols = drop, names_from = Section, values_from=Total) |>
+                select(Before_FemOff, After_FemOff, 
+                       Before_FemOn, After_FemOn, 
+                       Before_FemUp, After_FemUp, 
+                       Before_FemDown, After_FemDown)
+
+# Write table to file            
+write_csv(table_s8_totals, file="Output/TABLE_S8_TOTALS.csv")

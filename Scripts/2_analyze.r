@@ -401,6 +401,11 @@ lm(Compression_Ratio ~ Entropy_Scaled, data=data_analyzed) |>
     summary() |>
     writeSummaryBlock("Entropy vs. Compressibility correlation")
 
+# Length vs. Compressibility correlation ---------------------------------------------
+lm(Compression_Ratio ~ DisplayLength, data=data_analyzed) |>
+    summary() |>
+    writeSummaryBlock("DisplayLength vs. Compressibility correlation")
+
 # # Most compressible string ---------------------------------------------
 # data_analyzed |>
 #     filter(Compression_Ratio == max(Compression_Ratio)) |>
@@ -523,14 +528,20 @@ t.test(x = filter(data_analyzed, Category == "AUDI")$Prop_FemDown,
 # [Mutate] exclude the Attempted copulation behavioral element from the AfterCop Display String
 # [Mutate] exclude the Copulation behavioral element from the AfterCop display string
 # [Pivot longer] to get one DisplayCode string per row, Before or After, retaining the UID to match them up
-# [MUTATESx] Duplicate repertoire and syntax analyses (see LL 17-41 above)
+# [MUTATESx] Duplicate repertoire and syntax analyses
 # [Select] Only relevant cols for comparison
 afterCop_comparison <- data_analyzed |>
                     filter(Category=="COP") |>
-                    select(UID, Before=DisplayCode, After=DisplayCode_AfterCop) |>
-                    mutate(After = str_replace(After, behavior_code["AttC"], "")) |>
+                    select(UID, 
+                           Before=DisplayCode, After=DisplayCode_AfterCop,
+                           FemOnOff_Before=FemOnOff, FemOnOff_After=FemOnOff_AfterCop,
+                           FemUpDown_Before=FemUpDown, FemUpDown_After=FemUpDown_AfterCop) |>
+                    mutate(After = str_replace(After, behavior_code["AttC"], ""),) |>
                     mutate(After = str_replace(After, behavior_code["Cop"], "")) |>
                     pivot_longer(cols=c(Before, After), names_to="Section", values_to="DisplayCode") |>
+                    mutate(FemOnOff = ifelse(Section == "Before", FemOnOff_Before, FemOnOff_After),
+                           FemUpDown = ifelse(Section == "Before", FemUpDown_Before, FemUpDown_After)) |>
+                    select(UID, Section, DisplayCode, FemOnOff, FemUpDown) |>
                     mutate(DisplayCode_Raw = map(DisplayCode, charToRaw)) |>
                     mutate(DisplayCode_Compressed = map(DisplayCode_Raw, brotli::brotli_compress)) |>
 			        mutate(DisplayLength = nchar(DisplayCode),
@@ -539,8 +550,15 @@ afterCop_comparison <- data_analyzed |>
                            Entropy_Scaled = Entropy_Unscaled / log(UniqueDisplayElements, base=2),
                            Compression_Length = map_dbl(DisplayCode_Compressed, length),
                            Compression_Ratio = map2_dbl(DisplayCode_Raw, DisplayCode_Compressed, ~ length(.x) / length(.y))) |>
+                    mutate(DisplayCode_FemOn = map2_chr(str_split(DisplayCode, ""), str_split(FemOnOff, ""), ~ paste(.x[grep("Y", .y)], collapse="")),
+                           DisplayCode_FemOff = map2_chr(str_split(DisplayCode, ""), str_split(FemOnOff, ""), ~ paste(.x[grep("N", .y)], collapse="")),
+                           DisplayCode_FemUp = map2_chr(str_split(DisplayCode, ""), str_split(FemUpDown, ""), ~ paste(.x[grep("U", .y)], collapse="")),
+                           DisplayCode_FemDown = map2_chr(str_split(DisplayCode, ""), str_split(FemUpDown, ""), ~ paste(.x[grep("D", .y)], collapse=""))) |>
+                    mutate(Prop_FemOn = map_dbl(FemOnOff, ~ str_count(., "Y") / nchar(.)),
+                           Prop_FemDown = map_dbl(FemUpDown, ~ str_count(., "D") / (str_count(., "U") + str_count(., "D")))) |>            
                     mutate(Entropy_Scaled = ifelse(Entropy_Unscaled==0, 0, Entropy_Scaled)) |>
-                    select(UID, Section, DisplayCode, DisplayLength, UniqueDisplayElements, Entropy_Scaled, Compression_Ratio) |>
+                    select(UID, Section, DisplayCode, DisplayLength, UniqueDisplayElements, Entropy_Scaled, Compression_Ratio, 
+                           Prop_FemOn, Prop_FemDown, DisplayCode_FemOn, DisplayCode_FemOff, DisplayCode_FemUp, DisplayCode_FemDown) |>
                     unite("UID_Section", UID, Section, sep="-", remove=FALSE)
 
 # Save object to read in for plotting
@@ -635,3 +653,30 @@ beforeAfterDistances <- expand_grid(afterCop_comparison$UID_Section,
 
 # Save for plotting later
 saveRDS(beforeAfterDistances, file="Output/beforeAfterDistances.rds")
+
+# Before vs. After-copulation Female Behavior
+# Female On or Off Log 
+afterCop_comparison |>
+    group_by(Section) |>
+    summarize(mean(Prop_FemOn, na.rm=TRUE), sd(Prop_FemOn, na.rm=TRUE)) |>
+    writeSummaryBlock("BEFORE- VS. AFTER-COP -- Female Behavior -- Proportion Female On Log -- Key Values")
+
+t.test(x = filter(afterCop_comparison, Section == "Before")$Prop_FemOn,
+       y = filter(afterCop_comparison, Section == "After")$Prop_FemOn,
+       paired = FALSE, alternative = "two.sided",
+       na.action = "exclude") |>
+    writeSummaryBlock("BEFORE- VS. AFTER-COP -- Female Behavior -- Proportion Female On Log -- T Test")
+
+# Female Upslope or Downslope
+afterCop_comparison |>
+    group_by(Section) |>
+    summarize(mean(Prop_FemDown, na.rm=TRUE), sd(Prop_FemDown, na.rm=TRUE)) |>
+    writeSummaryBlock("BEFORE- VS. AFTER-COP -- Female Behavior -- Proportion Female Downslope -- Key Values")
+
+t.test(x = filter(afterCop_comparison, Section == "Before")$Prop_FemDown,
+       y = filter(afterCop_comparison, Section == "After")$Prop_FemDown,
+       paired = FALSE,
+       alternative = "two.sided",
+       na.action = "exclude") |>
+    writeSummaryBlock("BEFORE- VS. AFTER-COP -- Female Behavior -- Proportion Female Downslope -- T Test")
+

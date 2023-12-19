@@ -228,11 +228,9 @@ data_clean_wide <- data_clean_long |>
                 separate(FemOnOff, into=c("FemOnOff", "FemOnOff_AfterCop"), 
                          sep="(?<=C)", 
                          fill="right", extra="merge") |>
-                select(-FemOnOff_AfterCop) |>
                 separate(FemUpDown, into=c("FemUpDown", "FemUpDown_AfterCop"), 
                          sep="(?<=C)", 
                          fill="right", extra="merge") |>
-                select(-FemUpDown_AfterCop) |>
                 mutate(Duration = map_dbl(UID, displayDuration)) |>
                 ungroup() |>
                 filter(Duration >= 60) |>
@@ -241,9 +239,13 @@ data_clean_wide <- data_clean_long |>
                 mutate(DisplayCode = str_replace(DisplayCode, behavior_code["AttC"], "")) |>
                 mutate(DisplayCode = str_replace(DisplayCode, behavior_code["Cop"], "")) |>
                 mutate(FemOnOff = str_replace(FemOnOff, "A", ""),
-                       FemUpDown = str_replace(FemUpDown, "A", "")) |>
+                       FemUpDown = str_replace(FemUpDown, "A", ""),
+                       FemOnOff_AfterCop = str_replace(FemOnOff_AfterCop, "A", ""),
+                       FemUpDown_AfterCop = str_replace(FemUpDown_AfterCop, "A", "")) |>
                 mutate(FemOnOff = str_replace(FemOnOff, "C", ""),
-                       FemUpDown = str_replace(FemUpDown, "C", ""))
+                       FemUpDown = str_replace(FemUpDown, "C", ""),
+                       FemOnOff_AfterCop = str_replace(FemOnOff_AfterCop, "C", ""),
+                       FemUpDown_AfterCop = str_replace(FemUpDown_AfterCop, "C", ""))
 
 # Write clean datasheet for analysis
 write_csv(data_clean_wide, CLEAN_DATA_PATH)
