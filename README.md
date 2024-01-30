@@ -12,7 +12,7 @@ Data (in the Data/ directory):
 
 Analysis scripts (in the Scripts/ directory):
 1. 0_logistics.r (set runtime variables, file paths, load packages)
-2. 1_parse_data.r (prepare dataset from indiivdual behavioral element records)
+2. 1_parse_data.r (prepare dataset from individual behavioral element records)
 3. 2_analyze.r (calculate display characteristics and write analysis report file)
 4. 3_plot.r (generate all figures and tables)
 
