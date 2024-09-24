@@ -28,10 +28,11 @@ data_raw <- read_csv(RAW_DATA_PATH,
         mutate(FemOnOff = c("X"="X", "Female On Log"="Y", "Female Off Log"="N")[FemOnOff],
                FemUpDown = c("X"="X", "FemUp"="U", "FemDown"="D")[FemUpDown]) |>
         mutate(FemOnOff = ifelse(Behavior=="Attempted Copulation", "A", FemOnOff),
-               FemUpDown = ifelse(Behavior=="Atempted Copulation", "A", FemUpDown)) |>
+               FemUpDown = ifelse(Behavior=="Attempted Copulation", "A", FemUpDown)) |>
         mutate(FemOnOff = ifelse(Behavior=="Copulation", "C", FemOnOff),
-               FemUpDown = ifelse(Behavior=="Copulation", "C", FemUpDown))
-
+               FemUpDown = ifelse(Behavior=="Copulation", "C", FemUpDown)) |>
+        mutate(FemUpDown = ifelse(FemOnOff == "N" | FemOnOff == "X", "X", FemUpDown))
+ 
 # Write T S1, with raw element frequencies
 table_s1 <- data_raw |>
          group_by(Behavior) |>
