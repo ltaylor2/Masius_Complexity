@@ -6,14 +6,6 @@ countUniqueChars <- function(s) {
 	return(length(unique(strsplit(s, "")[[1]])))
 }
  
-# Custom function to Brotli compress
-compress <- function(raw) {
-    maxWindow <- 22
-    if (length(raw) < maxWindow) { maxWindow <- length(raw) }
-    compressed <- brotli::brotli_compress(raw, quality=11, window=maxWindow)
-    return(compressed)
-}
-
 # NOTE takes a few minutes because of call to acss::local_complexity()
 # [Mutate] DisplayType into ordered factor
 # [Mutate] DisplayCode_Raw format for compression
@@ -161,7 +153,7 @@ randomDrawJaro <- function(i, comparison=c("Diff Male/Same Context vs. Same Male
              pull(Jaro_Distance)
     } else if (comparison == "Diff Male/Same Context COP vs. AUDI + SOLO") {
         draw <- distances |>
-             filter(Comparison_Type == "Diff Male/Same Context") |>
+             filter(Category_1 %in% c("AUDI", "SOLO"), Comparison_Type == "Diff Male/Same Context") |>
              slice_sample(n=n_draws, replace=FALSE) |>
              pull(Jaro_Distance)
     }
@@ -679,4 +671,3 @@ t.test(x = filter(afterCop_comparison, Section == "Before")$Prop_FemDown,
        alternative = "two.sided",
        na.action = "exclude") |>
     writeSummaryBlock("BEFORE- VS. AFTER-COP -- Female Behavior -- Proportion Female Downslope -- T Test")
-

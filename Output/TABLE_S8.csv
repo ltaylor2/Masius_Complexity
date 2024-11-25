@@ -1,0 +1,11 @@
+Code,Element,Before_FemOff,After_FemOff,Before_FemOn,After_FemOn,Before_FemUp,After_FemUp,Before_FemDown,After_FemDown
+A,Zro,NA,1,NA,NA,NA,NA,NA,NA
+B,ALAD,NA,<1,2,5,NA,NA,NA,NA
+D,Bow,3,5,96,65,NA,NA,99,99
+E,HafB,1,NA,<1,NA,NA,NA,<1,NA
+F,HdBw,NA,<1,NA,4,NA,12,NA,NA
+G,Metr,NA,2,NA,NA,NA,NA,NA,NA
+H,Swtc,9,NA,NA,NA,NA,NA,NA,NA
+I,Neck,80,91,2,26,100,88,<1,1
+J,Taf,7,NA,NA,NA,NA,NA,NA,NA
+L,Othr,NA,1,<1,NA,NA,NA,<1,NA

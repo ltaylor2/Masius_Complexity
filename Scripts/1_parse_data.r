@@ -172,14 +172,16 @@ if (nrow(missingCodes) > 0) {
 # Custom function to calculate display duration
 #   NOTE calculated from Raw data, including all cut elements
 #   NOTE cuts duration off at Cop, when relevant
-displayDuration <- function(uid, coded=FALSE) {
+displayDuration <- function(uid) {
     display <- data_raw |>
-            filter(UID == uid)
+            filter(UID == uid) |>
+            arrange(Time)
 
+    startTime <- display$Time[1]
     duration <- 0
     for (r in 1:nrow(display)) {
         duration <- display$Time[r]
-        behavior <- display$Behavior[r]
+        behavior <- display$Behavior[r] 
         if (behavior == "Copulation") { return(duration) }
     }
     return(duration)

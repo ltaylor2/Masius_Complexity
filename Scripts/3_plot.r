@@ -434,6 +434,7 @@ table_s3 <- data_analyzed |>
          pivot_wider(id_cols=ID, names_from=Category, values_from=n) |>
          mutate(ID=as.character(ID)) |>
          left_join(bands, by=c("ID"="Band_ID")) |>
+         filter(is.na(Sex) | Sex != "M") |>
          select(Band_ID=ID, Banding_Date=Date, Banding_Plumage=Age, AUDI, COP) |>
          mutate(Banding_Plumage = c("G"="Green")[Banding_Plumage]) |>
          mutate(First_Display = map_chr(Band_ID, ~as.character(min(filter(data_analyzed, FemID == . | Bird2ID == .)$ObsDate))),
@@ -825,6 +826,7 @@ plots_randComparionsJaro <- plot_randComp_jaroSameDiffMaleCOP /
                             plot_randComp_jaroDiffMaleAcrossContext
 
 ggsave(plots_randComparionsJaro, file="Plots/FIGURE_S6.png", width=6, height=5) 
+
 # TABLE S6 ---------------------------------------------
 # COP vs. after-COP displays, raw element frequencies
 # [Filter] to include only COP displays
@@ -888,7 +890,7 @@ write_csv(table_s7, file="Output/TABLE_S7.csv")
 afterCop_comparison <- readRDS("Output/afterCop_comparison.rds")
 
 # Custom function to plot brackets with T-test for 
-#   before and after cop compraisons
+#   before and after cop comparisons
 geom_tTestBracket <- function(metric, min, max) {
     # Widen by-UID comparison dataset for t.test 
     comp <- afterCop_comparison |>
