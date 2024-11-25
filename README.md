@@ -52,13 +52,15 @@ Analysis scripts (in the Scripts/ directory):
 ### Software requirements
 Scripts are written for R. See scripts and manuscript for packages and software citations.
 
-R 4.4.1
-tidyverse 2.0.0
-lubridate 1.9.3
-acss 0.2.5
-brotli 1.3.0
-stringdist 0.9.12
-patchwork 1.2.0
+| Software  | Version |
+| ---       | ---     |
+|R          | 4.4.1 |
+|tidyverse  | 2.0.0 |
+|lubridate  | 1.9.3 |
+|acss       | 0.2.5 |
+|brotli     | 1.3.0 |
+|stringdist | 0.9.12 |
+|patchwork  | 1.2.0  |
 
 ### Motion Detection Software
 The folder Masius_Movement.zip contains the full repository directory for the video motion-detection program used to flag clips featuring bird displays from the full, day-long video recordings. Motion segments are flagged from the full video file. The uesr can then manually confirm the clips, downloading them for subsequent behavioral coding with BORISsoftware. 
