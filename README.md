@@ -63,10 +63,8 @@ Scripts are written for R. See scripts and manuscript for packages and software 
 |patchwork  | 1.2.0  |
 
 ### Motion Detection Software
-The folder Masius_Movement.zip contains the full repository directory for the video motion-detection program used to flag clips featuring bird displays from the full, day-long video recordings. Motion segments are flagged from the full video file. The uesr can then manually confirm the clips, downloading them for subsequent behavioral coding with BORISsoftware. 
+The folder Masius_Movement.zip contains the full repository directory for the video motion-detection program used to flag clips featuring bird displays from the full, day-long video recordings. This ZIP folder contains its own README with execution instructions and file descriptions.
 
-The program is built to run in Python 2.7.12 using OpenCV 3.3.0-dev.
+The motion detection program program is built to run in Python 2.7.12 using OpenCV 3.3.0-dev. Motion segments are flagged from the full video file. The user can then manually confirm the clips, downloading them for subsequent behavioral coding with BORIS software. The annotated BORIS data is already provided in this repository -- the motion detection software is provided for reference, and is not needed to replicate the results in the manuscript.
 
-This ZIP folder contains its own README with execution instructions and file descriptions.
-
-These zipped files are drawn from GitHub (https://github.com/ltaylor2/Masius_Movement). They are provided here to associate versioned files with the DOI for this project.
+These zipped files are drawn from GitHub (https://github.com/ltaylor2/Masius_Movement).
