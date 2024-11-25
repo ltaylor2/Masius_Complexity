@@ -180,7 +180,7 @@ displayDuration <- function(uid) {
     startTime <- display$Time[1]
     duration <- 0
     for (r in 1:nrow(display)) {
-        duration <- display$Time[r]
+        duration <- display$Time[r] - startTime
         behavior <- display$Behavior[r] 
         if (behavior == "Copulation") { return(duration) }
     }
