@@ -1,6 +1,5 @@
 # Female audience shapes the complexity and syntax of male courtship displays in a lek-mating bird
 ## Data and code repository
-## Last updated 2024-11-25
 
 ### Study summary
 This repository contains all data and code necessary to generate results and figures for the manuscript, "Female audience shapes the complexity and syntax of male courtship displays in a lek-mating bird." This study analyzes the repetoires and syntax of courtship displays in a tropical lekking bird, the Golden-winged Manakin (*Masius chrysopterus*). By representing displays as strings of individual behavioral elements, we quantify the complexity of these displays and directly compare the syntax of displays from the same, or different, males across three display contexts: SOLO (male-only displays), AUDI (displays for a female audience), and COP (displays for a female audience that ends in copulation).
