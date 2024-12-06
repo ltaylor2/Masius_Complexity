@@ -379,53 +379,53 @@ lm(formula = DisplayLength ~ Category + as.character(ObsMonth) +
 
 Residuals:
     Min      1Q  Median      3Q     Max 
--90.517 -11.480  -3.147   8.100 264.290 
+-90.532 -11.479  -3.139   8.082 264.280 
 
 Coefficients: (1 not defined because of singularities)
                          Estimate Std. Error t value Pr(>|t|)    
-(Intercept)                83.312     10.902   7.642 1.71e-13 ***
-CategoryCOP               -37.133     10.901  -3.406 0.000728 ***
-CategorySOLO              -76.230      4.416 -17.261  < 2e-16 ***
-as.character(ObsMonth)10    4.569     14.122   0.324 0.746444    
-as.character(ObsMonth)11    6.149     13.974   0.440 0.660144    
-as.character(ObsMonth)12    3.562     12.888   0.276 0.782405    
-as.character(ObsMonth)6    18.669     38.773   0.482 0.630432    
-as.character(ObsMonth)7     4.454     18.268   0.244 0.807508    
-as.character(ObsMonth)8     1.136     15.495   0.073 0.941608    
-as.character(ObsMonth)9     7.006     16.924   0.414 0.679122    
-UniqueMale1ID113           -4.103     17.474  -0.235 0.814498    
-UniqueMale1ID296           11.249      8.506   1.322 0.186792    
-UniqueMale1ID299            6.783     12.076   0.562 0.574654    
-UniqueMale1ID8000-110      15.912     38.716   0.411 0.681311    
-UniqueMale1ID8000-150      -0.536     39.267  -0.014 0.989115    
-UniqueMale1ID8000-157       9.912     38.716   0.256 0.798078    
-UniqueMale1ID8000-213      50.464     39.267   1.285 0.199507    
-UniqueMale1ID8000-220       2.912     38.716   0.075 0.940087    
-UniqueMale1ID8000-234       2.464     39.267   0.063 0.949999    
-UniqueMale1ID8000-235      14.464     39.267   0.368 0.712813    
-UniqueMale1ID8000-259      -2.536     39.267  -0.065 0.948538    
-UniqueMale1ID8000-260       0.464     39.267   0.012 0.990579    
-UniqueMale1ID8000-263      -6.536     39.267  -0.166 0.867888    
-UniqueMale1ID8000-32      -68.318     38.697  -1.765 0.078278 .  
-UniqueMale1ID8000-343      -3.218     38.099  -0.084 0.932735    
-UniqueMale1ID8000-5010     47.553     38.118   1.248 0.212969    
-UniqueMale1ID8000-5011    -57.447     38.118  -1.507 0.132606    
-UniqueMale1ID8000-5012     61.553     38.118   1.615 0.107175    
-UniqueMale1ID8000-5013    -55.447     38.118  -1.455 0.146587    
-UniqueMale1ID8000-975      22.349     37.563   0.595 0.552218    
+(Intercept)               83.3195    10.9016   7.643  1.7e-13 ***
+CategoryCOP              -37.1445    10.9009  -3.407 0.000725 ***
+CategorySOLO             -76.2413     4.4162 -17.264  < 2e-16 ***
+as.character(ObsMonth)10   4.5845    14.1221   0.325 0.745636    
+as.character(ObsMonth)11   6.1454    13.9734   0.440 0.660332    
+as.character(ObsMonth)12   3.5591    12.8882   0.276 0.782578    
+as.character(ObsMonth)6   18.6668    38.7722   0.481 0.630470    
+as.character(ObsMonth)7    4.4594    18.2681   0.244 0.807277    
+as.character(ObsMonth)8    1.1408    15.4948   0.074 0.941348    
+as.character(ObsMonth)9    7.0076    16.9237   0.414 0.679052    
+UniqueMale1ID113          -4.0972    17.4743  -0.234 0.814746    
+UniqueMale1ID296          11.2550     8.5057   1.323 0.186540    
+UniqueMale1ID299           6.7890    12.0758   0.562 0.574309    
+UniqueMale1ID8000-110     15.9142    38.7157   0.411 0.681261    
+UniqueMale1ID8000-150     -0.5375    39.2661  -0.014 0.989085    
+UniqueMale1ID8000-157      9.9142    38.7157   0.256 0.798027    
+UniqueMale1ID8000-213     50.4625    39.2661   1.285 0.199514    
+UniqueMale1ID8000-220      2.9142    38.7157   0.075 0.940037    
+UniqueMale1ID8000-234      2.4625    39.2661   0.063 0.950028    
+UniqueMale1ID8000-235     14.4625    39.2661   0.368 0.712837    
+UniqueMale1ID8000-259     -2.5375    39.2661  -0.065 0.948507    
+UniqueMale1ID8000-260      0.4625    39.2661   0.012 0.990609    
+UniqueMale1ID8000-263     -6.5375    39.2661  -0.166 0.867856    
+UniqueMale1ID8000-32     -68.3271    38.6964  -1.766 0.078233 .  
+UniqueMale1ID8000-343     -3.2189    38.0983  -0.084 0.932710    
+UniqueMale1ID8000-5010    47.5397    38.1176   1.247 0.213086    
+UniqueMale1ID8000-5011   -57.4603    38.1176  -1.507 0.132514    
+UniqueMale1ID8000-5012    61.5397    38.1176   1.614 0.107243    
+UniqueMale1ID8000-5013   -55.4603    38.1176  -1.455 0.146488    
+UniqueMale1ID8000-975     22.3374    37.5624   0.595 0.552410    
 UniqueMale1ID940               NA         NA      NA       NA    
-UniqueMale1ID948          -10.833     28.065  -0.386 0.699719    
-UniqueMale1ID965            9.052     12.910   0.701 0.483599    
-UniqueMale1ID975            0.464     39.267   0.012 0.990579    
-UniqueMale1ID976           14.849     29.708   0.500 0.617473    
-UniqueMale1ID978          -44.197     21.526  -2.053 0.040724 *  
-UniqueMale1ID980           16.636      9.532   1.745 0.081738 .  
+UniqueMale1ID948         -10.8396    28.0643  -0.386 0.699530    
+UniqueMale1ID965           9.0499    12.9094   0.701 0.483708    
+UniqueMale1ID975           0.4625    39.2661   0.012 0.990609    
+UniqueMale1ID976          14.8418    29.7073   0.500 0.617641    
+UniqueMale1ID978         -44.2103    21.5256  -2.054 0.040663 *  
+UniqueMale1ID980          16.6284     9.5321   1.744 0.081875 .  
 ---
 Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
 
-Residual standard error: 36.33 on 386 degrees of freedom
-Multiple R-squared:  0.4655,	Adjusted R-squared:  0.4171 
-F-statistic: 9.606 on 35 and 386 DF,  p-value: < 2.2e-16
+Residual standard error: 36.32 on 386 degrees of freedom
+Multiple R-squared:  0.4656,	Adjusted R-squared:  0.4171 
+F-statistic: 9.609 on 35 and 386 DF,  p-value: < 2.2e-16
 
 
 
@@ -438,7 +438,7 @@ F-statistic: 9.606 on 35 and 386 DF,  p-value: < 2.2e-16
 # A tibble: 3 x 5
   Category `mean(UniqueDisplayElements)` `sd(UniqueDisplayElements)` `min(UniqueDisplayElements)` `max(UniqueDisplayElements)`
   <chr>                            <dbl>                       <dbl>                        <dbl>                        <dbl>
-1 AUDI                              5.52                       1.34                             1                            8
+1 AUDI                              5.53                       1.33                             1                            8
 2 COP                               3.15                       0.801                            2                            5
 3 SOLO                              5.64                       1.22                             2                           10
 
@@ -456,53 +456,53 @@ lm(formula = UniqueDisplayElements ~ Category + as.character(ObsMonth) +
 
 Residuals:
     Min      1Q  Median      3Q     Max 
--4.4787 -0.7504  0.0750  0.6341  4.3761 
+-4.4939 -0.7150  0.0740  0.6215  4.3726 
 
 Coefficients: (1 not defined because of singularities)
-                          Estimate Std. Error t value Pr(>|t|)    
-(Intercept)               4.777390   0.361642  13.210  < 2e-16 ***
-CategoryCOP              -2.345106   0.361616  -6.485 2.72e-10 ***
-CategorySOLO              0.145203   0.146501   0.991  0.32224    
-as.character(ObsMonth)10  0.692976   0.468475   1.479  0.13990    
-as.character(ObsMonth)11  1.094965   0.463543   2.362  0.01866 *  
-as.character(ObsMonth)12  1.048593   0.427544   2.453  0.01462 *  
-as.character(ObsMonth)6   1.332984   1.286199   1.036  0.30068    
-as.character(ObsMonth)7   1.297455   0.606012   2.141  0.03290 *  
-as.character(ObsMonth)8   0.833891   0.514012   1.622  0.10555    
-as.character(ObsMonth)9   0.727217   0.561415   1.295  0.19598    
-UniqueMale1ID113         -0.660024   0.579678  -1.139  0.25557    
-UniqueMale1ID296         -0.255578   0.282160  -0.906  0.36561    
-UniqueMale1ID299         -0.634121   0.400592  -1.583  0.11425    
-UniqueMale1ID8000-110    -0.649811   1.284323  -0.506  0.61318    
-UniqueMale1ID8000-150    -3.220048   1.302583  -2.472  0.01386 *  
-UniqueMale1ID8000-157    -0.649811   1.284323  -0.506  0.61318    
-UniqueMale1ID8000-213     0.779952   1.302583   0.599  0.54968    
-UniqueMale1ID8000-220    -0.649811   1.284323  -0.506  0.61318    
-UniqueMale1ID8000-234    -0.220048   1.302583  -0.169  0.86594    
-UniqueMale1ID8000-235    -0.220048   1.302583  -0.169  0.86594    
-UniqueMale1ID8000-259    -2.220048   1.302583  -1.704  0.08912 .  
-UniqueMale1ID8000-260    -2.220048   1.302583  -1.704  0.08912 .  
-UniqueMale1ID8000-263    -4.220048   1.302583  -3.240  0.00130 ** 
-UniqueMale1ID8000-32     -0.504607   1.283685  -0.393  0.69447    
-UniqueMale1ID8000-343    -3.756485   1.263841  -2.972  0.00314 ** 
-UniqueMale1ID8000-5010    1.388719   1.264483   1.098  0.27278    
-UniqueMale1ID8000-5011    0.388719   1.264483   0.307  0.75869    
-UniqueMale1ID8000-5012    1.388719   1.264483   1.098  0.27278    
-UniqueMale1ID8000-5013    0.388719   1.264483   0.307  0.75869    
-UniqueMale1ID8000-975     1.384430   1.246064   1.111  0.26724    
-UniqueMale1ID940                NA         NA      NA       NA    
-UniqueMale1ID948          0.316117   0.930982   0.340  0.73438    
-UniqueMale1ID965          0.197018   0.428246   0.460  0.64573    
-UniqueMale1ID975         -2.220048   1.302583  -1.704  0.08912 .  
-UniqueMale1ID976         -0.147447   0.985487  -0.150  0.88114    
-UniqueMale1ID978         -1.611281   0.714072  -2.256  0.02460 *  
-UniqueMale1ID980          0.008375   0.316211   0.026  0.97888    
+                           Estimate Std. Error t value Pr(>|t|)    
+(Intercept)               4.7851791  0.3611710  13.249  < 2e-16 ***
+CategoryCOP              -2.3567183  0.3611453  -6.526 2.13e-10 ***
+CategorySOLO              0.1335098  0.1463103   0.913  0.36207    
+as.character(ObsMonth)10  0.7080015  0.4678653   1.513  0.13103    
+as.character(ObsMonth)11  1.0912553  0.4629395   2.357  0.01891 *  
+as.character(ObsMonth)12  1.0456396  0.4269869   2.449  0.01477 *  
+as.character(ObsMonth)6   1.3306034  1.2845246   1.036  0.30091    
+as.character(ObsMonth)7   1.3028424  0.6052225   2.153  0.03196 *  
+as.character(ObsMonth)8   0.8389429  0.5133432   1.634  0.10302    
+as.character(ObsMonth)9   0.7287299  0.5606840   1.300  0.19447    
+UniqueMale1ID113         -0.6543593  0.5789229  -1.130  0.25905    
+UniqueMale1ID296         -0.2492924  0.2817926  -0.885  0.37689    
+UniqueMale1ID299         -0.6281020  0.4000706  -1.570  0.11724    
+UniqueMale1ID8000-110    -0.6474188  1.2826503  -0.505  0.61402    
+UniqueMale1ID8000-150    -3.2215314  1.3008871  -2.476  0.01370 *  
+UniqueMale1ID8000-157    -0.6474188  1.2826503  -0.505  0.61402    
+UniqueMale1ID8000-213     0.7784686  1.3008871   0.598  0.54991    
+UniqueMale1ID8000-220    -0.6474188  1.2826503  -0.505  0.61402    
+UniqueMale1ID8000-234    -0.2215314  1.3008871  -0.170  0.86487    
+UniqueMale1ID8000-235    -0.2215314  1.3008871  -0.170  0.86487    
+UniqueMale1ID8000-259    -2.2215314  1.3008871  -1.708  0.08850 .  
+UniqueMale1ID8000-260    -2.2215314  1.3008871  -1.708  0.08850 .  
+UniqueMale1ID8000-263    -4.2215314  1.3008871  -3.245  0.00128 ** 
+UniqueMale1ID8000-32     -0.5139091  1.2820134  -0.401  0.68874    
+UniqueMale1ID8000-343    -3.7576318  1.2621954  -2.977  0.00309 ** 
+UniqueMale1ID8000-5010    1.3758779  1.2628366   1.090  0.27661    
+UniqueMale1ID8000-5011    0.3758779  1.2628366   0.298  0.76613    
+UniqueMale1ID8000-5012    1.3758779  1.2628366   1.090  0.27661    
+UniqueMale1ID8000-5013    0.3758779  1.2628366   0.298  0.76613    
+UniqueMale1ID8000-975     1.3733096  1.2444419   1.104  0.27047    
+UniqueMale1ID940                 NA         NA      NA       NA    
+UniqueMale1ID948          0.3091231  0.9297699   0.332  0.73971    
+UniqueMale1ID965          0.1946274  0.4276888   0.455  0.64932    
+UniqueMale1ID975         -2.2215314  1.3008871  -1.708  0.08850 .  
+UniqueMale1ID976         -0.1547765  0.9842041  -0.157  0.87512    
+UniqueMale1ID978         -1.6241221  0.7131422  -2.277  0.02331 *  
+UniqueMale1ID980          0.0006774  0.3157997   0.002  0.99829    
 ---
 Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
 
-Residual standard error: 1.205 on 386 degrees of freedom
-Multiple R-squared:  0.2227,	Adjusted R-squared:  0.1522 
-F-statistic: 3.159 on 35 and 386 DF,  p-value: 2.324e-08
+Residual standard error: 1.203 on 386 degrees of freedom
+Multiple R-squared:  0.2225,	Adjusted R-squared:  0.152 
+F-statistic: 3.155 on 35 and 386 DF,  p-value: 2.411e-08
 
 
 
@@ -545,53 +545,53 @@ lm(formula = Entropy_Scaled ~ Category + as.character(ObsMonth) +
 
 Residuals:
      Min       1Q   Median       3Q      Max 
--0.67689 -0.04644  0.00909  0.05817  0.35066 
+-0.67622 -0.04659  0.00931  0.05863  0.35064 
 
 Coefficients: (1 not defined because of singularities)
                           Estimate Std. Error t value Pr(>|t|)    
-(Intercept)               0.690190   0.031119  22.179  < 2e-16 ***
-CategoryCOP              -0.443666   0.031116 -14.258  < 2e-16 ***
-CategorySOLO              0.174085   0.012606  13.810  < 2e-16 ***
-as.character(ObsMonth)10 -0.040967   0.040311  -1.016  0.31014    
-as.character(ObsMonth)11 -0.019403   0.039887  -0.486  0.62692    
-as.character(ObsMonth)12  0.007241   0.036789   0.197  0.84406    
-as.character(ObsMonth)6  -0.352387   0.110675  -3.184  0.00157 ** 
-as.character(ObsMonth)7   0.020011   0.052146   0.384  0.70138    
-as.character(ObsMonth)8  -0.024054   0.044230  -0.544  0.58686    
-as.character(ObsMonth)9  -0.039060   0.048309  -0.809  0.41927    
-UniqueMale1ID113         -0.088633   0.049880  -1.777  0.07637 .  
-UniqueMale1ID296          0.027749   0.024279   1.143  0.25379    
-UniqueMale1ID299          0.020141   0.034470   0.584  0.55935    
-UniqueMale1ID8000-110    -0.129011   0.110514  -1.167  0.24378    
-UniqueMale1ID8000-150     0.021332   0.112085   0.190  0.84916    
-UniqueMale1ID8000-157    -0.049525   0.110514  -0.448  0.65431    
-UniqueMale1ID8000-213    -0.024800   0.112085  -0.221  0.82501    
-UniqueMale1ID8000-220     0.023138   0.110514   0.209  0.83427    
-UniqueMale1ID8000-234     0.035952   0.112085   0.321  0.74857    
-UniqueMale1ID8000-235    -0.024385   0.112085  -0.218  0.82789    
-UniqueMale1ID8000-259     0.034009   0.112085   0.303  0.76173    
-UniqueMale1ID8000-260    -0.280527   0.112085  -2.503  0.01273 *  
-UniqueMale1ID8000-263    -0.162359   0.112085  -1.449  0.14828    
-UniqueMale1ID8000-32      0.092801   0.110459   0.840  0.40135    
-UniqueMale1ID8000-343     0.130729   0.108751   1.202  0.23007    
-UniqueMale1ID8000-5010   -0.179038   0.108807  -1.645  0.10069    
-UniqueMale1ID8000-5011    0.072056   0.108807   0.662  0.50822    
-UniqueMale1ID8000-5012    0.058402   0.108807   0.537  0.59175    
-UniqueMale1ID8000-5013    0.117917   0.108807   1.084  0.27916    
-UniqueMale1ID8000-975     0.033146   0.107222   0.309  0.75739    
+(Intercept)               0.689844   0.031167  22.134   <2e-16 ***
+CategoryCOP              -0.443149   0.031165 -14.219   <2e-16 ***
+CategorySOLO              0.174605   0.012626  13.829   <2e-16 ***
+as.character(ObsMonth)10 -0.041636   0.040375  -1.031   0.3031    
+as.character(ObsMonth)11 -0.019238   0.039950  -0.482   0.6304    
+as.character(ObsMonth)12  0.007373   0.036847   0.200   0.8415    
+as.character(ObsMonth)6  -0.352281   0.110849  -3.178   0.0016 ** 
+as.character(ObsMonth)7   0.019771   0.052228   0.379   0.7052    
+as.character(ObsMonth)8  -0.024279   0.044299  -0.548   0.5840    
+as.character(ObsMonth)9  -0.039128   0.048384  -0.809   0.4192    
+UniqueMale1ID113         -0.088885   0.049958  -1.779   0.0760 .  
+UniqueMale1ID296          0.027469   0.024317   1.130   0.2593    
+UniqueMale1ID299          0.019874   0.034524   0.576   0.5652    
+UniqueMale1ID8000-110    -0.129117   0.110687  -1.167   0.2441    
+UniqueMale1ID8000-150     0.021398   0.112261   0.191   0.8489    
+UniqueMale1ID8000-157    -0.049631   0.110687  -0.448   0.6541    
+UniqueMale1ID8000-213    -0.024734   0.112261  -0.220   0.8257    
+UniqueMale1ID8000-220     0.023032   0.110687   0.208   0.8353    
+UniqueMale1ID8000-234     0.036018   0.112261   0.321   0.7485    
+UniqueMale1ID8000-235    -0.024319   0.112261  -0.217   0.8286    
+UniqueMale1ID8000-259     0.034075   0.112261   0.304   0.7616    
+UniqueMale1ID8000-260    -0.280461   0.112261  -2.498   0.0129 *  
+UniqueMale1ID8000-263    -0.162293   0.112261  -1.446   0.1491    
+UniqueMale1ID8000-32      0.093214   0.110632   0.843   0.4000    
+UniqueMale1ID8000-343     0.130780   0.108922   1.201   0.2306    
+UniqueMale1ID8000-5010   -0.178466   0.108977  -1.638   0.1023    
+UniqueMale1ID8000-5011    0.072627   0.108977   0.666   0.5055    
+UniqueMale1ID8000-5012    0.058974   0.108977   0.541   0.5887    
+UniqueMale1ID8000-5013    0.118489   0.108977   1.087   0.2776    
+UniqueMale1ID8000-975     0.033640   0.107390   0.313   0.7543    
 UniqueMale1ID940                NA         NA      NA       NA    
-UniqueMale1ID948          0.053776   0.080109   0.671  0.50245    
-UniqueMale1ID965          0.046201   0.036850   1.254  0.21069    
-UniqueMale1ID975         -0.019500   0.112085  -0.174  0.86198    
-UniqueMale1ID976         -0.128854   0.084799  -1.520  0.12945    
-UniqueMale1ID978          0.033696   0.061445   0.548  0.58374    
-UniqueMale1ID980          0.027669   0.027209   1.017  0.30984    
+UniqueMale1ID948          0.054087   0.080235   0.674   0.5006    
+UniqueMale1ID965          0.046307   0.036908   1.255   0.2104    
+UniqueMale1ID975         -0.019434   0.112261  -0.173   0.8627    
+UniqueMale1ID976         -0.128528   0.084932  -1.513   0.1310    
+UniqueMale1ID978          0.034267   0.061541   0.557   0.5780    
+UniqueMale1ID980          0.028011   0.027252   1.028   0.3047    
 ---
 Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
 
-Residual standard error: 0.1037 on 386 degrees of freedom
-Multiple R-squared:  0.6205,	Adjusted R-squared:  0.5861 
-F-statistic: 18.03 on 35 and 386 DF,  p-value: < 2.2e-16
+Residual standard error: 0.1039 on 386 degrees of freedom
+Multiple R-squared:  0.6202,	Adjusted R-squared:  0.5857 
+F-statistic: 18.01 on 35 and 386 DF,  p-value: < 2.2e-16
 
 
 
@@ -616,7 +616,7 @@ F-statistic: 18.03 on 35 and 386 DF,  p-value: < 2.2e-16
 # A tibble: 3 x 5
   Category `mean(Compression_Ratio)` `sd(Compression_Ratio)` `min(Compression_Ratio)` `max(Compression_Ratio)`
   <chr>                        <dbl>                   <dbl>                    <dbl>                    <dbl>
-1 AUDI                          2.73                   1.14                     0.88                      7.45
+1 AUDI                          2.72                   1.13                     0.88                      7.45
 2 COP                           3.65                   1.01                     1.95                      4.73
 3 SOLO                          1.05                   0.313                    0.556                     2.34
 
@@ -634,53 +634,53 @@ lm(formula = Compression_Ratio ~ Category + as.character(ObsMonth) +
 
 Residuals:
     Min      1Q  Median      3Q     Max 
--1.9941 -0.2991 -0.0259  0.2698  4.5749 
+-1.9878 -0.2985 -0.0269  0.2707  4.5812 
 
 Coefficients: (1 not defined because of singularities)
                          Estimate Std. Error t value Pr(>|t|)    
-(Intercept)               2.44789    0.18730  13.069  < 2e-16 ***
-CategoryCOP               0.86621    0.18729   4.625 5.12e-06 ***
-CategorySOLO             -1.77501    0.07588 -23.394  < 2e-16 ***
-as.character(ObsMonth)10  0.32578    0.24263   1.343   0.1802    
-as.character(ObsMonth)11  0.26996    0.24008   1.124   0.2615    
-as.character(ObsMonth)12  0.11548    0.22143   0.521   0.6023    
-as.character(ObsMonth)6   1.02086    0.66615   1.532   0.1262    
-as.character(ObsMonth)7   0.16180    0.31387   0.516   0.6065    
-as.character(ObsMonth)8   0.22633    0.26622   0.850   0.3958    
-as.character(ObsMonth)9   0.17774    0.29077   0.611   0.5414    
-UniqueMale1ID113         -0.01432    0.30023  -0.048   0.9620    
-UniqueMale1ID296          0.15626    0.14614   1.069   0.2856    
-UniqueMale1ID299          0.03756    0.20747   0.181   0.8564    
-UniqueMale1ID8000-110     0.64939    0.66518   0.976   0.3295    
-UniqueMale1ID8000-150    -0.10135    0.67463  -0.150   0.8807    
-UniqueMale1ID8000-157     0.41254    0.66518   0.620   0.5355    
-UniqueMale1ID8000-213     1.04411    0.67463   1.548   0.1225    
-UniqueMale1ID8000-220     0.14939    0.66518   0.225   0.8224    
-UniqueMale1ID8000-234    -0.05690    0.67463  -0.084   0.9328    
-UniqueMale1ID8000-235     0.40342    0.67463   0.598   0.5502    
-UniqueMale1ID8000-259    -0.14237    0.67463  -0.211   0.8330    
-UniqueMale1ID8000-260    -0.08468    0.67463  -0.126   0.9002    
-UniqueMale1ID8000-263    -0.27912    0.67463  -0.414   0.6793    
-UniqueMale1ID8000-32     -1.46773    0.66485  -2.208   0.0279 *  
-UniqueMale1ID8000-343    -0.34365    0.65457  -0.525   0.5999    
-UniqueMale1ID8000-5010    1.20813    0.65490   1.845   0.0658 .  
-UniqueMale1ID8000-5011   -1.50031    0.65490  -2.291   0.0225 *  
-UniqueMale1ID8000-5012    0.64396    0.65490   0.983   0.3261    
-UniqueMale1ID8000-5013   -1.35604    0.65490  -2.071   0.0391 *  
-UniqueMale1ID8000-975     0.30904    0.64536   0.479   0.6323    
+(Intercept)               2.44315    0.18611  13.127  < 2e-16 ***
+CategoryCOP               0.87326    0.18610   4.692 3.75e-06 ***
+CategorySOLO             -1.76791    0.07539 -23.449  < 2e-16 ***
+as.character(ObsMonth)10  0.31665    0.24109   1.313   0.1898    
+as.character(ObsMonth)11  0.27222    0.23856   1.141   0.2545    
+as.character(ObsMonth)12  0.11727    0.22003   0.533   0.5944    
+as.character(ObsMonth)6   1.02231    0.66192   1.544   0.1233    
+as.character(ObsMonth)7   0.15853    0.31187   0.508   0.6115    
+as.character(ObsMonth)8   0.22326    0.26453   0.844   0.3992    
+as.character(ObsMonth)9   0.17682    0.28892   0.612   0.5409    
+UniqueMale1ID113         -0.01776    0.29832  -0.060   0.9525    
+UniqueMale1ID296          0.15244    0.14521   1.050   0.2945    
+UniqueMale1ID299          0.03391    0.20616   0.164   0.8694    
+UniqueMale1ID8000-110     0.64793    0.66096   0.980   0.3276    
+UniqueMale1ID8000-150    -0.10045    0.67035  -0.150   0.8810    
+UniqueMale1ID8000-157     0.41109    0.66096   0.622   0.5343    
+UniqueMale1ID8000-213     1.04501    0.67035   1.559   0.1198    
+UniqueMale1ID8000-220     0.14793    0.66096   0.224   0.8230    
+UniqueMale1ID8000-234    -0.05600    0.67035  -0.084   0.9335    
+UniqueMale1ID8000-235     0.40432    0.67035   0.603   0.5468    
+UniqueMale1ID8000-259    -0.14147    0.67035  -0.211   0.8330    
+UniqueMale1ID8000-260    -0.08378    0.67035  -0.125   0.9006    
+UniqueMale1ID8000-263    -0.27822    0.67035  -0.415   0.6783    
+UniqueMale1ID8000-32     -1.46208    0.66063  -2.213   0.0275 *  
+UniqueMale1ID8000-343    -0.34296    0.65042  -0.527   0.5983    
+UniqueMale1ID8000-5010    1.21594    0.65075   1.869   0.0624 .  
+UniqueMale1ID8000-5011   -1.49250    0.65075  -2.294   0.0224 *  
+UniqueMale1ID8000-5012    0.65176    0.65075   1.002   0.3172    
+UniqueMale1ID8000-5013   -1.34824    0.65075  -2.072   0.0389 *  
+UniqueMale1ID8000-975     0.31580    0.64127   0.492   0.6227    
 UniqueMale1ID940               NA         NA      NA       NA    
-UniqueMale1ID948         -0.57588    0.48217  -1.194   0.2331    
-UniqueMale1ID965          0.14063    0.22180   0.634   0.5264    
-UniqueMale1ID975         -0.08468    0.67463  -0.126   0.9002    
-UniqueMale1ID976          0.77613    0.51040   1.521   0.1292    
-UniqueMale1ID978         -0.82592    0.36983  -2.233   0.0261 *  
-UniqueMale1ID980          0.17818    0.16377   1.088   0.2773    
+UniqueMale1ID948         -0.57163    0.47912  -1.193   0.2336    
+UniqueMale1ID965          0.14209    0.22039   0.645   0.5195    
+UniqueMale1ID975         -0.08378    0.67035  -0.125   0.9006    
+UniqueMale1ID976          0.78058    0.50717   1.539   0.1246    
+UniqueMale1ID978         -0.81812    0.36749  -2.226   0.0266 *  
+UniqueMale1ID980          0.18286    0.16273   1.124   0.2618    
 ---
 Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
 
-Residual standard error: 0.6241 on 386 degrees of freedom
-Multiple R-squared:  0.6653,	Adjusted R-squared:  0.635 
-F-statistic: 21.93 on 35 and 386 DF,  p-value: < 2.2e-16
+Residual standard error: 0.6201 on 386 degrees of freedom
+Multiple R-squared:  0.6669,	Adjusted R-squared:  0.6367 
+F-statistic: 22.08 on 35 and 386 DF,  p-value: < 2.2e-16
 
 
 
@@ -708,18 +708,18 @@ lm(formula = Compression_Ratio ~ Entropy_Scaled, data = data_analyzed)
 
 Residuals:
     Min      1Q  Median      3Q     Max 
--3.6242 -0.3651 -0.1281  0.1880  5.1633 
+-3.6117 -0.3636 -0.1249  0.1909  5.1675 
 
 Coefficients:
                Estimate Std. Error t value Pr(>|t|)    
-(Intercept)      5.0242     0.1897   26.48   <2e-16 ***
-Entropy_Scaled  -4.3291     0.2306  -18.77   <2e-16 ***
+(Intercept)      5.0117     0.1884   26.60   <2e-16 ***
+Entropy_Scaled  -4.3160     0.2290  -18.84   <2e-16 ***
 ---
 Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
 
-Residual standard error: 0.7627 on 420 degrees of freedom
-Multiple R-squared:  0.4562,	Adjusted R-squared:  0.4549 
-F-statistic: 352.4 on 1 and 420 DF,  p-value: < 2.2e-16
+Residual standard error: 0.7583 on 420 degrees of freedom
+Multiple R-squared:  0.4581,	Adjusted R-squared:  0.4569 
+F-statistic: 355.1 on 1 and 420 DF,  p-value: < 2.2e-16
 
 
 
@@ -734,19 +734,19 @@ Call:
 lm(formula = Compression_Ratio ~ DisplayLength, data = data_analyzed)
 
 Residuals:
-     Min       1Q   Median       3Q      Max 
--3.03323 -0.23553 -0.11895  0.05385  2.72175 
+    Min      1Q  Median      3Q     Max 
+-3.0222 -0.2349 -0.1182  0.0548  2.7240 
 
 Coefficients:
                Estimate Std. Error t value Pr(>|t|)    
-(Intercept)   0.7617539  0.0341593   22.30   <2e-16 ***
-DisplayLength 0.0186482  0.0005426   34.37   <2e-16 ***
+(Intercept)   0.7615448  0.0337908   22.54   <2e-16 ***
+DisplayLength 0.0186173  0.0005367   34.69   <2e-16 ***
 ---
 Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
 
-Residual standard error: 0.5297 on 420 degrees of freedom
-Multiple R-squared:  0.7377,	Adjusted R-squared:  0.7371 
-F-statistic:  1181 on 1 and 420 DF,  p-value: < 2.2e-16
+Residual standard error: 0.524 on 420 degrees of freedom
+Multiple R-squared:  0.7412,	Adjusted R-squared:  0.7406 
+F-statistic:  1203 on 1 and 420 DF,  p-value: < 2.2e-16
 
 
 
@@ -832,18 +832,18 @@ lm(formula = Jaro_Distance ~ Difference_DisplayLength, data = distances)
 
 Residuals:
      Min       1Q   Median       3Q      Max 
--0.45258 -0.09918 -0.00650  0.08209  0.54094 
+-0.45256 -0.09919 -0.00649  0.08207  0.54096 
 
 Coefficients:
                           Estimate Std. Error t value Pr(>|t|)    
-(Intercept)              4.591e-01  5.624e-04   816.3   <2e-16 ***
-Difference_DisplayLength 7.665e-04  7.288e-06   105.2   <2e-16 ***
+(Intercept)              4.590e-01  5.624e-04   816.2   <2e-16 ***
+Difference_DisplayLength 7.666e-04  7.288e-06   105.2   <2e-16 ***
 ---
 Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
 
 Residual standard error: 0.1493 on 115519 degrees of freedom
-Multiple R-squared:  0.0874,	Adjusted R-squared:  0.08739 
-F-statistic: 1.106e+04 on 1 and 115519 DF,  p-value: < 2.2e-16
+Multiple R-squared:  0.08742,	Adjusted R-squared:  0.08741 
+F-statistic: 1.107e+04 on 1 and 115519 DF,  p-value: < 2.2e-16
 
 
 
@@ -860,18 +860,18 @@ lm(formula = Jaro_Distance ~ Difference_UniqueDisplayElements,
 
 Residuals:
      Min       1Q   Median       3Q      Max 
--0.47805 -0.10977  0.00021  0.09438  0.51522 
+-0.47811 -0.10981  0.00020  0.09441  0.51506 
 
 Coefficients:
                                   Estimate Std. Error t value Pr(>|t|)    
-(Intercept)                      0.4847830  0.0007180  675.20   <2e-16 ***
-Difference_UniqueDisplayElements 0.0077591  0.0003821   20.31   <2e-16 ***
+(Intercept)                      0.4849362  0.0007172  676.14   <2e-16 ***
+Difference_UniqueDisplayElements 0.0076641  0.0003824   20.04   <2e-16 ***
 ---
 Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
 
 Residual standard error: 0.156 on 115519 degrees of freedom
-Multiple R-squared:  0.003557,	Adjusted R-squared:  0.003548 
-F-statistic: 412.3 on 1 and 115519 DF,  p-value: < 2.2e-16
+Multiple R-squared:  0.003465,	Adjusted R-squared:  0.003456 
+F-statistic: 401.6 on 1 and 115519 DF,  p-value: < 2.2e-16
 
 
 
@@ -923,13 +923,13 @@ F-statistic: 412.3 on 1 and 115519 DF,  p-value: < 2.2e-16
 	Welch Two Sample t-test
 
 data:  filter(data_analyzed, Category == "AUDI")$Prop_FemOn and filter(data_analyzed, Category == "COP")$Prop_FemOn
-t = -8.71, df = 23.932, p-value = 6.947e-09
+t = -8.7092, df = 23.935, p-value = 6.953e-09
 alternative hypothesis: true difference in means is not equal to 0
 95 percent confidence interval:
- -0.4758679 -0.2935260
+ -0.4758466 -0.2935004
 sample estimates:
 mean of x mean of y 
-0.5350845 0.9197815 
+0.5351079 0.9197815 
 
 
 

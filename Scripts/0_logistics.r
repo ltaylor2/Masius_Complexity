@@ -9,7 +9,7 @@ library(patchwork)
 # SET ME
 WD <- "."
 
-RAW_DATA_PATH <- "Data/data_raw_2023-12-17.csv"
+RAW_DATA_PATH <- "Data/data_raw_2024-12-05.csv"
 CLEAN_DATA_PATH <- "Data/data_clean.csv"
 ANALYZED_DATA_PATH <- "Data/data_analyzed.csv"
 AFTERCOP_DATA_PATH <- "Data/data_afterCop.csv"
