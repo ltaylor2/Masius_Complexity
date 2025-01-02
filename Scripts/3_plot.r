@@ -2,12 +2,13 @@
 # Custom plotting theme
 customTheme <- theme_bw() +
             theme(panel.grid=element_blank(),
-                  axis.text.x=element_text(size=8),
-                  axis.text.y=element_text(size=8),
-                  axis.title.x=element_text(size=12),
-                  axis.title.y=element_text(size=12),
-                  plot.title=element_text(size=12))
-            
+                  axis.text.x=element_text(size=8, family="Arial"),
+                  axis.text.y=element_text(size=8, family="Arial"),
+                  axis.title.x=element_text(size=12, family="Arial"),
+                  axis.title.y=element_text(size=12, family="Arial"),
+                  plot.title=element_text(size=12, family="Arial"))
+
+
 # 4-Class qualitative colors, colorblind safe
 # from colorbrewer2.org
 categoryColors <- c("SOLO" = "#a6cee3",
@@ -227,7 +228,7 @@ plot_duration <- ggplot(data_analyzed, aes(x=Category, y=Duration, fill=Category
               geom_lmBracket("AUDI", "COP", "Duration", 0, 720) +
               geom_jitter(width=0.15, height=0,
                           colour="black", size=0.5) +
-              geom_boxplot(alpha=0.5, outlier.shape=NA) +
+              geom_boxplot(alpha=0.75, outlier.shape=NA) +
               scale_x_discrete(limits=c("SOLO", "AUDI", "COP")) +
               scale_y_continuous(breaks=seq(0, 720, by=120), limits=c(0, 740)) +
               scale_fill_manual(values=categoryColors) +
@@ -242,7 +243,7 @@ plot_displayLength <- ggplot(data_analyzed, aes(x=Category, y=DisplayLength, fil
                    geom_lmBracket("AUDI", "COP", "DisplayLength", 0, 400) +
                    geom_jitter(width=0.15, height=0,
                                colour="black", size=0.5) +
-                   geom_boxplot(alpha=0.5, outlier.shape=NA) +
+                   geom_boxplot(alpha=0.75, outlier.shape=NA) +
                    scale_x_discrete(limits=c("SOLO", "AUDI", "COP")) +   
                    scale_y_continuous(breaks=seq(0, 400, by=100), limits=c(0, 420)) +                
                    scale_fill_manual(values=categoryColors) +
@@ -257,7 +258,7 @@ plot_uniqueElements <- ggplot(data_analyzed, aes(x=Category, y=UniqueDisplayElem
                     geom_lmBracket("AUDI", "COP", "UniqueDisplayElements", 0, 10) +
                     geom_jitter(width=0.15, height=0,
                                 colour="black", size=0.5) +
-                    geom_boxplot(alpha=0.5, outlier.shape=NA) +
+                    geom_boxplot(alpha=0.75, outlier.shape=NA) +
                     scale_x_discrete(limits=c("SOLO", "AUDI", "COP")) +     
                     scale_y_continuous(breaks=seq(0, 10, by=2), limits=c(0, 11)) +              
                     scale_fill_manual(values=categoryColors) +
@@ -272,7 +273,7 @@ plot_entropy <- ggplot(data_analyzed, aes(x=Category, y=Entropy_Scaled, fill=Cat
              geom_lmBracket("AUDI", "COP", "Entropy_Scaled", 0, 1.1) +
              geom_jitter(width=0.15, height=0,
                          colour="black", size=0.5) +
-             geom_boxplot(alpha=0.5, outlier.shape=NA) +
+             geom_boxplot(alpha=0.75, outlier.shape=NA) +
              scale_x_discrete(limits=c("SOLO", "AUDI", "COP")) +
              scale_y_continuous(breaks=seq(0, 1, by=0.2), limits=c(0,1.2)) +
              scale_fill_manual(values=categoryColors) +
@@ -287,7 +288,7 @@ plot_compression <- ggplot(data_analyzed, aes(x=Category, y=Compression_Ratio, f
                  geom_lmBracket("AUDI", "COP", "Compression_Ratio", 0, 7) +
                  geom_jitter(width=0.15, height=0,
                              colour="black", size=0.5) +
-                 geom_boxplot(alpha=0.5, outlier.shape=NA) +
+                 geom_boxplot(alpha=0.75, outlier.shape=NA) +
                  scale_x_discrete(limits=c("SOLO", "AUDI", "COP")) +   
                  scale_y_continuous(breaks=seq(0, 8, by=2), limits=c(0, 8)) +
                  scale_fill_manual(values=categoryColors) +
@@ -304,6 +305,7 @@ plots_characteristics <- plot_duration + plot_displayLength + plot_uniqueElement
                       theme(plot.tag.position=c(0.89, 0.93)) 
 
 ggsave(plots_characteristics, file="Plots/FIGURE_1.png", width=8, height=2) 
+ggsave(plots_characteristics, file="Plots/FIGURE_1.pdf", width=8, height=2, device = cairo_pdf)
 
 # FIGURE 2 ------------------------------------------------------
 # Jaro distance comparison
@@ -326,10 +328,10 @@ plot_jaro <- ggplot(distances,
                         fill=Category_1)) +
           geom_jitter(width=0.15, height=0,
                       colour="black", size=0.15, alpha=0.15) +
-          geom_boxplot(alpha=0.5, outlier.shape=NA) +
+          geom_boxplot(alpha=0.75, outlier.shape=NA) +
           geom_text(data=comparisonSampleSizes,
                     aes(label=n, x=Comparison_Type, 
-                        y=-Inf), vjust=-0.5, size=2.5) +
+                        y=-Inf), vjust=-0.5, size=2.5, family="Arial") +
           xlab("Comparison display") +
           ylab("Jaro distance") +
           facet_wrap(facet=vars(Focal_Label)) +
@@ -344,6 +346,7 @@ plot_jaro <- ggplot(distances,
                 strip.background = element_rect(colour=NA, fill=NA))
       
 ggsave(plot_jaro, file="Plots/FIGURE_2.png", width=8, height=3)
+ggsave(plot_jaro, file="Plots/FIGURE_2.pdf", width=8, height=3, device = cairo_pdf)
 
 # TABLE S2 ---------------------------------------------
 # Male performance patterns 
